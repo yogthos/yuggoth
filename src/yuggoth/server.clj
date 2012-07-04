@@ -1,6 +1,7 @@
 (ns yuggoth.server
   (:use hiccup.middleware)
-  (:require [noir.server :as server]))
+  (:require [noir.server :as server]
+            [yuggoth.views archives auth blog common upload]))
 
 (server/load-views-ns 'yuggoth.views)
 (def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
