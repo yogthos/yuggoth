@@ -31,6 +31,7 @@
 (pre-route "/make-post")
 (pre-route "/delete-post")
 (pre-route "/delete-file")
+(pre-route "/profile")
 
 (defn -main [& m]
   (let [mode (keyword (or (first m) :dev))
