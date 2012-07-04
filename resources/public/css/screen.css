@@ -135,10 +135,6 @@ body {
     float: left;                
 }
 
-#preview {
-	display:none;
-}
-
 .entry-content p {
  	line-height: 135%;
 }
