@@ -41,8 +41,8 @@
 (defn check-admin-fields [admin]
   (cond
     (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
-    (nil? (:handle admin)) "administrator name is required"
-    (nil? (:title admin)) "blog title is required"
+    (empty? (:handle admin)) "administrator name is required"
+    (empty? (:title admin)) "blog title is required"
     :else nil))
 
 (defpage [:post "/create-admin"] admin
