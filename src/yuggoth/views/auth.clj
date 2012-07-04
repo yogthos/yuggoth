@@ -38,9 +38,16 @@
                              "email" "email" email)
              [:span.submit {:tabindex 5} "create"])))
 
+(defn check-admin-fields [admin]
+  (connd
+    (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
+    (nil? (:handle admin)) "administrator name is required"
+    (nil? (:title admin)) "blog title is required"
+    :else nil))
+
 (defpage [:post "/create-admin"] admin
-  (if (not= (:pass admin) (:pass1 admin)) 
-    (render "/create-admin" {:error "entered passwords do not match"})
+  (if-let [error (check-admin-fields admin)] 
+    (render "/create-admin" {:error error})
     (do
       (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))
       (resp/redirect "/login"))))
