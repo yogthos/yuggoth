@@ -11,6 +11,8 @@ lein deps
 lein run
 ```
 
+see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts
+
 ## License
 
 Copyright (C) 2011 Yogthos
