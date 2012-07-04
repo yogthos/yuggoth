@@ -39,7 +39,7 @@
              [:span.submit {:tabindex 5} "create"])))
 
 (defn check-admin-fields [admin]
-  (connd
+  (cond
     (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
     (nil? (:handle admin)) "administrator name is required"
     (nil? (:title admin)) "blog title is required"
