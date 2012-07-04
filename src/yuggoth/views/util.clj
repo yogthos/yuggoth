@@ -12,5 +12,7 @@
     [:table]
     (vec (partition 3 fields))))
 
-(defn format-time [time]
-  (.format (new java.text.SimpleDateFormat "dd MM yyyy") time))
+(defn format-time
+  ([time] (format-time time "dd MM yyyy"))
+  ([time fmt]
+    (.format (new java.text.SimpleDateFormat fmt) time)))
