@@ -26,12 +26,12 @@
   (session/clear!)
   (resp/redirect "/"))
 
-(defpage "/create-admin" {:keys [handle pass pass1 email error]}
+(defpage "/create-admin" {:keys [title handle pass pass1 email error]}
   (common/layout
     "Create blog"
     (when error [:h2.error error])
     (form-to [:post "/create-admin"]
-             (text-field {:placeholder "Blog title"} "title")             
+             (text-field {:placeholder "Blog title"} "title" title)             
              (util/make-form "handle" "name" handle 
                              "pass"  "password" pass
                              "pass1" "confirm password" pass1
