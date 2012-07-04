@@ -1,13 +1,22 @@
 (ns yuggoth.server
-  (:use hiccup.middleware)
+  ;(:use hiccup.middleware)
   (:require [noir.server :as server]
             [noir.core :as core]
             [noir.response :as resp]
             [noir.session :as session]
             [yuggoth.views archives auth blog common upload]))
 
+
+;;hack
+(defn fix-base-url [handler]
+  (fn [request]
+    (with-redefs [noir.options/resolve-url (fn [url] (str (:context request) url))]
+      (handler request))))
+        
 (server/load-views-ns 'yuggoth.views)
-(def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+;(def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+(def handler (fix-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+
 
 (defmacro pre-route [route]
   `(core/pre-route ~route {} (when-not (session/get :admin) (resp/redirect "/"))))
