@@ -1,0 +1,313 @@
+body {
+    background-color: #fff;
+    color: #555;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    margin: 0;
+    text-align: center;
+}
+.container {   
+    height: auto;
+    margin: 50px;        
+}
+
+.header {
+    min-height: 50px;    
+    width: 800px;
+    color: #555;
+    font-family: 'Oswald', Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 30px;    
+    text-rendering: optimizeLegibility;
+}
+
+.menu {
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 10px;
+    text-align: right;
+    min-width: 1000px;
+}
+.menu img {
+    margin-bottom: 10px;
+}
+.menu a {
+    color: #666;
+    font-family: 'Oswald', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    margin: 0 10px;
+    padding: 10px 0;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+.menu a:hover {
+    color: #000;
+}
+.menu ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+.menu li {
+    float: right;
+    position: relative;
+}
+
+.menu ul li:hover > ul {
+    display: block;
+}
+.menu ul li.selected > a {
+    color: #111;
+}
+.menu ul:after {
+    clear: both;
+    content: ' ';
+    display: block;
+}
+
+.menu-items {
+	width: 990px;
+}
+
+.contents {    
+    height: auto;    
+    padding-bottom: 10px;
+    min-width: 1000px;    
+}
+
+.sidebar {
+    font-family: 'Oswald', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    float: left;
+    margin-left: 20px;            
+    text-transform: uppercase;    
+    line-height: 10px;
+    text-align: left;    
+}
+
+.sidebar a {
+    text-decoration: none;
+}
+
+.sidebar .date {    
+    color: #555;    
+    font-size: 10px;   
+    margin-bottom: 20px; 
+}
+
+.post {
+	float: left;
+    border-right: 1px solid #ccc;
+    width: 750px;
+    margin-bottom: 10px;
+}
+
+.entry-title {
+    color: #555;
+    font-family: 'Oswald', Helvetica, Arial, sans-serif;    
+    line-height: 10px;
+    margin-left:70px;    
+    text-align: left;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+.entry-title div {
+	float: right;
+	margin-top: -5px;
+}
+.entry-title span {
+	color: #555;	
+	cursor:pointer; 
+	margin-top: 5px;
+	margin-right: 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 11px;
+}
+
+.entry-content {
+    height: auto;
+    clear: both;
+    margin: 5px 0px 15px 80px;    
+    text-align: left;    
+    font-size: 16px;
+    float: left;                
+}
+
+.entry-content p {
+ 	line-height: 135%;
+}
+
+.entry-content h1 {
+font-size: 17px;
+}
+
+.entry-content h2 {
+font-size: 15px;
+}
+
+.entry-content h3 {
+font-size: 13px;
+}
+
+.entry-content a img {
+    border: 10px solid #ddd;
+}
+.entry-content a:hover img {
+    border: 10px solid #000;
+}
+
+
+input#title {
+	width: 650px;
+	min-height: 30px;
+	color: #555;
+	font-size: 25px;
+	border: none;
+	margin-bottom: 25px;
+}
+
+textarea#content {
+	width: 650px;
+	height: 800px;
+	color: #555;
+	font-size: 16px;
+	border: 2px solid #cccccc;	
+	font-family: Tahoma, sans-serif;		
+}
+
+.submit {
+	margin-left: 10px;
+	cursor:pointer;
+}
+
+input {	
+	width: 100px;
+	min-height: 20px;
+	color: #555;
+	font-size: 15px;
+	border: none;
+	margin-left: 10px;
+	margin-bottom: 10px;
+}
+
+blockquote {
+    background: #eee;
+    border-left: 10px solid #36bcab;
+    color: #000;
+    font-family: Georgia, Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    padding: 10px;
+    text-align: justify;
+}
+a {
+    color: #555;
+    text-decoration: underline;
+}
+a:hover {
+    color: #36bcab;
+}
+
+b, strong {
+    color: #000;
+}
+
+.entry-content tr th {
+    color: #888;
+    font-weight: normal;
+    line-height: 20px;
+    padding: 9px 24px;
+}
+
+.entry-content tr.alternate td {
+    background: #f5f5f5;
+}
+
+li.archive {	
+	margin-bottom: 10px;
+}
+
+/* General */
+ol ol {
+    list-style: upper-alpha;
+}
+ol ol ol {
+    list-style: lower-roman;
+}
+ul ul, ol ol, ul ol, ol ul {
+    margin-bottom: 0;
+}
+
+
+/* =Post Formats
+-------------------------------------------------------------- */
+
+.entry-content p:first-child {
+    margin-top: 0;
+}
+/* Link */
+.format-link .entry-title:after {
+    content: "\2192";
+    font-size: 26px;
+    padding-left: 10px;
+    text-decoration: none;
+}
+/* Quote */
+.format-quote blockquote {
+    font-size: 16px;
+}
+.format-quote blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =Images
+-------------------------------------------------------------- */
+a img {
+    border: none;
+}
+p img {
+    margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
+}
+/*
+Resize images to fit the main content area.
+- Applies only to images uploaded via WordPress by targeting size-* classes.
+- Other images will be left alone. Use "size-auto" class to apply to other images.
+*/
+img.size-auto,
+img.size-full,
+img.size-large,
+img.size-medium,
+.entry-content .attachment img,
+.widget-area img {
+    max-width: 100%; /* When images are too wide for containing element, force them to fit. */
+    height: auto; /* Override height to match resized width for correct aspect ratio. */
+}
+img.alignleft {
+    margin-right: 1em;
+}
+img.alignright {
+    margin-left: 1em;
+}
+
+/* =Footer
+----------------------------------------------- */
+.footer {    
+    clear: both;
+    color: #555;
+    font-size: 11px;
+    font-weight: bold;
+    height: auto;    
+    margin-top: 25px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    min-width: 1000px;
+}
+.footer p {
+	width: 800px;
+}
+.footer a {
+    color: #36bcab;
+    text-decoration: none;
+}
