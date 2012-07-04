@@ -7,10 +7,15 @@
             [yuggoth.views archives auth blog common upload]))
 
 
+
 ;;hack
 (defn fix-base-url [handler]
   (fn [request]
-    (with-redefs [noir.options/resolve-url (fn [url] (str (:context request) url))]
+    (with-redefs [noir.options/resolve-url 
+                  (fn [url] 
+                    ;prepend context to the relative URLs
+                    (if (.contains url "://") 
+                      url (str (:context request) url)))]
       (handler request))))
         
 (server/load-views-ns 'yuggoth.views)
