@@ -5,5 +5,7 @@
                            [markdown-clj "0.8"]
                            [org.clojure/java.jdbc "0.2.3"]
                            [hsqldb/hsqldb "1.8.0.10"]]
+	    :dev-dependencies [[lein-ring "0.7.1"]]
+            :ring {:handler yuggoth.server/handler}
             :main yuggoth.server)
 
