@@ -3,3 +3,6 @@ pom.xml
 /lib/
 /classes/
 .lein-deps-sum
+yog.db.*
+*.war
+.gitignore

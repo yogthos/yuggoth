@@ -1,13 +1,24 @@
 (ns yuggoth.server
   (:use hiccup.middleware)
   (:require [noir.server :as server]
+            [noir.core :as core]
+            [noir.response :as resp]
+            [noir.session :as session]
             [yuggoth.views archives auth blog common upload]))
 
 (server/load-views-ns 'yuggoth.views)
 (def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
 
+(defmacro pre-route [route]
+  `(core/pre-route ~route {} (when-not (session/get :admin) (resp/redirect "/"))))
+
+(pre-route "/upload")
+(pre-route "/update-post")
+(pre-route "/make-post")
+(pre-route "/delete-post")
+(pre-route "/delete-file")
+
 (defn -main [& m]
   (let [mode (keyword (or (first m) :dev))
         port (Integer. (get (System/getenv) "PORT" "8080"))]
-    (server/start port {:mode mode
-                        :ns 'yuggoth})))
+    (server/start port {:mode mode :ns 'yuggoth})))

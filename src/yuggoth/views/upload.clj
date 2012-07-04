@@ -31,14 +31,13 @@
                     [:span.submit "upload"])))
 
 (defpage [:post "/upload"] params   
-  (when (session/get :admin)
-    (try
-      (db/store-file (:file params))    
-      (resp/redirect "/upload")
-      (catch Exception ex
-        (do
-          (.printStackTrace ex)
-          (render "/fail" {:error (.getMessage ex)}))))))
+  (try
+    (db/store-file (:file params))    
+    (render "/upload")
+    (catch Exception ex
+      (do
+        (.printStackTrace ex)
+        (render "/fail" {:error (.getMessage ex)})))))
 
 
 (defpage "/fail" params
@@ -47,7 +46,7 @@
     [:p "An error has occured while uploading the file: " (:error params)]))
 
 (defpage [:post "/delete-file"] params  
-  (when (session/get :admin) (db/delete-file (:name params)))
+  (db/delete-file (:name params))
   (resp/redirect "/upload"))
 
 (defpage "/files/:name" {:keys [name]}
