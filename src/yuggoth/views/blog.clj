@@ -36,29 +36,33 @@
   (let [{:keys [title content]} (db/get-post post-id)] 
     (common/layout
       "Edit post"
-      (form-to [:post "/save-post"]
+      (form-to [:post "/make-post"]
                (text-field "title" title)
                [:br]
                (text-area "content" content)
                [:br]
                (hidden-field "post-id" post-id)
-               [:span.submit "post"]))))
+               [:span.submit {:tabindex 1} "post"]))))
 
-(defpage "/save-post" []
+(defpage "/make-post" {:keys [content error]}
   (common/layout
     "New post"
-    (form-to [:post "/save-post"]
+    (when error [:div.error error])
+    (form-to [:post "/make-post"]
              (text-field {:placeholder "Title"} "title")
              [:br]
-             (text-area "content")
+             (text-area "content" content)
              [:br]  
-             [:span.submit "post"])))
+             [:span.submit {:tabindex 1} "post"])))
 
-(defpage [:post "/save-post"] {:keys [post-id title content]}  
-  (if post-id
-    (db/update-post post-id title content)
-    (db/store-post title content (:handle (session/get :admin))))
-  (resp/redirect "/"))
+(defpage [:post "/make-post"] post  
+  (if (not-empty (:title post)) 
+    (let [{:keys [post-id title content]} post]
+      (if post-id
+        (db/update-post post-id title content)
+        (db/store-post title content (:handle (session/get :admin))))
+      (resp/redirect "/"))
+    (render "/make-post" (assoc post :error "post title is required"))))
 
 (defpage [:post "/delete-post"] {:keys [post-id]}
   (db/delete-post post-id)

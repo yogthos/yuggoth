@@ -5,8 +5,8 @@ $(document).ready(function(){
   	$(".submit").keypress(onEnter);
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
     $(".delete").click(function(e){
-    jConfirm('Can you confirm this?', 
-             'Confirmation Dialog', 
+    jConfirm('', 
+             'Delete post', 
              function(r) {
                // If they confirmed, manually trigger a form submission
                if (r) $(".delete").parents("FORM").submit();
