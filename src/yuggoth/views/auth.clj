@@ -47,7 +47,8 @@
 
 (defpage [:post "/create-admin"] admin
   (if-let [error (check-admin-fields admin)] 
-    (render "/create-admin" {:error error})
+    (render "/create-admin" (assoc admin :error error))
     (do
       (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))
       (resp/redirect "/login"))))
+

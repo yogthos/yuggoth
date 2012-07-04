@@ -228,7 +228,6 @@ li.archive {
 	margin-bottom: 10px;
 }
 
-/* General */
 ol ol {
     list-style: upper-alpha;
 }
@@ -239,21 +238,17 @@ ul ul, ol ol, ul ol, ol ul {
     margin-bottom: 0;
 }
 
-
-/* =Post Formats
--------------------------------------------------------------- */
-
 .entry-content p:first-child {
     margin-top: 0;
 }
-/* Link */
+
 .format-link .entry-title:after {
     content: "\2192";
     font-size: 26px;
     padding-left: 10px;
     text-decoration: none;
 }
-/* Quote */
+
 .format-quote blockquote {
     font-size: 16px;
 }
@@ -262,27 +257,21 @@ ul ul, ol ol, ul ol, ol ul {
 }
 
 
-/* =Images
--------------------------------------------------------------- */
 a img {
     border: none;
 }
 p img {
-    margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
+    margin-bottom: 0.5em;
 }
-/*
-Resize images to fit the main content area.
-- Applies only to images uploaded via WordPress by targeting size-* classes.
-- Other images will be left alone. Use "size-auto" class to apply to other images.
-*/
+
 img.size-auto,
 img.size-full,
 img.size-large,
 img.size-medium,
 .entry-content .attachment img,
 .widget-area img {
-    max-width: 100%; /* When images are too wide for containing element, force them to fit. */
-    height: auto; /* Override height to match resized width for correct aspect ratio. */
+    max-width: 100%; 
+    height: auto; 
 }
 img.alignleft {
     margin-right: 1em;
@@ -291,8 +280,6 @@ img.alignright {
     margin-left: 1em;
 }
 
-/* =Footer
------------------------------------------------ */
 .footer {    
     clear: both;
     color: #555;
