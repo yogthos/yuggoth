@@ -11,6 +11,11 @@ lein deps
 lein run
 ```
 
+to make a deployable war
+```bash
+lein ring uberwar
+```
+
 see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
 
 
