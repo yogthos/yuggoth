@@ -23,7 +23,10 @@
         (fn [groups [date items]]
           (conj groups (make-list date items)))
         [:div]
-        (group-by #(util/format-time (:time %) "MM yyyy") archives)))))
+        (->> archives
+          (sort-by :time)
+          reverse
+          (group-by #(util/format-time (:time %) "MM yyyy")))))))
 
 
 
