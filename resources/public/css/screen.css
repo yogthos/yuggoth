@@ -135,6 +135,10 @@ body {
     float: left;                
 }
 
+#preview {
+	display:none;
+}
+
 .entry-content p {
  	line-height: 135%;
 }
@@ -180,6 +184,18 @@ textarea#content {
 .submit {
 	margin-left: 10px;
 	cursor:pointer;
+}
+
+.delete {
+	cursor:pointer;
+}
+
+.file {
+	float: right;
+}
+
+.file-link {
+	margin-bottom: 15px;
 }
 
 input {	

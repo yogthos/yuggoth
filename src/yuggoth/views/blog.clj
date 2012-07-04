@@ -33,16 +33,17 @@
   (entry (db/get-post postid)))
 
 (defpage [:post "/update-post"] {:keys [post-id]}  
-  (let [{:keys [title content]} (db/get-post post-id)] 
-    (common/layout
-      "Edit post"
-      (form-to [:post "/make-post"]
-               (text-field "title" title)
-               [:br]
-               (text-area "content" content)
-               [:br]
-               (hidden-field "post-id" post-id)
-               [:span.submit {:tabindex 1} "post"]))))
+  (when (session/get :admin)
+    (let [{:keys [title content]} (db/get-post post-id)] 
+      (common/layout
+        "Edit post"
+        (form-to [:post "/make-post"]
+                 (text-field "title" title)
+                 [:br]
+                 (text-area "content" content)
+                 [:br]
+                 (hidden-field "post-id" post-id)
+                 [:span.submit {:tabindex 1} "post"])))))
 
 (defpage "/make-post" {:keys [content error]}
   (common/layout
@@ -56,14 +57,15 @@
              [:span.submit {:tabindex 1} "post"])))
 
 (defpage [:post "/make-post"] post  
-  (if (not-empty (:title post)) 
-    (let [{:keys [post-id title content]} post]
-      (if post-id
-        (db/update-post post-id title content)
-        (db/store-post title content (:handle (session/get :admin))))
-      (resp/redirect "/"))
-    (render "/make-post" (assoc post :error "post title is required"))))
+  (when (session/get :admin)
+    (if (not-empty (:title post)) 
+      (let [{:keys [post-id title content]} post]
+        (if post-id
+          (db/update-post post-id title content)
+          (db/store-post title content (:handle (session/get :admin))))
+        (resp/redirect "/"))
+      (render "/make-post" (assoc post :error "post title is required")))))
 
 (defpage [:post "/delete-post"] {:keys [post-id]}
-  (db/delete-post post-id)
+  (when (session/get :admin) (db/delete-post post-id))
   (resp/redirect "/"))
