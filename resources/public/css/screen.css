@@ -262,9 +262,6 @@ ol ol {
 ol ol ol {
     list-style: lower-roman;
 }
-ul ul, ol ol, ul ol, ol ul {
-    margin-bottom: 0;
-}
 
 .entry-content p:first-child {
     margin-top: 0;
@@ -284,7 +281,6 @@ ul ul, ol ol, ul ol, ol ul {
     margin-bottom: 0;
 }
 
-
 a img {
     border: none;
 }
@@ -292,21 +288,11 @@ p img {
     margin-bottom: 0.5em;
 }
 
-img.size-auto,
-img.size-full,
-img.size-large,
-img.size-medium,
-.entry-content .attachment img,
-.widget-area img {
-    max-width: 100%; 
+img {
+    max-width: 650px; 
     height: auto; 
 }
-img.alignleft {
-    margin-right: 1em;
-}
-img.alignright {
-    margin-left: 1em;
-}
+
 
 .footer {    
     clear: both;
