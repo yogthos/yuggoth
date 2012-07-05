@@ -168,10 +168,9 @@ form input {
 }
 
 form span {
-	border: 2px solid #AAA;
-	padding: 3px;
-	cursor:pointer;
-	background-color: #EEE;
+	border: 1px solid #AAA;
+	padding: 1px;
+	cursor:pointer;	
 }
 
 input#title {
