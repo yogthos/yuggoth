@@ -4,7 +4,8 @@
             [noir.core :as core]
             [noir.response :as resp]
             [noir.session :as session]
-            [yuggoth.views archives auth blog common upload]))
+            [yuggoth.views archives auth blog common upload])
+  (:gen-class))
 
 
 
