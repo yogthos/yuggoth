@@ -13,7 +13,7 @@
       [:h2 handle " - " email]
       (markdown/md-to-html-string (str about)))))
 
-(defpage "/profile" {:keys [title handle style about pass pass1 pass2 info]}  
+(defpage "/profile" {:keys [title handle style email about pass pass1 pass2 info]}  
   (common/layout
     "Profile"
     [:h2.info info]
@@ -21,6 +21,7 @@
       (form-to [:post "/profile"]
                (util/make-form "handle" "name" (or handle (:handle admin))
                                "style" "custom css url" (or style (:style admin))
+                               "email" "email" (or email (:email admin))
                                "pass"  "password" nil
                                "pass1" "new password" nil
                                "pass2" "confirm password" nil)
@@ -32,7 +33,7 @@
 
 (defn get-updated-fields [profile] 
   (let [pass (:pass1 profile)
-        updated-profile (select-keys profile [:title :handle :style :about])] 
+        updated-profile (select-keys profile [:title :handle :email :style :about])] 
     (if (not-empty pass) (assoc updated-profile :pass (when  (crypt/encrypt pass))) updated-profile)))
 
 (defn update-profile [admin profile]  
@@ -44,9 +45,9 @@
       "profile updated successfully"
       (catch Exception ex (.getMessage ex)))))
 
-(defpage [:post "/profile"] profile  
-  (let [{:keys [pass pass1 pass2]} profile
-        admin (session/get :admin)] 
+(defpage [:post "/profile"] profile    
+  (let [{:keys [pass pass1 pass2]} profile        
+        admin (session/get :admin)]     
     (render "/profile"
             (assoc profile 
                    :info
