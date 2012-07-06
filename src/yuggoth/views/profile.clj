@@ -33,10 +33,8 @@
 
 (defn get-updated-fields [profile] 
   (let [pass (:pass1 profile)] 
-    (into {} 
-          (filter second 
-                  (assoc (select-keys profile [:title :handle :style :about])
-                         :pass (when (not-empty pass) (crypt/encrypt pass)))))))
+    (assoc (select-keys profile [:title :handle :style :about])
+           :pass (when (not-empty pass) (crypt/encrypt pass)))))
 
 (defn update-profile [admin profile]  
   (let [updated-admin (merge admin (get-updated-fields profile))]    
