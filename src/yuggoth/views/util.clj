@@ -1,5 +1,6 @@
 (ns yuggoth.views.util
-  (:use hiccup.form))
+  (:use hiccup.form)
+  (:require [yuggoth.models.db :as db]))
 
 (defn make-form [& fields]
   (reduce-kv 
@@ -16,3 +17,6 @@
   ([time] (format-time time "dd MM yyyy"))
   ([time fmt]
     (.format (new java.text.SimpleDateFormat fmt) time)))
+
+(defn get-css []
+  (or (not-empty (:style (db/get-admin))) "/css/screen.css"))

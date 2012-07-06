@@ -2,7 +2,9 @@ pom.xml
 *jar
 /lib/
 /classes/
-.lein-deps-sum
 yog.db.*
 *.war
+.*
+target/*
+count_lines.sh
 .gitignore
