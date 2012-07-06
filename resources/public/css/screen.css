@@ -72,7 +72,7 @@ body {
 
 .contents {    
     height: auto;    
-    padding-bottom: 10px;
+    padding-bottom: 10px;    
     min-width: 1000px;    
 }
 
@@ -84,6 +84,7 @@ body {
     text-transform: uppercase;    
     line-height: 10px;
     text-align: left;    
+    max-width: 250px;
 }
 
 .sidebar a {
@@ -99,7 +100,7 @@ body {
 .post {
 	float: left;
     border-right: 1px solid #ccc;
-    width: 750px;
+    width: 720px;
     margin-bottom: 10px;
 }
 
@@ -132,7 +133,8 @@ body {
     margin: 5px 0px 15px 80px;    
     text-align: left;    
     font-size: 16px;
-    float: left;                
+    float: left;     
+    max-width: 600px;           
 }
 
 #preview {
