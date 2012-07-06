@@ -39,8 +39,7 @@
                          :pass (when (not-empty pass) (crypt/encrypt pass)))))))
 
 (defn update-profile [admin profile]  
-  (let [updated-admin (merge admin (get-updated-fields profile))]
-    (println profile "\n" updated-admin)
+  (let [updated-admin (merge admin (get-updated-fields profile))]    
     (try
       (session/remove! :admin)
       (session/put! :admin updated-admin)
