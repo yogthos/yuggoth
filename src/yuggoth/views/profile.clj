@@ -29,8 +29,7 @@
                [:h2 "About"]                             
                (text-area {:id "content" :tabindex 6} "about" (or about (:about admin)))
                [:br]
-               [:span.submit {:tabindex 7} "update profile"]))
-    #_ (form-to [:post "/reset-blog"] [:span.delete "reset blog"])))
+               [:span.submit {:tabindex 7} "update profile"]))))
 
 (defpage [:post "/reset-blog"] []
   (db/reset-blog)
