@@ -194,10 +194,12 @@ textarea#content {
 .submit {
 	margin-left: 10px;
 	cursor:pointer;
+	border: none;
 }
 
 .delete {
 	cursor:pointer;
+	border: none;
 }
 
 .file {
