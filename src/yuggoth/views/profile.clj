@@ -32,9 +32,9 @@
                [:span.submit {:tabindex 7} "update profile"]))))
 
 (defn get-updated-fields [profile] 
-  (let [pass (:pass1 profile)] 
-    (assoc (select-keys profile [:title :handle :style :about])
-           :pass (when (not-empty pass) (crypt/encrypt pass)))))
+  (let [pass (:pass1 profile)
+        updated-profile (select-keys profile [:title :handle :style :about])] 
+    (if (not-empty pass) (assoc updated-profile :pass (when  (crypt/encrypt pass))) updated-profile)))
 
 (defn update-profile [admin profile]  
   (let [updated-admin (merge admin (get-updated-fields profile))]    
