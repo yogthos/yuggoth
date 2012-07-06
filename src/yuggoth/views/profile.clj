@@ -16,11 +16,10 @@
 (defpage "/profile" {:keys [title handle style about pass pass1 pass2 info]}  
   (common/layout
     "Profile"
-    (let [admin (session/get :admin)]
-      (when info [:h2.info info])
+    [:h2.info info]
+    (let [admin (session/get :admin)]      
       (form-to [:post "/profile"]
-               (util/make-form ;"title" "blog title" nil 
-                               "handle" "name" (or handle (:handle admin))
+               (util/make-form "handle" "name" (or handle (:handle admin))
                                "style" "custom css url" (or style (:style admin))
                                "pass"  "password" nil
                                "pass1" "new password" nil
