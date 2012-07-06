@@ -16,7 +16,7 @@
 (defpage "/profile" {:keys [title handle style email about pass pass1 pass2 info]}  
   (common/layout
     "Profile"
-    [:h2.info info]
+    [:h2.info info]    
     (let [admin (session/get :admin)]      
       (form-to [:post "/profile"]
                (util/make-form "handle" "name" (or handle (:handle admin))
@@ -29,7 +29,12 @@
                [:h2 "About"]                             
                (text-area {:id "content" :tabindex 6} "about" (or about (:about admin)))
                [:br]
-               [:span.submit {:tabindex 7} "update profile"]))))
+               [:span.submit {:tabindex 7} "update profile"]))
+    #_ (form-to [:post "/reset-blog"] [:span.delete "reset blog"])))
+
+(defpage [:post "/reset-blog"] []
+  (db/reset-blog)
+  (render "/"))
 
 (defn get-updated-fields [profile] 
   (let [pass (:pass1 profile)

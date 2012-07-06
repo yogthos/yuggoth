@@ -19,8 +19,8 @@
                      [:span "  "] 
                      [:div.file
                       (form-to [:post "/delete-file"]
-                               (hidden-field "name" name)
-                               (submit-button "delete"))]]))]
+                               (hidden-field "name" name)                               
+                               (submit-button {:class "delete"} "delete"))]]))]
            [:br]
            
            (form-to {:enctype "multipart/form-data"}
