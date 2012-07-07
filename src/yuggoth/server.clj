@@ -4,7 +4,7 @@
             [noir.core :as core]
             [noir.response :as resp]
             [noir.session :as session]
-            [yuggoth.views archives auth blog common profile upload]))
+            [yuggoth.views archives auth blog comments common profile upload]))
 
 ;;hack
 (defn fix-base-url [handler]
