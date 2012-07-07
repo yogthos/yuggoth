@@ -29,7 +29,7 @@ see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax
 
 ## License
 
-Copyright (C) 2011 Yogthos
+Copyright (C) 2012 Yogthos
 
 Distributed under the Eclipse Public License, the same as Clojure.
 
