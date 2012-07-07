@@ -5,7 +5,8 @@
             [noir.session :as session]
             [noir.response :as resp]
             [yuggoth.views.common :as common]
-            [yuggoth.models.db :as db]))
+            [yuggoth.models.db :as db]
+            [yuggoth.views.comments :as comments]))
 
 (defn admin-forms [post-id]
   (when (session/get :admin) 
@@ -21,7 +22,9 @@
   (apply common/layout
          (if id
            [{:title title :elements (admin-forms id)}
-            (markdown/md-to-html-string content)]
+            (markdown/md-to-html-string content)            
+            (comments/get-comments id)            
+            (comments/make-comment id)]
            ["Welcome to your new blog" "Nothing here yet..."])))
 
 (defpage "/" []     

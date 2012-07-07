@@ -137,6 +137,38 @@ body {
     max-width: 600px;           
 }
 
+.comments h2 {
+font-size: 12px;
+}
+
+.comment h4 {
+	font-size: 12px;
+}
+
+#comment-content h1 {
+font-size: 15px;
+}
+
+#comment-content h2 {
+font-size: 14px;
+}
+
+#comment-content h3 {
+font-size: 13px;
+}
+
+#comment-content h4 {
+font-size: 12px;
+}
+
+div#comment-content {
+	min-width: 500px;
+		
+	color: #555;
+	font-size: 12px;		
+	font-family: Tahoma, sans-serif;	
+}
+
 #preview {
 	display:none;
 }
@@ -146,15 +178,19 @@ body {
 }
 
 .entry-content h1 {
-font-size: 17px;
+font-size: 25px;
 }
 
 .entry-content h2 {
-font-size: 15px;
+font-size: 22px;
 }
 
 .entry-content h3 {
-font-size: 13px;
+font-size: 19px;
+}
+
+.entry-content h4 {
+font-size: 15px;
 }
 
 .entry-content a img {
