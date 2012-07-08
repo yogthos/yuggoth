@@ -1,8 +1,12 @@
 (ns yuggoth.views.comments
-  (:use hiccup.form noir.core)
+  (:use hiccup.element hiccup.form noir.core)
   (:require [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
-            [noir.response :as resp]))
+            [noir.session :as session]
+            [noir.response :as resp])
+  (:import net.sf.jlue.util.Captcha
+           javax.imageio.ImageIO
+           [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
 (defn get-comments [blog-id]
   (vec
@@ -17,11 +21,31 @@
 (defn make-comment [blog-id]  
   (form-to [:post "/comment"]
            (hidden-field "blog-id" blog-id)           
-           (text-field {:placeholder "author" :tabindex 2} "author") [:br]
-           (text-area {:id "comment" :placeholder "comment" :tabindex 3} "content") [:br]
-           (submit-button {:tabindex 4} "submit")
-           #_ [:span.submit {:tabindex 4} "submit"]))
+           (text-field {:tabindex 2} "author" "anonymous") [:br]
+           [:div 
+            [:div#captcha-image(image "/captcha")] 
+            [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]] [:br]
+           (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
+           (submit-button {:tabindex 5} "submit")))
 
-(defpage [:post "/comment"] {:keys [blog-id content author]}
-  (when (and author content) (db/add-comment blog-id content author))  
+(defpage [:post "/comment"] {:keys [blog-id captcha content author]}
+  (when (and (= captcha (:text (session/get :captcha))) author content) 
+    (db/add-comment blog-id content author))  
   (resp/redirect (str "/blog/" blog-id)))
+
+(defn gen-captcha-text []
+  (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))
+
+(defn gen-captcha []
+  (let [text (gen-captcha-text)
+        captcha (doto (new Captcha))]
+    (session/put! :captcha {:text text :image (.gen captcha text 250 40)})))
+
+(defpage "/captcha" []
+  (gen-captcha)
+  (resp/content-type 
+    "image/jpeg" 
+    (let [out (new ByteArrayOutputStream)]
+      (ImageIO/write (:image (session/get :captcha)) "jpeg" out)
+      (new ByteArrayInputStream (.toByteArray out)))))
+

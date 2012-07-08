@@ -169,6 +169,13 @@ div#comment-content {
 	font-family: Tahoma, sans-serif;	
 }
 
+#captcha-image {	
+	margin-left: 15px;
+}
+#captcha-text {	
+		
+}
+
 #preview {
 	display:none;
 }
