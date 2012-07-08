@@ -17,13 +17,6 @@ to make a deployable war run
 lein ring uberwar
 ```
 
-for the really lazy, just grab the standalone jar and run it :)
-
-```bash
-wget https://github.com/yogthos/yuggoth/raw/master/yuggoth-0.1.0-SNAPSHOT-standalone.jar
-java -jar yuggoth-0.1.0-SNAPSHOT-standalone.jar
-```
-
 valid options
 
 * -mode dev or prod
