@@ -19,7 +19,9 @@
         
 (server/load-views-ns 'yuggoth.views)
 ;(def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
-(def handler (fix-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+(def handler (fix-base-url (server/gen-handler {:mode :prod, 
+                                                :ns 'yuggoth 
+                                                :session-cookie-attrs {:max-age 1800000}})))
 
 
 (defmacro pre-route [route]
@@ -37,7 +39,9 @@
         (for [[name val] (partition 2 args)]
           (condp = name
             "-port" [:port (Integer/parseInt val)]
-            "-mode" [:mode (keyword val)]            
+            "-mode" [:mode (if (some #{"dev" "prod"} [val])                             
+                             (keyword val)
+                             (throw (new Exception (str "unkown mode" val))))]            
              (throw (new Exception (str "invalid option " name val " see -help for valid options")))))))
 
 (defn -main [& args]  
@@ -46,6 +50,7 @@
     (let [m (parse-args args)
           mode (get m :mode :dev)         
           port (get m :port (new Integer 8080))]
-      (server/start port {:mode mode :ns 'yuggoth}))))
+      (println "starting in mode" mode " on port " port)
+      (server/start port {:mode mode :ns 'yuggoth :session-cookie-attrs {:max-age 1800000}}))))
 
 

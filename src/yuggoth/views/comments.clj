@@ -8,15 +8,18 @@
            javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
+(defn append-comment [comments {:keys [author content time]}]
+  (conj
+    comments
+    [:div.comment
+     [:h4 (util/format-time time) " - " author]
+     [:div#comment-content (markdown/md-to-html-string content)]]))
+
 (defn get-comments [blog-id]
-  (vec
-    (concat
-      [:div.comments [:h2 "comments"] [:hr]] 
-      (for [{:keys [author content time]} (db/get-comments blog-id)]
-        [:div.comment
-         [:h4 (util/format-time time) " - " author]
-         [:div#comment-content (markdown/md-to-html-string content)]])
-      [[:hr]])))
+  (let [header [:div.comments [:h2 "comments"] [:hr]]]
+    (if-let [comments (db/get-comments blog-id)]
+      (conj (reduce append-comment header comments) [:hr])
+      header)))
 
 (defn make-comment [blog-id]  
   (form-to [:post "/comment"]
