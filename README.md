@@ -24,6 +24,12 @@ wget https://github.com/yogthos/yuggoth/raw/master/yuggoth-0.1.0-SNAPSHOT.jar
 java -jar yuggoth-0.1.0-SNAPSHOT-standalone.jar
 ```
 
+valid options
+
+* -mode dev or prod
+* -port integer
+
+
 see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
 
 
