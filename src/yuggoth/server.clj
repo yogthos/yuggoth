@@ -4,7 +4,8 @@
             [noir.core :as core]
             [noir.response :as resp]
             [noir.session :as session]
-            [yuggoth.views archives auth blog comments common profile upload]))
+            [yuggoth.views archives auth blog comments common profile upload])
+  (:gen-class))
 
 ;;hack
 (defn fix-base-url [handler]
@@ -31,7 +32,18 @@
 (pre-route "/delete-file")
 (pre-route "/profile")
 
-(defn -main [& m]
-  (let [mode (keyword (or (first m) :dev))
-        port (Integer. (get (System/getenv) "PORT" "8080"))]
-    (server/start port {:mode mode :ns 'yuggoth})))
+(defn parse-args [args]
+  (into {} 
+        (for [[name val] (partition 2 args)]
+          (condp = name
+            "-port" [:port (Integer/parseInt val)]
+            "-mode" [:mode (keyword val)]            
+             (throw (new Exception (str "invalid option " name val " see -help for valid options")))))))
+
+(defn -main [& args]  
+  (if (= "-help" (first args))
+    (println "valid options:\n-port integer\n-mode dev/prod\n-help this message")
+    (let [m (parse-args args)
+          mode (get m :mode :dev)         
+          port (get m :port (new Integer 8080))]
+      (server/start port {:mode mode :ns 'yuggoth}))))
