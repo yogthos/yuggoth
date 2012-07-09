@@ -27,7 +27,7 @@
             (comments/make-comment id)]
            ["Welcome to your new blog" "Nothing here yet..."])))
 
-(defpage "/" []     
+(defpage "/" []    
   (if (db/get-admin)
     (entry (db/get-last-post))
     (resp/redirect "/create-admin")))
