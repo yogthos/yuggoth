@@ -1,5 +1,5 @@
 (ns yuggoth.views.profile
-  (:use hiccup.form hiccup.element noir.core)
+  (:use hiccup.form hiccup.element noir.core clojure.pprint)
   (:require [yuggoth.views.common :as common]
             [yuggoth.views.util :as util]
             [noir.util.crypt :as crypt]
@@ -66,5 +66,5 @@
   (resp/content-type 
     "text/plain" 
     (let [buf (new java.io.StringWriter)] 
-      (clojure.pprint/pprint (db/export) buf)
+      (pprint (db/export) buf)
       (.toString buf))))
