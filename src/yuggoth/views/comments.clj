@@ -21,18 +21,25 @@
       (conj (reduce append-comment header comments) [:hr])
       header)))
 
-(defn make-comment [blog-id]  
+(defn make-comment [blog-id]    
   (form-to [:post "/comment"]
            (hidden-field "blog-id" blog-id)           
-           (text-field {:tabindex 2} "author" "anonymous") [:br]
-           [:div 
-            [:div#captcha-image(image "/captcha")] 
-            [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]] [:br]
+           (if-let [admin (session/get :admin)]
+             (hidden-field "author" (:handle admin))
+             [:div
+              (text-field {:tabindex 2} "author" "anonymous")
+              [:br]
+              [:div#captcha-image(image "/captcha")]
+              [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]]) 
+           
+           [:br]
            (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
            (submit-button {:tabindex 5} "submit")))
 
 (defpage [:post "/comment"] {:keys [blog-id captcha content author]}
-  (when (and (= captcha (:text (session/get :captcha))) author content) 
+  (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
+             (not-empty author) 
+             (not-empty content)) 
     (db/add-comment blog-id content author))  
   (resp/redirect (str "/blog/" blog-id)))
 
