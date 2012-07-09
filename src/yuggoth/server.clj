@@ -33,6 +33,7 @@
 (pre-route "/delete-post")
 (pre-route "/delete-file")
 (pre-route "/profile")
+(pre-route "/export")
 
 (defn parse-args [args]
   (into {} 
@@ -52,5 +53,3 @@
           port (get m :port (new Integer 8080))]
       (println "starting in mode" mode " on port " port)
       (server/start port {:mode mode :ns 'yuggoth :session-cookie-attrs {:max-age 1800000}}))))
-
-

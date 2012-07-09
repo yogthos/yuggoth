@@ -1,10 +1,11 @@
 (ns yuggoth.views.profile
-  (:use hiccup.form noir.core)
+  (:use hiccup.form hiccup.element noir.core)
   (:require [yuggoth.views.common :as common]
             [yuggoth.views.util :as util]
             [noir.util.crypt :as crypt]
             [noir.session :as session]
-            [yuggoth.models.db :as db]))
+            [yuggoth.models.db :as db]
+            [noir.response :as resp]))
 
 (defpage "/about" []
   (let [{:keys [about style handle email]} (db/get-admin)]   
@@ -16,8 +17,9 @@
 (defpage "/profile" {:keys [title handle style email about pass pass1 pass2 info]}  
   (common/layout
     "Profile"
-    [:h2.info info]    
-    (let [admin (session/get :admin)]      
+    [:h2.info info]
+    (link-to "/export" "export blog")
+    (let [admin (session/get :admin)]            
       (form-to [:post "/profile"]
                (util/make-form "handle" "name" (or handle (:handle admin))
                                "style" "custom css url" (or style (:style admin))
@@ -58,3 +60,11 @@
                    (cond (not (crypt/compare pass (:pass admin))) "wrong password"
                          (not= pass1 pass2) "passwords do not match"
                          :else (update-profile admin profile))))))
+
+(defpage "/export" []
+  (println (db/export))
+  (resp/content-type 
+    "text/plain" 
+    (let [buf (new java.io.StringWriter)] 
+      (clojure.pprint/pprint (db/export) buf)
+      (.toString buf))))
