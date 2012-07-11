@@ -209,7 +209,7 @@ font-size: 15px;
 }
 
 .entry-content a img {
-    border: 10px solid #ddd;
+    border: 10px solid #ddd;    
 }
 .entry-content a:hover img {
     border: 10px solid #000;
@@ -343,7 +343,8 @@ p img {
 }
 
 img {
-    max-width: 650px; 
+    max-width: 615px;
+    padding: 10px; 
     height: auto; 
 }
 
