@@ -1,6 +1,13 @@
-# blog
+# Yuggoth
 
 My barebones blog. 
+
+# Features
+
+* markdown content editing
+* file uploads and management
+* custom styles
+* content export
 
 ## Usage
 
