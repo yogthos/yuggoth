@@ -18,6 +18,9 @@ lein deps
 lein run
 ```
 
+to enable SSL uncomment secure-login-redirect in service.clj and ensure change the port to the one you're using, default is 443
+
+
 to make a deployable war run
 
 ```bash
