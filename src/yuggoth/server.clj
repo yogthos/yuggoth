@@ -16,12 +16,35 @@
                     (if (.contains url "://") 
                       url (str (:context request) url)))]
       (handler request))))
-        
+
+;;
+(defn secure-login-redirect [handler]
+  (fn [request]
+    (let [{:keys [scheme uri server-name server-port]} request]            
+      (if (and (= scheme :http) (.contains uri "login"))      
+        (ring.util.response/redirect (str "https://" server-name ":" port  uri))
+        (handler request)))))
+
+
 (server/load-views-ns 'yuggoth.views)
 ;(def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
-(def handler (fix-base-url (server/gen-handler {:mode :prod, 
-                                                :ns 'yuggoth 
-                                                :session-cookie-attrs {:max-age 1800000}})))
+;(def handler (ssl-redirects (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+(def handler
+  (-> (server/gen-handler 
+        {:mode :prod, 
+         :ns 'yuggoth 
+         :session-cookie-attrs {:max-age 1800000}})
+   
+    ;;enable this to redirect login to HTTPS 
+    ;;make sure that the container has an HTTPS listener setup and that HTTP listener forwards SSL requests to it
+    
+    ;;on Glassfish: Configurations->Network Config->Network Listeners->http-listener-1->HTTP 
+    ;;set redirect port to that of http-listener-2
+    
+    ;;on Tomcat check server.xml to make sure that HTTP listener has redirectPort set correctly (default should be correct)
+    
+    ;secure-login-redirect 
+    fix-base-url))
 
 
 (defmacro pre-route [route]
