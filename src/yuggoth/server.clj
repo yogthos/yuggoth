@@ -22,7 +22,7 @@
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]            
       (if (and (= scheme :http) (.contains uri "login"))      
-        (ring.util.response/redirect (str "https://" server-name ":" port  uri))
+        (ring.util.response/redirect (str "https://" server-name ":" server-port  uri))
         (handler request)))))
 
 
@@ -41,8 +41,7 @@
     ;;on Glassfish: Configurations->Network Config->Network Listeners->http-listener-1->HTTP 
     ;;set redirect port to that of http-listener-2
     
-    ;;on Tomcat check server.xml to make sure that HTTP listener has redirectPort set correctly (default should be correct)
-    
+    ;;on Tomcat check server.xml to make sure that HTTP listener has redirectPort set correctly (default should be correct)    
     ;secure-login-redirect 
     fix-base-url))
 
