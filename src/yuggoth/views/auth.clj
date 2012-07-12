@@ -11,8 +11,8 @@
   (common/layout
     "Login"
     (form-to [:post "/login"]           
-           (text-field {:placeholder "User" :tabindex 1} :handle)
-           (password-field {:placeholder "Password" :tabindex 2} :pass)
+           (text-field {:placeholder "User" :tabindex 1} "handle")
+           (password-field {:placeholder "Password" :tabindex 2} "pass")
            [:span.submit {:tabindex 3} "login"])))
 
 (defpage [:post "/login"] {:keys [handle pass]}  

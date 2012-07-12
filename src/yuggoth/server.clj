@@ -22,7 +22,7 @@
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]            
       (if (and (= scheme :http) (.contains uri "login"))      
-        (ring.util.response/redirect (str "https://" server-name ":443"   uri))
+        (ring.util.response/redirect (str "https://" server-name ":8443" uri))
         (handler request)))))
 
 
@@ -43,7 +43,7 @@
     fix-base-url))
 
 
-(defmacro pre-route [route]
+#_ (defmacro pre-route [route]
   `(core/pre-route ~route {} (when-not (session/get :admin) (resp/redirect "/"))))
 
 ;;does not work when a context is present
