@@ -22,7 +22,7 @@
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]            
       (if (and (= scheme :http) (.contains uri "login"))      
-        (ring.util.response/redirect (str "https://" server-name ":8443" uri))
+        (ring.util.response/redirect (str "https://" server-name ":443" uri))
         (handler request)))))
 
 
