@@ -1,6 +1,8 @@
 (ns yuggoth.views.util
   (:use hiccup.form)
-  (:require [yuggoth.models.db :as db]))
+  (:require [noir.response :as resp]
+            [noir.session :as session]
+            [yuggoth.models.db :as db]))
 
 (defn make-form [& fields]
   (reduce-kv 
@@ -20,3 +22,8 @@
 
 (defn get-css []
   (or (not-empty (:style (db/get-admin))) "/css/screen.css"))
+
+(defmacro private-page [& content]
+  `(if (session/get :admin)
+     (do ~@content)
+     (resp/redirect "/")))

@@ -27,13 +27,14 @@
 (defmacro pre-route [route]
   `(core/pre-route ~route {} (when-not (session/get :admin) (resp/redirect "/"))))
 
-(pre-route "/upload")
-(pre-route "/update-post")
-(pre-route "/make-post")
-(pre-route "/delete-post")
-(pre-route "/delete-file")
-(pre-route "/profile")
-(pre-route "/export")
+;;does not work when a context is present
+;(pre-route "/upload")
+;(pre-route "/update-post")
+;(pre-route "/make-post")
+;(pre-route "/delete-post")
+;(pre-route "/delete-file")
+;(pre-route "/profile")
+;(pre-route "/export")
 
 (defn parse-args [args]
   (into {} 
