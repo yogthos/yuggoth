@@ -20,6 +20,10 @@
       "Profile"
       [:h2.info info]
       (link-to "/export" "export blog")
+      #_ (form-to [:post "/import"]
+               (text-area "blog")
+               [:br]
+               [:span.submit "import blog"])
       (let [admin (session/get :admin)]            
         (form-to [:post "/profile"]
                  (util/make-form "handle" "name" (or handle (:handle admin))
@@ -66,3 +70,7 @@
       (let [buf (new java.io.StringWriter)] 
         (pprint (db/export) buf)
         (.toString buf)))))
+
+(defpage [:post "/import"] {:keys [blog]}
+  (db/import-posts blog)
+  (resp/redirect "/profile"))

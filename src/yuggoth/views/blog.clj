@@ -67,7 +67,7 @@
         (if post-id
           (db/update-post post-id title content)
           (db/store-post title content (:handle (session/get :admin))))
-        (resp/redirect (str "/blog/" post-id)))
+        (resp/redirect (if post-id (str "/blog/" post-id) "/")))
       (render "/make-post" (assoc post :error "post title is required")))))
 
 (defpage [:post "/delete-post"] {:keys [post-id]}
