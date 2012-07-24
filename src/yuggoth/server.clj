@@ -3,7 +3,7 @@
   (:require [noir.server :as server]
             [noir.core :as core]
             [noir.response :as resp]
-            [noir.session :as session]
+            [noir.session :as session]            
             [yuggoth.views archives auth blog comments common profile upload])
   (:gen-class))
 

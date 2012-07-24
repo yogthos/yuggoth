@@ -11,6 +11,8 @@ My barebones blog.
 
 ## Usage
 
+First, setup postgreSQL db and update db in yuggoth.models.db to point to it, the blog will automatically create the necessary tables for you. 
+
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
 
 ```bash
