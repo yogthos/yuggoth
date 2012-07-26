@@ -1,7 +1,8 @@
-$(document).ready(function(){
-    
+$(document).ready(function(){    
+    if ($("#post-preview").length != 0) renderPreview();
     $($("#selected").val()).toggleClass("selected");
-  	  	
+  	 
+  	$("#content").keypress(renderPreview);  	
   	$(".submit").keypress(onEnter);
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
     $(".delete").click(function(e){
@@ -17,6 +18,11 @@ $(document).ready(function(){
  	
 });
 
+function renderPreview() {
+	var md = $("#content").val();
+	$("#post-preview").html(markdown.mdToHtml(md));   	
+}
+	
 function onEnter(e)
 {
 	var keynum;

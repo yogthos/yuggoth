@@ -87,6 +87,16 @@ body {
     max-width: 250px;
 }
 
+.sidebar-preview {
+	font-family: 'Oswald', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    float: left;
+    margin-left: 20px;                
+    line-height: 10px;
+    text-align: left;    
+    max-width: 250px;
+}
+
 .sidebar a {
     text-decoration: none;
 }
