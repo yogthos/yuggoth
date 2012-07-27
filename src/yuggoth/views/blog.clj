@@ -53,10 +53,11 @@
     (common/layout
       "New post"
       (when error [:div.error error])
+      [:div#output]
       (form-to [:post "/make-post"]
                (text-field {:placeholder "Title"} "title")
                [:br]
-               (text-area "content" content)
+               (text-area {:onkeypress "render()"} "content" content)
                [:br]  
                [:span.submit {:tabindex 1} "post"]))))
 
