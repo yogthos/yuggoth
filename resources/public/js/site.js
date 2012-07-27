@@ -2,7 +2,7 @@ $(document).ready(function(){
     if ($("#post-preview").length != 0) renderPreview();
     $($("#selected").val()).toggleClass("selected");
   	 
-  	$("#content").keypress(renderPreview);  	
+  	$(".render-preview").click(renderPreview);  	
   	$(".submit").keypress(onEnter);
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
     $(".delete").click(function(e){

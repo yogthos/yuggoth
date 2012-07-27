@@ -188,6 +188,10 @@ div#comment-content {
 	display:none;
 }
 
+.render-preview {
+	cursor:pointer;
+}
+
 .entry-content p {
  	line-height: 135%;
 }
@@ -237,7 +241,7 @@ form span {
 }
 
 input#title {
-	width: 650px;
+	width: 620px;
 	min-height: 30px;
 	color: #555;
 	font-size: 25px;
