@@ -27,13 +27,13 @@
             (comments/make-comment id)]
            ["Welcome to your new blog" "Nothing here yet..."])))
 
-(defpage "/" []    
+(defpage "/" []
   (if (db/get-admin)
-    (entry (db/get-last-post))
+    (util/cache :home (entry (db/get-last-post)))
     (resp/redirect "/create-admin")))
 
-(defpage "/blog/:postid" {:keys [postid]}    
-  (entry (db/get-post postid)))
+(defpage "/blog/:postid" {:keys [postid]}
+  (util/cache (keyword (str "post-" postid)) (entry (db/get-post postid))))
 
 (defpage [:post "/update-post"] {:keys [post-id]}  
   (util/private-page

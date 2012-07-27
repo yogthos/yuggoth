@@ -16,17 +16,19 @@
 	                     (str (util/format-time time) " - " title))]))])
 	
 	(defpage "/archives" []
-	  (let [archives (db/get-posts)]    
-	    (common/layout 
-	      "Archives"
-	      (reduce
-	        (fn [groups [date items]]
-	          (conj groups (make-list date items)))
-	        [:div]
-	        (->> archives
-	          (sort-by :time)
-	          reverse
-	          (group-by #(util/format-time (:time %) "MM yyyy")))))))
+	  (util/cache
+     :archives
+     (let [archives (db/get-posts)]    
+       (common/layout 
+         "Archives"
+         (reduce
+           (fn [groups [date items]]
+             (conj groups (make-list date items)))
+           [:div]
+           (->> archives
+             (sort-by :time)
+             reverse
+             (group-by #(util/format-time (:time %) "MM yyyy"))))))))
 	
 	
 	
