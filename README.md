@@ -1,6 +1,6 @@
 # Yuggoth
 
-My barebones blog. 
+My barebones blog which can be seen in action [here](http://yogthos.net). 
 
 # Features
 
