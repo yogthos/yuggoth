@@ -4,7 +4,7 @@
             [noir.session :as session]
             [yuggoth.models.db :as db]))
 
-(def cache (agent {}))
+(def cached (agent {}))
 
 (defn make-form [& fields]
   (reduce-kv 
@@ -31,11 +31,13 @@
      (resp/redirect "/")))
 
 (defmacro cache [id content]
-  `(let [cached# (get @cache ~id)
-         last-updated# (:time cached#)
-         cur-time# (.getTime (new java.util.Date))
-         cached-content# (:content cached# )]
-     (if (or (nil? last-updated#)
-             (> (- cur-time# last-updated#) 10000))
-       (send cache assoc ~id {:time cur-time# :content ~content}))
-     (or cached-content# ~content)))
+  (if (session/get :admin)
+    content
+    `(let [cached# (get @cached ~id)
+           last-updated# (:time cached#)
+           cur-time# (.getTime (new java.util.Date))
+           cached-content# (:content cached# )]
+       (if (or (nil? last-updated#)
+               (> (- cur-time# last-updated#) 10000))
+         (send cached assoc ~id {:time cur-time# :content ~content}))
+       (or cached-content# ~content))))
