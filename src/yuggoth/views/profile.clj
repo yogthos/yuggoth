@@ -10,9 +10,9 @@
 (defpage "/about" []
   (let [{:keys [about style handle email]} (db/get-admin)]   
     (common/layout
-      "About"
-      [:h2 handle " - " email]
-      (markdown/md-to-html-string (str about)))))
+      (str "About " handle)            
+      (markdown/md-to-html-string (str about))
+      [:p [:b email]])))
 
 (defpage "/profile" {:keys [title handle style email about pass pass1 pass2 info]}    
   (util/private-page
