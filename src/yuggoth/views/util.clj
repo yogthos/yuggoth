@@ -18,7 +18,7 @@
     (vec (partition 3 fields))))
 
 (defn format-time
-  ([time] (format-time time "dd MM yyyy"))
+  ([time] (format-time time "dd MMM, yyyy"))
   ([time fmt]
     (.format (new java.text.SimpleDateFormat fmt) time)))
 
@@ -36,6 +36,6 @@
     (let [last-updated# (:time (get @cached ~id))
           cur-time# (.getTime (new java.util.Date))]
       (if (or (nil? last-updated#)
-              (> (- cur-time# last-updated#) 10000))
+              (> (- cur-time# last-updated#) 300000))
         (swap! cached assoc ~id {:time cur-time# :content ~content}))
       (:content (get @cached ~id))))) 

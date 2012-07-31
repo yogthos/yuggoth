@@ -13,7 +13,7 @@
 	           [:li.archive 
 	            (link-to {:class "archive"} 
 	                     (str "/blog/" id) 
-	                     (str (util/format-time time) " - " title))]))])
+	                     (str (util/format-time time "dd") " - " title))]))])
 	
 	(defpage "/archives" []
 	  (util/cache
@@ -28,7 +28,7 @@
            (->> archives
              (sort-by :time)
              reverse
-             (group-by #(util/format-time (:time %) "MM yyyy"))))))))
+             (group-by #(util/format-time (:time %) "yyyy MMMM"))))))))
 	
 	
 	

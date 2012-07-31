@@ -18,10 +18,15 @@
                     (hidden-field "post-id" post-id)
                     [:span.submit "edit"])]]))
 
+#_ (defn post-nav [id]
+  (link-to (str "/blog/" (dec id)) "previous")
+  (link-to (str "/blog/" (inc id)) "next"))
+
 (defn entry [{:keys [id time title content author]}]
   (apply common/layout
          (if id
            [{:title title :elements (admin-forms id)}
+            [:p#post-time (util/format-time time)]
             (markdown/md-to-html-string content)            
             (comments/get-comments id)            
             (comments/make-comment id)]
