@@ -14,29 +14,28 @@
       (markdown/md-to-html-string (str about))
       [:p [:b email]])))
 
-(defpage "/profile" {:keys [title handle style email about pass pass1 pass2 info]}    
-  (util/private-page
-    (common/layout
-      "Profile"
-      [:h2.info info]
-      (link-to "/export" "export blog")
-      #_ (form-to [:post "/import"]
-               (text-area "blog")
+(util/private-page "/profile" {:keys [title handle style email about pass pass1 pass2 info]}
+  (common/layout
+    "Profile"
+    [:h2.info info]
+    (link-to "/export" "export blog")
+    #_ (form-to [:post "/import"]
+                (text-area "blog")
+                [:br]
+                [:span.submit "import blog"])
+    (let [admin (session/get :admin)]            
+      (form-to [:post "/profile"]
+               (util/make-form "handle" "name" (or handle (:handle admin))
+                               "style" "custom css url" (or style (:style admin))
+                               "email" "email" (or email (:email admin))
+                               "pass"  "password" nil
+                               "pass1" "new password" nil
+                               "pass2" "confirm password" nil)
+               
+               [:h2 "About"]                             
+               (text-area {:id "content" :tabindex 6} "about" (or about (:about admin)))
                [:br]
-               [:span.submit "import blog"])
-      (let [admin (session/get :admin)]            
-        (form-to [:post "/profile"]
-                 (util/make-form "handle" "name" (or handle (:handle admin))
-                                 "style" "custom css url" (or style (:style admin))
-                                 "email" "email" (or email (:email admin))
-                                 "pass"  "password" nil
-                                 "pass1" "new password" nil
-                                 "pass2" "confirm password" nil)
-                 
-                 [:h2 "About"]                             
-                 (text-area {:id "content" :tabindex 6} "about" (or about (:about admin)))
-                 [:br]
-                 [:span.submit {:tabindex 7} "update profile"])))))
+               [:span.submit {:tabindex 7} "update profile"]))))
 
 (defn get-updated-fields [profile] 
   (let [pass (:pass1 profile)
@@ -52,24 +51,22 @@
       "profile updated successfully"
       (catch Exception ex (.getMessage ex)))))
 
-(defpage [:post "/profile"] profile    
-  (util/private-page
-    (let [{:keys [pass pass1 pass2]} profile        
-          admin (session/get :admin)]     
-      (render "/profile"
-              (assoc profile 
-                     :info
-                     (cond (not (crypt/compare pass (:pass admin))) "wrong password"
-                           (not= pass1 pass2) "passwords do not match"
-                           :else (update-profile admin profile)))))))
+(util/private-page [:post "/profile"] profile
+  (let [{:keys [pass pass1 pass2]} profile        
+        admin (session/get :admin)]     
+    (render "/profile"
+            (assoc profile 
+                   :info
+                   (cond (not (crypt/compare pass (:pass admin))) "wrong password"
+                         (not= pass1 pass2) "passwords do not match"
+                         :else (update-profile admin profile))))))
 
-(defpage "/export" []  
-  (util/private-page
-    (resp/content-type 
-      "text/plain" 
-      (let [buf (new java.io.StringWriter)] 
-        (pprint (db/export) buf)
-        (.toString buf)))))
+(util/private-page "/export" []
+  (resp/content-type 
+    "text/plain" 
+    (let [buf (new java.io.StringWriter)] 
+      (pprint (db/export) buf)
+      (.toString buf))))
 
 (defpage [:post "/import"] {:keys [blog]}
   (db/import-posts blog)

@@ -25,10 +25,11 @@
 (defn get-css []
   (or (not-empty (:style (db/get-admin))) "/css/screen.css"))
 
-(defmacro private-page [& content]
-  `(if (session/get :admin)
-     (do ~@content)
-     (resp/redirect "/")))
+(defmacro private-page [path params & content]
+  `(noir.core/defpage 
+     ~path 
+     ~params 
+     (if (session/get :admin) (do ~@content) (resp/redirect "/"))))
 
 (defmacro cache [id content]
   `(if (session/get :admin)

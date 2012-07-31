@@ -40,43 +40,39 @@
 (defpage "/blog/:postid" {:keys [postid]}
   (util/cache (keyword (str "post-" postid)) (entry (db/get-post postid))))
 
-(defpage [:post "/update-post"] {:keys [post-id]}  
-  (util/private-page
-    (let [{:keys [title content]} (db/get-post post-id)] 
-      (common/layout
-        "Edit post"
-        (form-to [:post "/make-post"]
-                 (text-field {:tabindex 1} "title" title)
-                 [:br]
-                 (text-area {:tabindex 2} "content" content)
-                 [:br]
-                 (hidden-field "post-id" post-id)
-                 [:span.submit {:tabindex 3} "post"])))))
-
-(defpage "/make-post" {:keys [content error]}
-  (util/private-page
+(util/private-page [:post "/update-post"] {:keys [post-id]}
+  (let [{:keys [title content]} (db/get-post post-id)] 
     (common/layout
-      "New post"
-      (when error [:div.error error])
-      [:div#output]
+      "Edit post"
       (form-to [:post "/make-post"]
-               (text-field {:placeholder "Title"} "title")
+               (text-field {:tabindex 1} "title" title)
                [:br]
-               (text-area {:onkeypress "render()"} "content" content)
-               [:br]  
-               [:span.submit {:tabindex 1} "post"]))))
+               (text-area {:tabindex 2} "content" content)
+               [:br]
+               (hidden-field "post-id" post-id)
+               [:span.submit {:tabindex 3} "post"]))))
 
-(defpage [:post "/make-post"] post  
-  (util/private-page
-    (if (not-empty (:title post)) 
-      (let [{:keys [post-id title content]} post]
-        (if post-id
-          (db/update-post post-id title content)
-          (db/store-post title content (:handle (session/get :admin))))
-        (resp/redirect (if post-id (str "/blog/" post-id) "/")))
-      (render "/make-post" (assoc post :error "post title is required")))))
+(util/private-page "/make-post" {:keys [content error]}
+  (common/layout
+    "New post"
+    (when error [:div.error error])
+    [:div#output]
+    (form-to [:post "/make-post"]
+             (text-field {:placeholder "Title"} "title")
+             [:br]
+             (text-area {:onkeypress "render()"} "content" content)
+             [:br]  
+             [:span.submit {:tabindex 1} "post"])))
 
-(defpage [:post "/delete-post"] {:keys [post-id]}
-  (util/private-page
-    (db/delete-post post-id)
-    (resp/redirect "/")))
+(util/private-page [:post "/make-post"] post
+  (if (not-empty (:title post)) 
+    (let [{:keys [post-id title content]} post]
+      (if post-id
+        (db/update-post post-id title content)
+        (db/store-post title content (:handle (session/get :admin))))
+      (resp/redirect (if post-id (str "/blog/" post-id) "/")))
+    (render "/make-post" (assoc post :error "post title is required"))))
+
+(util/private-page [:post "/delete-post"] {:keys [post-id]}
+  (db/delete-post post-id)
+  (resp/redirect "/"))

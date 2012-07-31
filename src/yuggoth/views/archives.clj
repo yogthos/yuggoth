@@ -13,7 +13,7 @@
 	           [:li.archive 
 	            (link-to {:class "archive"} 
 	                     (str "/blog/" id) 
-	                     (str (util/format-time time "dd") " - " title))]))])
+	                     (str (util/format-time time "MMMM dd") " - " title))]))])
 	
 	(defpage "/archives" []
 	  (util/cache
