@@ -5,7 +5,7 @@ My bare bones blog which can be seen in action [here](http://yogthos.net).
 # Features
 
 * RSS feed
-* markdown content editing
+* markdown content editing with live preview
 * file uploads and management
 * custom styles
 * content export
