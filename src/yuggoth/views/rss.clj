@@ -41,7 +41,7 @@
 
 (defpage "/rss" []
   (resp/content-type 
-    "pplication/rss+xml" 
+    "application/rss+xml" 
     (new java.io.ByteArrayInputStream 
          (serve-feed (db/get-admin) (db/get-posts 10 true)))))
 
