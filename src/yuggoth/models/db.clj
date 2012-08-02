@@ -90,9 +90,9 @@ eg: (transaction add-user email firstname lastname password)"
         ["id=?" int-id]
         {:id int-id :title title :content content}))))
 
-(defn get-posts [& [limit]]  
+(defn get-posts [& [limit full?]]  
   (try
-    (db-read (str "select id, time, title from blog order by id desc " (if limit (str "limit " limit))))
+    (db-read (str "select id, time, title  " (if full? ", content") " from blog order by id desc " (if limit (str "limit " limit))))
     (catch Exception ex nil)))
 
 (defn get-post [id]  
