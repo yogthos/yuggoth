@@ -4,7 +4,7 @@
             [noir.core :as core]
             [noir.response :as resp]
             [noir.session :as session]            
-            [yuggoth.views archives auth blog comments common profile upload])
+            [yuggoth.views archives auth blog comments common profile rss upload])
   (:gen-class))
 
 ;;hack
@@ -26,8 +26,7 @@
         (handler request)))))
 
 (server/load-views-ns 'yuggoth.views)
-;(def handler (wrap-base-url (server/gen-handler {:mode :prod, :ns 'yuggoth})))
-;(def handler (ssl-redirects (server/gen-handler {:mode :prod, :ns 'yuggoth})))
+
 (def handler
   (-> (server/gen-handler 
         {:mode :prod, 
@@ -41,18 +40,6 @@
     ;secure-login-redirect
     fix-base-url))
 
-
-#_ (defmacro pre-route [route]
-  `(core/pre-route ~route {} (when-not (session/get :admin) (resp/redirect "/"))))
-
-;;does not work when a context is present
-;(pre-route "/upload")
-;(pre-route "/update-post")
-;(pre-route "/make-post")
-;(pre-route "/delete-post")
-;(pre-route "/delete-file")
-;(pre-route "/profile")
-;(pre-route "/export")
 
 (defn parse-args [args]
   (into {} 

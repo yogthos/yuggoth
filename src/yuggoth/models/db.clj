@@ -5,7 +5,7 @@
            javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
 
-#_ (def ^{:private true} db 
+(def ^{:private true} db 
   {:datasource (doto (new PGPoolingDataSource)
                  (.setServerName   "localhost")
                  (.setDatabaseName "yourdb")                       
