@@ -11,7 +11,7 @@ My bare bones blog which can be seen in action [here](http://yogthos.net).
 
 ## Usage
 
-First, setup postgreSQL db and update db in yuggoth.models.db to point to it, the blog will automatically create the necessary tables for you. 
+First, setup postgreSQL and update db in yuggoth.models.db to point to it, the blog will automatically create the necessary tables for you. 
 
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
 
@@ -37,10 +37,11 @@ valid options
 
 see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
 
-
+ 
 ## License
 
-Copyright (C) 2012 Yogthos
-
 Distributed under the Eclipse Public License, the same as Clojure.
+
+***
+Copyright (C) 2012 Yogthos
 
