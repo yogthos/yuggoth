@@ -115,6 +115,9 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-last-post [] 
   (first (db-read "select * from blog where id = (Select max(id) from blog)")))
 
+(defn last-post-id []
+  (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
+
 (defn create-comments-table []
   (sql/create-table
     :comment

@@ -317,6 +317,14 @@ b, strong {
     color: #000;
 }
 
+div .leftmost {
+	float: left;
+}
+
+div .rightmost {
+	float: right;
+}
+
 .entry-content tr th {
     color: #888;
     font-weight: normal;
@@ -370,7 +378,6 @@ img {
     padding: 10px; 
     height: auto; 
 }
-
 
 .footer {    
     clear: both;

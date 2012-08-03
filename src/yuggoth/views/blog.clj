@@ -1,5 +1,5 @@
 (ns yuggoth.views.blog
-  (:use noir.core hiccup.form)
+  (:use noir.core hiccup.form hiccup.element)
   (:require markdown
             [yuggoth.views.util :as util]
             [noir.session :as session]
@@ -18,16 +18,21 @@
                     (hidden-field "post-id" post-id)
                     [:span.submit "edit"])]]))
 
-#_ (defn post-nav [id]
-  (link-to (str "/blog/" (dec id)) "previous")
-  (link-to (str "/blog/" (inc id)) "next"))
+(defn post-nav [id]
+  [:div
+   (if (> id 1) [:div.leftmost (link-to (str "/blog/" (dec id)) "previous")])
+   (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog/" (inc id)) "next")])])
 
 (defn entry [{:keys [id time title content author]}]
   (apply common/layout
          (if id
            [{:title title :elements (admin-forms id)}
             [:p#post-time (util/format-time time)]
-            (markdown/md-to-html-string content)            
+            (markdown/md-to-html-string content)
+            (post-nav id)     
+            [:br]
+            ;[:hr]
+            
             (comments/get-comments id)            
             (comments/make-comment id)]
            ["Welcome to your new blog" "Nothing here yet..."])))
