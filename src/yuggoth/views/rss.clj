@@ -8,33 +8,35 @@
 
 (def site-url "http://yogthos.net/")
 
+(defmacro tag [id attrs & content]
+  `{:tag ~id :attrs ~attrs :content [~@content]})
+
 (defn gen-item [author {:keys [id title content time]}]
-  {:tag :item :attrs nil 
-   :content [{:tag :title :attrs nil :content [title]}
-             {:tag :dc:creator, :attrs nil, :content [author]}
-             {:tag :description :attrs nil 
-              :content [(if (> (count content) 300) (str (.substring content 0 300) " [...]") content)]} 
-             {:tag :link, :attrs nil, :content [(str site-url "blog/" id )]}               
-             {:tag :pubDate, :attrs nil, :content [(util/format-time time "EEE dd MMM yyyy HH:mm:ss ZZZZ")]}
-             {:tag :category, :attrs nil, :content ["clojure"]}]})
+  (tag :item nil 
+       (tag :title nil title)
+       (tag :dc:creator nil author)
+       (tag :description nil (if (> (count content) 300) (str (.substring content 0 300) " [...]") content))
+       (tag :link nil (str site-url "blog/" id ))
+       (tag :pubDate nil (util/format-time time "EEE dd MMM yyyy HH:mm:ss ZZZZ"))
+       (tag :category nil "clojure")))
 
 (defn gen-message [{:keys [title handle]} posts]
   (let [date (util/format-time (new Date) "EEE dd MMM yyyy HH:mm:ss ZZZZ")] 
-    {:tag :rss :attrs {:version "2.0"
-                       :xmlns:dc "http://purl.org/dc/elements/1.1/"
-                       :xmlns:sy "http://purl.org/rss/1.0/modules/syndication/"} 
-     :content 
-     [{:tag :channel :attrs nil 
-       :content (into
-                  [{:tag :title :attrs nil :content [(or (:title (first posts)) "")]} 
-                   {:tag :description :attrs nil :content [title]} 
-                   {:tag :link :attrs nil :content [site-url]} 
-                   {:tag :lastBuildDate :attrs nil :content [date]}                                                
-                   {:tag :dc:creator, :attrs nil, :content [handle]}
-                   {:tag :language, :attrs nil, :content ["en-US"]}
-                   {:tag :sy:updatePeriod, :attrs nil, :content ["hourly"]}
-                   {:tag :sy:updateFrequency, :attrs nil, :content ["1"]}]
-                  (map (partial gen-item handle) posts))}]}))
+    (tag :rss {:version "2.0"
+               :xmlns:dc "http://purl.org/dc/elements/1.1/"
+               :xmlns:sy "http://purl.org/rss/1.0/modules/syndication/"}
+         (update-in 
+           (tag :channel nil
+                (tag :title nil (or (:title (first posts)) ""))
+                (tag :description nil title)
+                (tag :link nil site-url)
+                (tag :lastBuildDate nil date)
+                (tag :dc:creator nil handle)
+                (tag :language nil "en-US")
+                (tag :sy:updatePeriod nil "hourly")
+                (tag :sy:updateFrequency nil "1"))
+           [:content]
+           into (map (partial gen-item handle) posts)))))
 
 (defn serve-feed [admin posts]    
   (.getBytes (with-out-str (xml/emit (gen-message admin posts)))))
