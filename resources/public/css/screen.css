@@ -317,11 +317,11 @@ b, strong {
     color: #000;
 }
 
-div .leftmost {
+.leftmost {
 	float: left;
 }
 
-div .rightmost {
+.rightmost {
 	float: right;
 }
 
