@@ -33,8 +33,18 @@ body {
     min-width: 1000px;
 }
 .menu img {
-    margin-bottom: 10px;
+	margin-top: -1px; 		       
+    height: 16px;
+    width: 16px;  
+    padding: 0px;     
+    float: left; 
 }
+
+#rss div {
+	float: left;
+	padding-right: 2px;		
+}
+
 .menu a {
     color: #666;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
