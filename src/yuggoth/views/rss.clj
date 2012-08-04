@@ -58,5 +58,3 @@
     "application/rss+xml" 
     (new java.io.ByteArrayInputStream 
          (feed (db/get-admin) (db/get-posts 10 true)))))
-
-(xml/emit (item "Yogthos" {:id 1 :title "Test post" :content "Some content" :time (new Date)}))
