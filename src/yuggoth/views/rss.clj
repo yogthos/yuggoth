@@ -1,6 +1,7 @@
 (ns yuggoth.views.rss
   (:use noir.core)
-  (:require [clojure.xml :as xml]
+  (:require markdown 
+            [clojure.xml :as xml]
             [noir.response :as resp]
             [yuggoth.models.db :as db]
             [yuggoth.views.util :as util])
@@ -11,11 +12,18 @@
 (defmacro tag [id attrs & content]
   `{:tag ~id :attrs ~attrs :content [~@content]})
 
+(defn parse-content [content]
+  (.replaceAll
+    (.replaceAll 
+      (markdown/md-to-html-string (if (> (count content) 300) (str (.substring content 0 500) " [...]") content))
+      "<" "&lt;")
+    ">" "&gt;"))
+
 (defn gen-item [author {:keys [id title content time]}]
   (tag :item nil 
        (tag :title nil title)
        (tag :dc:creator nil author)
-       (tag :description nil (if (> (count content) 300) (str (.substring content 0 300) " [...]") content))
+       (tag :description nil (parse-content content))
        (tag :link nil (str site-url "blog/" id ))
        (tag :pubDate nil (util/format-time time "EEE dd MMM yyyy HH:mm:ss ZZZZ"))
        (tag :category nil "clojure")))
@@ -38,7 +46,7 @@
            [:content]
            into (map (partial gen-item handle) posts)))))
 
-(defn serve-feed [admin posts]    
+(defn serve-feed [admin posts]
   (.getBytes (with-out-str (xml/emit (gen-message admin posts)))))
 
 (defpage "/rss" []
@@ -46,4 +54,3 @@
     "application/rss+xml" 
     (new java.io.ByteArrayInputStream 
          (serve-feed (db/get-admin) (db/get-posts 10 true)))))
-
