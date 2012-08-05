@@ -4,8 +4,7 @@
             [clojure.xml :as xml]
             [noir.response :as resp]
             [yuggoth.models.db :as db]
-            [yuggoth.views.util :as util])
-  (:import java.util.Date))
+            [yuggoth.views.util :as util]))
 
 (def site-url "http://yogthos.net/")
 
@@ -32,7 +31,7 @@
              {:title title 
               :link site-url 
               :description title
-              :lastBuildDate (new Date)
+              :lastBuildDate (new java.util.Date)
               :dc:creator author
               :sy:updatePeriod "hourly"
               :sy:updateFrequency "1"})
