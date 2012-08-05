@@ -24,7 +24,7 @@
          :category "clojure"}))
     posts))
 
-(defn make-channel [title author items]
+(defn make-channel [title author posts]
   (apply 
     (partial rss/channel 
              false
@@ -35,13 +35,13 @@
               :dc:creator author
               :sy:updatePeriod "hourly"
               :sy:updateFrequency "1"})
-    items))
+    (posts-to-items author posts)))
 
 (defn feed [admin posts]
   (let [{:keys [handle title]} (db/get-admin)
         posts                  (db/get-posts 10 true)
-        feed-title (or (:title (first posts)) "nothing here yet...")]
-    (update-in (make-channel feed-title handle (posts-to-items handle posts))
+        feed-title             (or (:title (first posts)) "nothing here yet...")]
+    (update-in (make-channel feed-title handle posts)
                [:attrs]
                assoc 
                :xmlns:dc "http://purl.org/dc/elements/1.1/"
