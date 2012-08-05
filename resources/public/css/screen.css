@@ -32,17 +32,17 @@ body {
     text-align: right;
     min-width: 1000px;
 }
-.menu img {
-	margin-top: 1px; 		       
-    height: 16px;
-    width: 16px;  
-    padding: 0px;     
-    float: left; 
+.menu img {		       
+    height: 11px;
+    width: 11px;
+    padding-right: 0px;  
+    padding-top: 2px;
+    padding-left: 2px;         
+    float: left;        
 }
 
 #rss div {
-	float: left;
-	padding-right: 2px;		
+	float: left;	
 }
 
 .menu a {
