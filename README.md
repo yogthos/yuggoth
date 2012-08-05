@@ -20,7 +20,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 
 ## Usage
 
-First, setup postgreSQL and update db in yuggoth.models.db to point to it, the blog will automatically create the necessary tables for you. 
+First, setup postgreSQL and update `db` definition in `yuggoth.models.db` to point to it, the blog will automatically create the necessary tables for you. 
 
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
 
