@@ -21,6 +21,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 ## Usage
 
 First, setup postgreSQL and update `db` definition in `yuggoth.models.db` to point to it, the blog will automatically create the necessary tables for you. 
+When you navigate to the blog on the first run it will present the setup wizard wich will allow you to configure the administrator and the blog title.  
 
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
 
@@ -29,7 +30,7 @@ lein deps
 lein run
 ```
 
-to enable SSL uncomment secure-login-redirect in service.clj and optionally change the port to the one you're using, default is 443
+to enable SSL uncomment `secure-login-redirect` in `service.clj` and optionally change the port to the one you're using, default is 443
 
 
 to make a deployable war run
