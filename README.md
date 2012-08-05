@@ -1,6 +1,14 @@
 # Yuggoth
 
-My bare bones blog which can be seen in action [here](http://yogthos.net). 
+>"Yuggoth... is a strange dark orb at the very rim of our solar system... 
+>There are mighty cities on Yuggoth—great tiers of terraced towers built of black stone... 
+>The sun shines there no brighter than a star, but the beings need no light. 
+>They have other subtler senses, and put no windows in their great houses and temples..."
+> — H. P. Lovecraft, "The Whisperer in Darkness"
+
+My blog which can be seen in action [here](http://yogthos.net). 
+
+
 
 # Features
 
