@@ -39,15 +39,16 @@ lein uberjar
 java -jar yuggoth-0.4.0-SNAPSHOT-standalone.jar
 ```
 
+valid options for running standalone
+
+* -mode dev or prod
+* -port integer
+
 to make a deployable WAR
 ```bash
 lein ring uberwar
 ```
 
-valid options
-
-* -mode dev or prod
-* -port integer
 
 
 see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
