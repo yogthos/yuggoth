@@ -2,6 +2,7 @@
   (:use noir.core)  
   (:require markdown 
             [clojure.xml :as xml]
+            [clj-rss.core :as rss]
             [noir.response :as resp]
             [yuggoth.models.db :as db]
             [yuggoth.views.util :as util]))
