@@ -6,17 +6,16 @@
 >They have other subtler senses, and put no windows in their great houses and temples..."
 > — H. P. Lovecraft, "The Whisperer in Darkness"
 
-My blog which can be seen in action [here](http://yogthos.net). 
+Yuggoth is a blog engine which powers my site at http://yogthos.net and allows me to experiment with using Noir.   
 
-
-
-# Features
+## Features
 
 * RSS feed
 * markdown content editing with live preview
 * file uploads and management
 * custom styles
-* content export
+* captchas for comments
+
 
 ## Usage
 
