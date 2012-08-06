@@ -2,6 +2,7 @@
   (:use hiccup.element hiccup.form noir.core)
   (:require [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
+            [yuggoth.views.common :as common]
             [noir.session :as session]
             [noir.response :as resp])
   (:import net.sf.jlue.util.Captcha
@@ -58,4 +59,11 @@
     (let [out (new ByteArrayOutputStream)]
       (ImageIO/write (:image (session/get :captcha)) "jpeg" out)
       (new ByteArrayInputStream (.toByteArray out)))))
+
+(util/private-page "/latest-comments" []
+  (common/layout
+    "Latest comments"
+    (into [:table] 
+        (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
+          [:tr [:td (link-to (str "/blog/" blogid) content " - " author)]]))))
 
