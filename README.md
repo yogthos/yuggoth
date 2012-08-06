@@ -1,7 +1,7 @@
 # Yuggoth
 
 <img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg"
- alt="Yuggoth logo" title="a strange dark orb" align="right" />
+ alt="Yuggoth logo" title="a strange dark orb" align="right" width="200" height="200" />
 >"Yuggoth... is a strange dark orb at the very rim of our solar system... 
 >There are mighty cities on Yuggoth—great tiers of terraced towers built of black stone... 
 >The sun shines there no brighter than a star, but the beings need no light. 
@@ -10,10 +10,7 @@
 > — H. P. Lovecraft, "The Whisperer in Darkness"
 
 Yuggoth is a blog engine which powers my site at http://yogthos.net and allows me to experiment with using Noir.   
-<br/>
-<br/>
-<br/>
-<br/>
+
 ## Features
 
 * RSS feed
