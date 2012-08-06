@@ -10,7 +10,10 @@
 > — H. P. Lovecraft, "The Whisperer in Darkness"
 
 Yuggoth is a blog engine which powers my site at http://yogthos.net and allows me to experiment with using Noir.   
-
+<br/>
+<br/>
+<br/>
+<br/>
 ## Features
 
 * RSS feed
