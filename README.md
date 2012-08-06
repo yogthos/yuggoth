@@ -18,7 +18,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 * file uploads and management
 * custom styles
 * captchas for comments
-
+* view latest comments
 
 ## Usage
 
