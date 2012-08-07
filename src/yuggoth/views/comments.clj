@@ -63,7 +63,7 @@
 (util/private-page "/latest-comments" []
   (common/layout
     "Latest comments"
-    (into [:table] 
+    (into [:table ] 
         (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
-          [:tr [:td (link-to (str "/blog/" blogid) content " - " author)]]))))
+          [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]]))))
 
