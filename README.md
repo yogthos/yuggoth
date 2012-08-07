@@ -1,6 +1,7 @@
 # Yuggoth
 
-<img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg" align="right" style="margin-left:50px;"
+<img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg" style="margin-left:50px;"
+ hspace="20"
  alt="Yuggoth logo" title="a strange dark orb" align="right" width="200" height="200"/>
  
 >"Yuggoth... is a strange dark orb at the very rim of our solar system... 
