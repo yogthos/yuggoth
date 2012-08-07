@@ -1,6 +1,6 @@
 # Yuggoth
 
-<img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg"
+<img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg" hspace="5"
  alt="Yuggoth logo" title="a strange dark orb" align="right" width="240" height="240"/>
 >"Yuggoth... is a strange dark orb at the very rim of our solar system... 
 >There are mighty cities on Yuggoth—great tiers of terraced towers built of black stone... 
