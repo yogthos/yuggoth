@@ -151,6 +151,16 @@ body {
 	font-size: 11px;
 }
 
+.entry-public {
+	float: left;
+	margin-top: 1px;	
+}
+.entry-public-check {
+	float: left;
+}
+.entry-submit {
+	float:right;
+}
 p#post-time {
   margin-top: -15px;   
   font-size: 8px;

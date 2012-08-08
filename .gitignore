@@ -8,3 +8,4 @@ yog.db.*
 target/*
 count_lines.sh
 .gitignore
+yuggoth-*

@@ -79,41 +79,58 @@ eg: (transaction add-user email firstname lastname password)"
     [:time :timestamp]
     [:title "varchar(100)"]
     [:content "TEXT"]
-    [:author "varchar(100)"]))
+    [:author "varchar(100)"]    
+    [:public boolean]))
 
-(defn update-post [id title content]
+(defn update-post [id title content public]
   (let [int-id (Integer/parseInt id)] 
     (sql/with-connection
       db
       (sql/update-values
         :blog
         ["id=?" int-id]
-        {:id int-id :title title :content content}))))
+        {:id int-id :title title :content content :public (Boolean/parseBoolean public)}))))
 
-(defn get-posts [& [limit full?]]  
+(defn get-posts [& [limit full? private?]]    
   (try
-    (db-read (str "select id, time, title  " (if full? ", content") " from blog order by id desc " (if limit (str "limit " limit))))
+    (db-read (str "select id, time, title, public" (if full? ", content") 
+                  " from blog " (if (not private?) "where public='true'") " order by id desc " 
+                  (if limit (str "limit " limit))))
     (catch Exception ex nil)))
 
 (defn get-post [id]  
   (first (db-read "select * from blog where id=?" (Integer/parseInt id))))
 
-(defn store-post [title content author]
+(defn get-public-post-id [id next?]
+  (:id
+    (first
+      (db-read 
+        (if next?
+          "select id from blog where id > ? and public='true' order by id asc limit 1"
+          "select id from blog where id < ? and public='true' order by id desc limit 1") 
+        (Integer/parseInt id)))))
+
+
+(db-read "select id from blog where id < 13 order by id asc limit 1")
+
+(defn store-post [title content author public]
   (sql/with-connection 
     db
     (sql/insert-values
       :blog
-      [:time :title :content :author]
-      [(new Timestamp (.getTime (new Date))) title content author])))
+      [:time :title :content :author :public]
+      [(new Timestamp (.getTime (new Date))) title content author (Boolean/parseBoolean public)])))
 
-(defn delete-post [id]
+(defn post-visible [id public]
   (sql/with-connection 
     db
-    (sql/delete-rows :blog ["id=?" (Integer/parseInt id)])
-    (sql/delete-rows :comment ["blogid=?" (Integer/parseInt id)])))
+    (sql/update-values
+      :blog 
+      ["id=?" (Integer/parseInt id)]
+      {:public public})))
 
 (defn get-last-post [] 
-  (first (db-read "select * from blog where id = (Select max(id) from blog)")))
+  (first (db-read "select * from blog where id = (select max(id) from blog)")))
 
 (defn last-post-id []
   (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
@@ -136,6 +153,10 @@ eg: (transaction add-user email firstname lastname password)"
 
 (defn get-comments [blog-id]
   (db-read "select * from comment where blogid=?" blog-id))
+
+(defn get-latest-comments [n]
+  (db-read "select * from comment order by time desc limit ?" n))
+
 
 ;;admin table management
 (defn create-admin-table []
