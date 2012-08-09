@@ -43,7 +43,11 @@
 
 (defpage "/" []
   (if (db/get-admin)
-    (util/cache :home (entry (db/get-last-post)))
+    (util/cache 
+      :home 
+      (if-let [post (db/get-last-public-post)] 
+        (entry post)
+        (common/layout "Welcome to your new blog" "Nothing here yet...")))
     (resp/redirect "/create-admin")))
 
 (defn display-public-post [postid next?]

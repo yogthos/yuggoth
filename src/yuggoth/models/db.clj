@@ -5,13 +5,14 @@
            javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
 
-#_ (def ^{:private true} db 
+(def ^{:private true} db 
   {:datasource (doto (new PGPoolingDataSource)
                  (.setServerName   "localhost")
                  (.setDatabaseName "yourdb")                       
                  (.setUser         "user")                 
                  (.setPassword     "pass")
                  (.setMaxConnections 10))})
+
 
 (defn drop-table
   "drops the supplied table from the DB, table name must be a keyword
@@ -130,6 +131,9 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-last-post [] 
   (first (db-read "select * from blog where id = (select max(id) from blog)")))
 
+(defn get-last-public-post []
+  (first (db-read "select * from blog where public='true' order by id desc limit 1")))
+
 (defn last-post-id []
   (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
 
@@ -219,13 +223,4 @@ eg: (transaction add-user email firstname lastname password)"
         (println (.getMessage ex))
         (.printStackTrace ex)
         (.getMessage ex)))))
-
-
-#_
-  (defn update-schema []
-    (println "updating tables...")
-    (sql/with-connection 
-      db
-      (sql/transaction      
-        (sql/do-commands "alter table blog add public boolean"))))
 
