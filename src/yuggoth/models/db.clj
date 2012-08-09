@@ -5,7 +5,7 @@
            javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
 
-(def ^{:private true} db 
+#_ (def ^{:private true} db 
   {:datasource (doto (new PGPoolingDataSource)
                  (.setServerName   "localhost")
                  (.setDatabaseName "yourdb")                       
@@ -110,8 +110,6 @@ eg: (transaction add-user email firstname lastname password)"
           "select id from blog where id < ? and public='true' order by id desc limit 1") 
         (Integer/parseInt id)))))
 
-
-(db-read "select id from blog where id < 13 order by id asc limit 1")
 
 (defn store-post [title content author public]
   (sql/with-connection 
@@ -221,3 +219,13 @@ eg: (transaction add-user email firstname lastname password)"
         (println (.getMessage ex))
         (.printStackTrace ex)
         (.getMessage ex)))))
+
+
+#_
+  (defn update-schema []
+    (println "updating tables...")
+    (sql/with-connection 
+      db
+      (sql/transaction      
+        (sql/do-commands "alter table blog add public boolean"))))
+
