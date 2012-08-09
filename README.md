@@ -24,6 +24,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 * custom styles
 * captchas for comments
 * view latest comments
+* toggle post visibility
 
 ## Usage
 
