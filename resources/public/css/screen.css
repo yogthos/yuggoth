@@ -188,6 +188,11 @@ tr.padded td {
 	padding-bottom: 10px;
 }
 
+textarea#comment {
+	width: 550px;
+	height: 100px;
+}
+
 #comment-content h1 {
 font-size: 15px;
 }
