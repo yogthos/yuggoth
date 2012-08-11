@@ -1,5 +1,5 @@
 (ns yuggoth.views.blog
-  (:use noir.core hiccup.form hiccup.element)
+  (:use noir.core hiccup.form hiccup.element hiccup.util)
   (:require markdown
             [yuggoth.views.util :as util]
             [noir.session :as session]
@@ -104,7 +104,7 @@
       (if post-id
         (db/update-post post-id title content public)
         (db/store-post title content (:handle (session/get :admin)) public))
-      (resp/redirect (if post-id (str "/blog/" post-id) "/")))
+      (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (render "/make-post" (assoc post :error "post title is required"))))
 
 
