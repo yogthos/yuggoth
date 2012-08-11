@@ -156,12 +156,15 @@ body {
 	float: left;
 	margin-top: 1px;	
 }
-.entry-public-check {
-	float: left;
+input[name=public] {
+	width: 10px;
 }
+
 .entry-submit {
 	float:right;
+	background-color:#ddd;	
 }
+
 p#post-time {
   margin-top: -15px;   
   font-size: 8px;

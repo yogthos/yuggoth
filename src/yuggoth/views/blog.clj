@@ -88,14 +88,14 @@
     (when error [:div.error error])
     [:div#output]
     (form-to [:post "/make-post"]
-             (text-field {:placeholder "Title"} "title")
+             (text-field {:tabindex 1 :placeholder "Title"} "title")
              [:br]
-             (text-area {:onkeypress "render()"} "content" content)
+             (text-area {:tabindex 2} "content" content)
              [:br]
              [:div
-              [:div.entry-public "public" ] 
-              [:div.entry-public-check (check-box "public" true)]
-              [:div.entry-submit [:span.submit {:tabindex 1} "post"]]])))
+              [:div.entry-public "public"]
+              (check-box {:tabindex 4} "public" true)                            
+              [:div.entry-submit [:span.submit {:tabindex 3} "post"]]])))
 
 
 (util/private-page [:post "/make-post"] post                   
