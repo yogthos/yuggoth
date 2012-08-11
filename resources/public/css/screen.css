@@ -430,3 +430,21 @@ img {
     color: #36bcab;
     text-decoration: none;
 }
+
+.tags {
+	width: 445px;
+}
+
+.tagon {
+	background-color: #999;
+	padding: 3px;
+	margin-right: 2px;
+	color: #fff;
+}
+.tagoff {
+	background-color: #eee;
+	padding: 3px;
+	margin-right: 2px;
+	color: #aaa;
+	cursor:pointer;
+}

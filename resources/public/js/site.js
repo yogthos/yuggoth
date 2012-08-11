@@ -3,7 +3,9 @@ $(document).ready(function(){
     $($("#selected").val()).toggleClass("selected");
   	 
   	$(".render-preview").click(renderPreview);  	
-  	$(".submit").keypress(onEnter);
+  	$(".submit").keypress(onEnter);  	
+  	$(".tagoff").click(toggleTag);
+  	$(".tagon").click(toggleTag);  	
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
     $(".delete").click(function(e){
     jConfirm('', 
@@ -31,4 +33,15 @@ function onEnter(e)
 	else if(e.which) // IE9/Firefox/Chrome/Opera/Safari	
 		keynum = e.which;		
 	if(keynum === 13) $(this).trigger("click");
+}
+
+function toggleTag(){
+	$(this).toggleClass("tagoff");
+	$(this).toggleClass("tagon");
+	var tagText = $(this).text();
+		
+	if ($(this).attr("class") == "tagon") 
+		$("#tag-" + tagText).val(tagText);
+	else
+		$("#tag-" + tagText).removeAttr("value"); 		
 }

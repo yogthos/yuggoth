@@ -19,15 +19,25 @@
     "Profile"
     [:h2.info info]
     (link-to "/export" "export blog")
+    
     #_ (form-to [:post "/import"]
                 (text-area "blog")
                 [:br]
                 [:span.submit "import blog"])
+    ;(db/add-tags)
+    (form-to [:post "/update-tags"]
+             (label "tags" "select tags to delete") 
+             (mapcat (fn [tag]
+                       [(hidden-field (str "tag-" tag))
+                        [:span.tagoff tag]])
+                     (db/tags))             
+             (submit-button "update tags"))
+    
     (let [admin (session/get :admin)]            
       (form-to [:post "/profile"]
                (util/make-form "handle" "name" (or handle (:handle admin))
                                "style" "custom css url" (or style (:style admin))
-                               "email" "email" (or email (:email admin))
+                               "email" "email" (or email (:email admin))                               
                                "pass"  "password" nil
                                "pass1" "new password" nil
                                "pass2" "confirm password" nil)
@@ -71,3 +81,8 @@
 (defpage [:post "/import"] {:keys [blog]}
   (db/import-posts blog)
   (resp/redirect "/profile"))
+
+(defpage [:post "/update-tags"] tags
+  (db/delete-tags (map second tags))
+  (resp/redirect "/profile"))
+

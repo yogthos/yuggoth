@@ -13,7 +13,6 @@
                  (.setPassword     "pass")
                  (.setMaxConnections 10))})
 
-
 (defn drop-table
   "drops the supplied table from the DB, table name must be a keyword
 eg: (drop-table :users)"
@@ -159,6 +158,56 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-latest-comments [n]
   (db-read "select * from comment order by time desc limit ?" n))
 
+;;tag table management
+(defn create-tag-table []
+  (sql/create-table
+    :tag
+    [:name "varchar(10)"]))
+
+(defn create-tag-map-table []
+  (sql/create-table
+    :tag_map
+    [:blogid :int]
+    [:tag "varchar(10)"]))
+
+(defn tag-post [blogid tag]
+  (sql/insert-values
+    :tag_map
+    [:blogid :tag]
+    [blogid tag]))
+
+(defn tags []
+  (map :name (db-read "select * from tag")))
+
+(defn add-tag [tag-name]
+  (sql/with-connection
+    db
+    (sql/insert-values
+      :tag [:name] [(.toLowerCase tag-name)])))
+
+(defn delete-tags [tags]
+  (sql/with-connection
+    db
+    (doseq [tag tags] 
+      (sql/delete-rows :tag_map ["tag=?" tag])
+      (sql/delete-rows :tag ["name=?" tag]))))
+
+(defn posts-by-tag [tag-name]
+  (map :blogid (db-read "select blogid from tag_map where tag=?" tag-name)))
+
+(defn tags-by-post [postid]
+  (mapcat vals (db-read "select tag from tag_map where blogid=?" postid)))
+
+(defn update-tags [blogid tags]    
+  (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)]    
+    (sql/with-connection
+      db
+      (sql/transaction
+        (sql/delete-rows :tag_map ["blogid=?" id])
+        (doseq [tag tags]
+          (if (nil? (sql/with-query-results res ["select * from tag where name=?" tag] (doall res)))
+            (sql/insert-values :tag [:name] [tag]))
+          (tag-post id tag))))))
 
 ;;admin table management
 (defn create-admin-table []
@@ -187,10 +236,14 @@ eg: (transaction add-user email firstname lastname password)"
       (drop-table :blog)
       (drop-table :comment)
       (drop-table :file)
+      (drop-table :tag)
+      (drop-table :tag_map)
       (create-admin-table)
       (create-blog-table)
       (create-comments-table)
-      (create-file-table))    
+      (create-file-table)
+      (create-tag-table)
+      (create-tag-map-table))    
     nil))
 
 (defn get-admin []

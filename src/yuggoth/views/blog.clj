@@ -13,7 +13,7 @@
     [:div
      [:div (form-to [:post "/toggle-post"]
                     (hidden-field "post-id" post-id)
-                    (hidden-field "visible" (str visible))
+                    (hidden-field "public" (str visible))
                     [:span.submit (if visible "hide" "show")])]
      [:div (form-to [:post "/update-post"]
                     (hidden-field "post-id" post-id)
@@ -25,16 +25,24 @@
    (if (> id 1) [:div.leftmost (link-to (str "/blog-previous/" id) "previous")])
    (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) "next")])])
 
+(defn display-public-post [postid next?]
+  (resp/redirect 
+    (if-let [id (db/get-public-post-id postid next?)]
+      (str "/blog/" id)
+      "/")))
 
 (defn entry [{:keys [id time title content author public]}]  
-  (apply common/layout
+  (apply common/layout         
          (if id
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
             (markdown/md-to-html-string content)
             (post-nav id)     
             [:br]
-            ;[:hr]
+            [:br]
+            [:div "tags "
+             (for [tag (db/tags-by-post id)]
+              [:span.tagon {:id "tag"} tag])]
             
             (comments/get-comments id)            
             (comments/make-comment id)]
@@ -50,11 +58,6 @@
         (common/layout "Welcome to your new blog" "Nothing here yet...")))
     (resp/redirect "/create-admin")))
 
-(defn display-public-post [postid next?]
-  (resp/redirect 
-    (if-let [id (db/get-public-post-id postid next?)]
-      (str "/blog/" id)
-      "/")))
 
 (defpage "/blog-previous/:postid" {:keys [postid]}
   (display-public-post postid false))
@@ -68,8 +71,21 @@
                 (entry (db/get-post id)))))
 
 
+(defn tag-list [& [post-id]]
+  (let [post-tags (set (if post-id (db/tags-by-post (Integer/parseInt post-id))))] 
+    [:div
+     (mapcat (fn [tag]
+               (if (contains? post-tags tag)
+                 [(hidden-field (str "tag-" tag) tag)
+                  [:span.tagon tag]]
+                 [(hidden-field (str "tag-" tag))
+                  [:span.tagoff tag]]))
+             (db/tags))
+     (text-field {:placeholder "other"} "tag-custom")]))
+
+
 (util/private-page [:post "/update-post"] {:keys [post-id error]}
-  (let [{:keys [title content]} (db/get-post post-id)] 
+  (let [{:keys [title content public]} (db/get-post post-id)] 
     (common/layout
       "Edit post"
       (when error [:div.error error])
@@ -79,6 +95,9 @@
                (text-area {:tabindex 2} "content" content)
                [:br]
                (hidden-field "post-id" post-id)
+               (hidden-field "public" (str public))               
+               (tag-list post-id)
+               [:br]
                [:span.submit {:tabindex 3} "post"]))))
 
 
@@ -92,6 +111,8 @@
              [:br]
              (text-area {:tabindex 2} "content" content)
              [:br]
+             (tag-list)
+             [:br]
              [:div
               [:div.entry-public "public"]
               (check-box {:tabindex 4} "public" true)                            
@@ -100,14 +121,22 @@
 
 (util/private-page [:post "/make-post"] post                   
   (if (not-empty (:title post)) 
-    (let [{:keys [post-id title content public]} post]      
+    (let [{:keys [post-id title content public]} post
+          tags (->> post (filter #(.startsWith (name (first %)) "tag-")) 
+                 (map second) 
+                 (remove empty?))]        
       (if post-id
-        (db/update-post post-id title content public)
-        (db/store-post title content (:handle (session/get :admin)) public))
+        (do
+          (db/update-post post-id title content public)
+          (db/update-tags post-id tags))
+        (db/update-tags 
+          (:id (db/store-post title content (:handle (session/get :admin)) public))
+          tags))
+      
       (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (render "/make-post" (assoc post :error "post title is required"))))
 
 
-(util/private-page [:post "/toggle-post"] {:keys [post-id visible]}                                      
-  (db/post-visible post-id (not (Boolean/parseBoolean visible)))
+(util/private-page [:post "/toggle-post"] {:keys [post-id public]}                                      
+  (db/post-visible post-id (not (Boolean/parseBoolean public)))
   (resp/redirect (str "/blog/" post-id)))
