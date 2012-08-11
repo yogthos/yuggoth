@@ -112,6 +112,7 @@ body {
 .sidebar a {	
     text-decoration: none;
     font-size: 12px;
+    line-height:120%;
 }
 
 .sidebar .date {
