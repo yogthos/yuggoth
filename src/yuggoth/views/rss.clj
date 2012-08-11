@@ -53,7 +53,7 @@
     "application/rss+xml" 
     (new java.io.ByteArrayInputStream 
          (->
-           (feed (db/get-admin) (db/get-posts 10 true))
+           (feed (db/get-admin) (db/get-posts 10 true false))
            xml/emit
            with-out-str
            .getBytes))))

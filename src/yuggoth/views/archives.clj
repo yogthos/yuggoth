@@ -1,5 +1,5 @@
 	(ns yuggoth.views.archives
-	  (:use noir.core hiccup.element hiccup.form)
+	  (:use noir.core hiccup.element hiccup.form hiccup.util)
 	  (:require [yuggoth.models.db :as db]             
               [noir.session :as session]
               [noir.response :as resp]
@@ -14,7 +14,7 @@
 	         (for [{:keys [id time title public]} items] 
 	           [:li.archive 
 	            (link-to {:class "archive"} 
-	                     (str "/blog/" id) 
+	                     (str "/blog/" (str id "-" (url-encode title))) 
 	                     (str (util/format-time time "MMMM dd") " - " title))             
               (if (session/get :admin) 
                 (form-to [:post "/archives"]

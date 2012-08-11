@@ -63,7 +63,9 @@
   (display-public-post postid true))
 
 (defpage "/blog/:postid" {:keys [postid]}  
-  (util/cache (keyword (str "post-" postid)) (entry (db/get-post postid))))
+  (let [id (re-find #"\d+" postid)]
+    (util/cache (keyword (str "post-" id)) 
+                (entry (db/get-post id)))))
 
 
 (util/private-page [:post "/update-post"] {:keys [post-id error]}
@@ -98,7 +100,7 @@
 
 (util/private-page [:post "/make-post"] post                   
   (if (not-empty (:title post)) 
-    (let [{:keys [post-id title content public]} post]
+    (let [{:keys [post-id title content public]} post]      
       (if post-id
         (db/update-post post-id title content public)
         (db/store-post title content (:handle (session/get :admin)) public))
