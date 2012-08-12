@@ -10,7 +10,7 @@
 (def site-url "http://yogthos.net/")
 
 (defn parse-content [content]
-  (markdown/md-to-html-string (if (> (count content) 300) (str (.substring content 0 500) " [...]") content)))
+  (markdown/md-to-html-string (if (> (count content) 500) (str (.substring content 0 500) " [...]") content)))
 
 (defn posts-to-items [author posts]
   (map
