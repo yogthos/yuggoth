@@ -24,9 +24,9 @@
                 (text-area "blog")
                 [:br]
                 [:span.submit "import blog"])
-    ;(db/add-tags)
+    
     (form-to [:post "/update-tags"]
-             (label "tags" "select tags to delete") 
+             (label "tags" "select tags to delete ") 
              (mapcat (fn [tag]
                        [(hidden-field (str "tag-" tag))
                         [:span.tagoff tag]])
