@@ -96,7 +96,7 @@
                [:br]
                (hidden-field "post-id" post-id)
                (hidden-field "public" (str public))               
-               (tag-list post-id)
+               "tags " (tag-list post-id)
                [:br]
                [:span.submit {:tabindex 3} "post"]))))
 
@@ -111,7 +111,7 @@
              [:br]
              (text-area {:tabindex 2} "content" content)
              [:br]
-             (tag-list)
+             "tags " (tag-list)
              [:br]
              [:div
               [:div.entry-public "public"]
