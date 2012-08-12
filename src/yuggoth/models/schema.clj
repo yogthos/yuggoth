@@ -1,5 +1,4 @@
-(ns yuggoth.models.schema
-  (:use [yuggoth.models.db :only [db drop-table]])
+(ns yuggoth.models.schema  
   (:require [clojure.java.jdbc :as sql]))
 
 ;;file table
@@ -52,42 +51,3 @@
     [:handle "varchar(100)"]
     [:pass   "varchar(100)"]
     [:email  "varchar(50)"]))
-
-(defn reset-blog []  
-  (sql/with-connection 
-    db  
-    (sql/transaction
-      (drop-table :admin)
-      (drop-table :blog)
-      (drop-table :comment)
-      (drop-table :file)
-      (drop-table :tag)
-      (drop-table :tag_map)
-      (create-admin-table)
-      (create-blog-table)
-      (create-comments-table)
-      (create-file-table)
-      (create-tag-table)
-      (create-tag-map-table))    
-    nil))
-
-#_(def updated (atom false))
-#_(defn update-schema []
-  (when (not @updated)
-    (println "updating tables...")
-    (sql/with-connection 
-      db
-      (sql/transaction      
-        (sql/do-commands "alter table tag alter column name type varchar(50)")
-        (sql/do-commands "alter table tag_map alter column tag type varchar(50)")))
-    (reset! updated true)))
-
-#_(def added-tags (atom false))
-#_(defn add-tags []
-  (when (not @added-tags)     
-    (sql/with-connection
-      db 
-      (sql/transaction
-        (create-tag-table)
-        (create-tag-map-table)))
-    (reset! added-tags true)))

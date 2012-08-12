@@ -1,4 +1,5 @@
 (ns yuggoth.models.db
+  (:use yuggoth.models.schema)
   (:require [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp 
            java.util.Date
@@ -36,6 +37,23 @@ eg: (transaction add-user email firstname lastname password)"
     (sql/transaction
       (apply f args))))
 
+(defn reset-blog []  
+  (sql/with-connection 
+    db  
+    (sql/transaction
+      (drop-table :admin)
+      (drop-table :blog)
+      (drop-table :comment)
+      (drop-table :file)
+      (drop-table :tag)
+      (drop-table :tag_map)
+      (create-admin-table)
+      (create-blog-table)
+      (create-comments-table)
+      (create-file-table)
+      (create-tag-table)
+      (create-tag-map-table))    
+    nil))
 
 ;files
 
@@ -180,7 +198,6 @@ eg: (transaction add-user email firstname lastname password)"
             (sql/insert-values :tag [:name] [tag]))
           (tag-post id tag))))))
 
-
 ;;admin user
 (defn set-admin [admin]
   (sql/with-connection db (sql/insert-record :admin admin)))
@@ -223,5 +240,3 @@ eg: (transaction add-user email firstname lastname password)"
         (println (.getMessage ex))
         (.printStackTrace ex)
         (.getMessage ex)))))
-
-
