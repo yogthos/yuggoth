@@ -13,8 +13,6 @@
                  (.setPassword     "pass")
                  (.setMaxConnections 10))})
 
-
-
 (defn drop-table
   "drops the supplied table from the DB, table name must be a keyword
 eg: (drop-table :users)"
@@ -195,7 +193,9 @@ eg: (transaction add-user email firstname lastname password)"
       (sql/delete-rows :tag ["name=?" tag]))))
 
 (defn posts-by-tag [tag-name]
-  (map :blogid (db-read "select blogid from tag_map where tag=?" tag-name)))
+  (db-read "select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
+           tag-name))
+
 
 (defn tags-by-post [postid]
   (mapcat vals (db-read "select tag from tag_map where blogid=?" postid)))
@@ -278,4 +278,5 @@ eg: (transaction add-user email firstname lastname password)"
         (println (.getMessage ex))
         (.printStackTrace ex)
         (.getMessage ex)))))
+
 

@@ -23,23 +23,30 @@
                          [:span.submit (if public "hide" "show")]))]))])
 
 	
+ (defn archives-by-date [archives]
+   (reduce
+     (fn [groups [date items]]
+       (conj groups (make-list date items)))
+     [:div]
+     (->> archives
+       (sort-by :time)
+       reverse
+       (group-by #(util/format-time (:time %) "yyyy MMMM")))))
+ 
+ 
 	(defpage "/archives" []
 	  (util/cache
      :archives
-     (let [archives (db/get-posts nil false (session/get :admin))]
-       (common/layout 
-         "Archives"
-         (reduce
-           (fn [groups [date items]]
-             (conj groups (make-list date items)))
-           [:div]
-           (->> archives
-             (sort-by :time)
-             reverse
-             (group-by #(util/format-time (:time %) "yyyy MMMM"))))))))
+     (common/layout 
+       "Archives"
+       (archives-by-date (db/get-posts nil false (session/get :admin))))))
 	
  (defpage [:post "/archives"] {:keys [post-id visible]}   
    (db/post-visible post-id (not (Boolean/parseBoolean visible)))
    (resp/redirect "/archives"))
 	
 	
+(defpage "/tag/:tagname" {:keys [tagname]}
+  (common/layout
+    tagname    
+    (archives-by-date (db/posts-by-tag tagname))))

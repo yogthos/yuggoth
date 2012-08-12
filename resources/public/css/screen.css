@@ -440,11 +440,26 @@ img {
 	padding: 3px;
 	margin-right: 2px;
 	color: #fff;
+	cursor:pointer;
 }
 .tagoff {
 	background-color: #eee;
 	padding: 3px;
 	margin-right: 2px;
 	color: #aaa;
+	cursor:pointer;
+}
+
+.taglist {
+	margin-left: 20px;
+	max-width: inherit;	
+}
+.tag {	
+	float: left;
+	padding: 2px;
+	font-size:90%;
+	
+	margin-bottom: 6px;	
+	color: #fff;
 	cursor:pointer;
 }
