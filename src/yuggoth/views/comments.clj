@@ -34,6 +34,17 @@
               [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]]) 
            
            [:br]
+           [:p "Markdown markup is supported in comments " [:span.help "help"]]
+           
+           [:table.mdhelp
+             [:tr [:td "*italics*"] [:td [:em "italics"]]]
+             [:tr [:td "**bold**"] [:td [:b "bold"]]]
+             [:tr [:td "~~foo~~"] [:td [:strike "strikethrough"]]]
+             [:tr [:td "[link](http://mylink.com)"] [:td (link-to "http://mylink.com" "link")]]             
+             [:tr [:td ">quoted text"] [:td [:blockquote "quoted text"]]]
+             [:tr [:td "super^script"] [:td "super" [:sup "script"]]]
+             [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
+           
            (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
            (submit-button {:tabindex 5} "submit")))
 

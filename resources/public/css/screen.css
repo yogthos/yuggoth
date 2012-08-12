@@ -329,13 +329,12 @@ input {
 	margin-bottom: 10px;
 }
 
-blockquote {
-    background: #eee;
-    border-left: 10px solid #36bcab;
-    color: #000;
+blockquote {    
+    border-left: 3px solid #ddd;
+    color: #333;
     font-family: Georgia, Arial, Helvetica, sans-serif;
     font-size: 15px;
-    padding: 10px;
+    padding-left: 5px;
     text-align: justify;
 }
 a {
@@ -462,4 +461,12 @@ img {
 	margin-bottom: 6px;	
 	color: #fff;
 	cursor:pointer;
+}
+.mdhelp {
+	display: none;
+}
+
+.mdhelp th, td {
+	border: 1px solid #ccc;
+	padding:5px;
 }

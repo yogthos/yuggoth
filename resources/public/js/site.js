@@ -2,6 +2,7 @@ $(document).ready(function(){
     if ($("#post-preview").length != 0) renderPreview();
     $($("#selected").val()).toggleClass("selected");
   	 
+  	$(".help").click(showHelp); 
   	$(".render-preview").click(renderPreview);  	
   	$(".submit").keypress(onEnter);  	
   	$(".tagoff").click(toggleTag);
@@ -44,4 +45,8 @@ function toggleTag(){
 		$("#tag-" + tagText).val(tagText);
 	else
 		$("#tag-" + tagText).removeAttr("value"); 		
+}
+
+function showHelp() {
+	$(".mdhelp").toggle();
 }

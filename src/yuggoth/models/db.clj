@@ -36,14 +36,8 @@ eg: (transaction add-user email firstname lastname password)"
     (sql/transaction
       (apply f args))))
 
-;file management
 
-(defn create-file-table []
-  (sql/create-table
-    :file
-    [:type "varchar(50)"]
-    [:name "varchar(50)"]
-    [:data "bytea"]))
+;files
 
 (defn to-byte-array [x]  
   (with-open [input (new java.io.FileInputStream x)
@@ -71,16 +65,8 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-file [name]
   (first (db-read "select * from file where name=?" name)))
 
-;;blog table management
-(defn create-blog-table []
-  (sql/create-table
-    :blog
-    [:id "SERIAL"]
-    [:time :timestamp]
-    [:title "varchar(100)"]
-    [:content "TEXT"]
-    [:author "varchar(100)"]    
-    [:public boolean]))
+
+;;blog posts
 
 (defn update-post [id title content public]
   (let [int-id (Integer/parseInt id)] 
@@ -136,14 +122,8 @@ eg: (transaction add-user email firstname lastname password)"
 (defn last-post-id []
   (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
 
-(defn create-comments-table []
-  (sql/create-table
-    :comment
-    [:blogid :int]
-    [:time :timestamp]    
-    [:content "TEXT"]
-    [:author "varchar(100)"]))
 
+;;comments
 (defn add-comment [blog-id content author]
   (sql/with-connection 
     db
@@ -158,18 +138,8 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-latest-comments [n]
   (db-read "select * from comment order by time desc limit ?" n))
 
-;;tag table management
-(defn create-tag-table []
-  (sql/create-table
-    :tag
-    [:name "varchar(50)"]))
 
-(defn create-tag-map-table []
-  (sql/create-table
-    :tag_map
-    [:blogid :int]
-    [:tag "varchar(50)"]))
-
+;;tags
 (defn tag-post [blogid tag]
   (sql/insert-values
     :tag_map
@@ -196,7 +166,6 @@ eg: (transaction add-user email firstname lastname password)"
   (db-read "select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
            tag-name))
 
-
 (defn tags-by-post [postid]
   (mapcat vals (db-read "select tag from tag_map where blogid=?" postid)))
 
@@ -211,17 +180,8 @@ eg: (transaction add-user email firstname lastname password)"
             (sql/insert-values :tag [:name] [tag]))
           (tag-post id tag))))))
 
-;;admin table management
-(defn create-admin-table []
-  (sql/create-table
-    :admin   
-    [:title "varchar(100)"]
-    [:style "varchar(50)"]
-    [:about "TEXT"]
-    [:handle "varchar(100)"]
-    [:pass   "varchar(100)"]
-    [:email  "varchar(50)"]))
 
+;;admin user
 (defn set-admin [admin]
   (sql/with-connection db (sql/insert-record :admin admin)))
 
@@ -230,23 +190,6 @@ eg: (transaction add-user email firstname lastname password)"
     db
     (sql/update-values :admin ["handle=?" (:handle admin)] admin)))
 
-(defn reset-blog []  
-  (sql/with-connection 
-    db  
-    (sql/transaction
-      (drop-table :admin)
-      (drop-table :blog)
-      (drop-table :comment)
-      (drop-table :file)
-      (drop-table :tag)
-      (drop-table :tag_map)
-      (create-admin-table)
-      (create-blog-table)
-      (create-comments-table)
-      (create-file-table)
-      (create-tag-table)
-      (create-tag-map-table))    
-    nil))
 
 (defn get-admin []
   (try (first (db-read "select * from admin"))
@@ -254,6 +197,8 @@ eg: (transaction add-user email firstname lastname password)"
       (when (.contains (.getMessage ex) "relation \"admin\" does not exist")
         (reset-blog)))))
 
+
+;;backup
 (defn export []
   {:admin (dissoc (get-admin) :pass)
    :posts
