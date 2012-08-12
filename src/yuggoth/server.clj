@@ -21,7 +21,7 @@
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]            
       (if (and (= scheme :http) (or (.contains uri "login") (.contains uri "create-admin")))      
-        (ring.util.response/redirect (str "https://" server-name ":11794" uri))
+        (ring.util.response/redirect (str "https://" server-name ":443" uri))
         (handler request)))))
 
 (server/load-views-ns 'yuggoth.views)
@@ -36,7 +36,7 @@
     ;;make sure that the container has an HTTPS listener setup 
     ;;if you're listening on a non standard SSL port (not 443), you will have to change the port above
     ;;I haven't found a way to get the port from the container
-    secure-login-redirect
+    ;secure-login-redirect
     fix-base-url))
 
 
