@@ -13,6 +13,8 @@
                  (.setPassword     "pass")
                  (.setMaxConnections 10))})
 
+
+
 (defn drop-table
   "drops the supplied table from the DB, table name must be a keyword
 eg: (drop-table :users)"
@@ -162,13 +164,13 @@ eg: (transaction add-user email firstname lastname password)"
 (defn create-tag-table []
   (sql/create-table
     :tag
-    [:name "varchar(10)"]))
+    [:name "varchar(50)"]))
 
 (defn create-tag-map-table []
   (sql/create-table
     :tag_map
     [:blogid :int]
-    [:tag "varchar(10)"]))
+    [:tag "varchar(50)"]))
 
 (defn tag-post [blogid tag]
   (sql/insert-values
