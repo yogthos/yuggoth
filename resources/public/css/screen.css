@@ -470,3 +470,8 @@ img {
 	border: 1px solid #ccc;
 	padding:5px;
 }
+
+.help, .render-comment-preview {
+	margin-left: 10px;	
+	background-color: #ddd;
+}

@@ -3,7 +3,8 @@ $(document).ready(function(){
     $($("#selected").val()).toggleClass("selected");
   	 
   	$(".help").click(showHelp); 
-  	$(".render-preview").click(renderPreview);  	
+  	$(".render-preview").click(renderPreview("#content"));
+  	$(".render-comment-preview").click(renderPreview("#comment"));
   	$(".submit").keypress(onEnter);  	
   	$(".tagoff").click(toggleTag);
   	$(".tagon").click(toggleTag);  	
@@ -21,9 +22,11 @@ $(document).ready(function(){
  	
 });
 
-function renderPreview() {
-	var md = $("#content").val();
-	$("#post-preview").html(markdown.mdToHtml(md));   	
+function renderPreview(id) {
+	return function() {
+		var md = $(id).val();
+		$("#post-preview").html(markdown.mdToHtml(md));
+	}   	
 }
 
 function onEnter(e)

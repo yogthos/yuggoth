@@ -46,6 +46,10 @@
              [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
            
            (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
+           [:span.render-comment-preview "preview"]
+           [:br]
+           [:div.comment-preview
+            [:p#post-preview ]]
            (submit-button {:tabindex 5} "submit")))
 
 (defpage [:post "/comment"] {:keys [blog-id captcha content author]}
