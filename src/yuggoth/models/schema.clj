@@ -18,7 +18,7 @@
     [:title "varchar(100)"]
     [:content "TEXT"]
     [:author "varchar(100)"]    
-    [:public boolean]))
+    [:public :boolean]))
 
 ;;comment table 
 (defn create-comments-table []
