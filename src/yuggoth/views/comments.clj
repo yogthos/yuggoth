@@ -56,7 +56,9 @@
   (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
              (not-empty author) 
              (not-empty content)) 
-    (db/add-comment blog-id content author))  
+    (db/add-comment blog-id content author)
+    (util/invalidate-cache :home)
+    (util/invalidate-cache (keyword (str "post-" blog-id))))  
   (resp/redirect (str "/blog/" blog-id)))
 
 (defn gen-captcha-text []

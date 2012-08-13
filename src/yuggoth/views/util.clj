@@ -31,12 +31,17 @@
      ~params 
      (if (session/get :admin) (do ~@content) (resp/redirect "/"))))
 
+(defn invalidate-cache [k]
+  (swap! cached assoc-in [k :invalid] true))
+ 
 (defmacro cache [id content]
   `(if (session/get :admin)
     ~content
     (let [last-updated# (:time (get @cached ~id))
+          invalid#  (:invalid (get @cached ~id))
           cur-time# (.getTime (new java.util.Date))]
-      (if (or (nil? last-updated#)
+      (if (or invalid# 
+              (nil? last-updated#)
               (> (- cur-time# last-updated#) 60000))
         (swap! cached assoc ~id {:time cur-time# :content ~content}))
       (:content (get @cached ~id))))) 

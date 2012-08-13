@@ -31,8 +31,8 @@
       (str "/blog/" id)
       "/")))
 
-(defn entry [{:keys [id time title content author public]}]  
-  (apply common/layout         
+(defn entry [{:keys [id time title content author public]}]
+   (apply common/layout         
          (if id
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
@@ -132,6 +132,9 @@
         (db/update-tags 
           (:id (db/store-post title content (:handle (session/get :admin)) public))
           tags))
+      
+      (util/invalidate-cache :home)
+      (util/invalidate-cache (keyword (str "post-" post-id)))
       
       (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (render "/make-post" (assoc post :error "post title is required"))))
