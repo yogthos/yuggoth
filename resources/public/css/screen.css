@@ -480,3 +480,6 @@ img {
 	padding-left: 21px;
 	padding-right: 21px;
 }
+.toolbar {
+        display: none;
+}
