@@ -195,6 +195,7 @@ tr.padded td {
 textarea#comment {
 	width: 600px;
 	height: 100px;
+	margin-bottom: 15px;
 }
 
 #comment-content h1 {
@@ -473,5 +474,9 @@ img {
 
 .help, .render-comment-preview {
 	margin-left: 10px;	
-	background-color: #ddd;
+	background-color: #ddd;	
+}
+.render-comment-preview {	
+	padding-left: 21px;
+	padding-right: 21px;
 }
