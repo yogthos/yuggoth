@@ -1,4 +1,7 @@
-$(document).ready(function(){    
+$(document).ready(function(){	
+	SyntaxHighlighter.config.tagName = "code";
+	SyntaxHighlighter.defaults.gutter = false;   
+	SyntaxHighlighter.all();
     if ($("#post-preview").length != 0) renderPreview();
     $($("#selected").val()).toggleClass("selected");
   	 
