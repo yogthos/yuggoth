@@ -20,6 +20,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 * RSS feed
 * tags
 * markdown in posts and comments with live preview
+* syntax highlighting using [syntax highlighter](http://alexgorbatchev.com/SyntaxHighlighter/)
 * file uploads and management through web UI
 * custom styles
 * captchas for comments
