@@ -1,6 +1,7 @@
 (ns yuggoth.views.comments
   (:use hiccup.element hiccup.form noir.core)
-  (:require [yuggoth.views.util :as util]
+  (:require [clojure.string :as string] 
+            [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
             [yuggoth.views.common :as common]
             [noir.session :as session]
@@ -52,11 +53,12 @@
             [:p#post-preview ]]
            (submit-button {:tabindex 5} "submit")))
 
+
 (defpage [:post "/comment"] {:keys [blog-id captcha content author]}
   (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
              (not-empty author) 
              (not-empty content)) 
-    (db/add-comment blog-id content author)
+    (db/add-comment blog-id (.text (org.jsoup.Jsoup/parse content)) author)
     (util/invalidate-cache :home)
     (util/invalidate-cache (keyword (str "post-" blog-id))))  
   (resp/redirect (str "/blog/" blog-id)))
