@@ -19,12 +19,12 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 * content caching
 * RSS feed
 * tags
-* markdown in posts and comments with live preview
+* markdown in posts and comments with preview
 * syntax highlighting using [syntax highlighter](http://alexgorbatchev.com/SyntaxHighlighter/)
 * file uploads and management through web UI
-* custom styles
+* custom CSS styles
 * captchas for comments
-* view latest comments
+* latest comments view
 * toggle post visibility
 
 ## Usage
