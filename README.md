@@ -32,12 +32,14 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 First, setup postgreSQL and update the configuration in `src/config.clj` to point to it.
 To enable SSL set `ssl` to `true` and optionally change the port to the one you're using, default is 443.
  ```clojure
-(def blog-config
-  ;;db config
-  {:host "localhost"
+(def blog-config  
+  {;;db config
+   :host "localhost"
    :schema "blogdb"
    :user "user"
    :pass "pass"       
+   
+   ;;SSL config
    :ssl false
    :ssl-port 443})
 ```
