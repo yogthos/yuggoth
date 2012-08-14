@@ -1,17 +1,17 @@
 (ns yuggoth.models.db
-  (:use yuggoth.models.schema)
+  (:use yuggoth.models.schema config)
   (:require [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp 
            java.util.Date
            javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
 
-(def ^{:private true} db 
+(def db 
   {:datasource (doto (new PGPoolingDataSource)
-                 (.setServerName   "localhost")
-                 (.setDatabaseName "yourdb")                       
-                 (.setUser         "user")                 
-                 (.setPassword     "pass")
+                 (.setServerName   (:host blog-config) )
+                 (.setDatabaseName (:schema blog-config))                       
+                 (.setUser         (:user blog-config))                                  
+                 (.setPassword     (:pass blog-config))
                  (.setMaxConnections 10))})
 
 (defn drop-table

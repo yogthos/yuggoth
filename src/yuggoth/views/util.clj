@@ -42,6 +42,6 @@
           cur-time# (.getTime (new java.util.Date))]
       (if (or invalid# 
               (nil? last-updated#)
-              (> (- cur-time# last-updated#) 60000))
+              (> (- cur-time# last-updated#) 300000))
         (swap! cached assoc ~id {:time cur-time# :content ~content}))
       (:content (get @cached ~id))))) 

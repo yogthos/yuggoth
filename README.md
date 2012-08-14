@@ -29,48 +29,27 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 
 ## Usage
 
-First, setup postgreSQL and update `db` definition in `yuggoth.models.db` to point to it: 
-```clojure
-(def ^{:private true} db
-  {:datasource (doto (new PGPoolingDataSource)
-                 (.setServerName "localhost")
-                 (.setDatabaseName "yourdb")
-                 (.setUser "user")
-                 (.setPassword "pass")
-                 (.setMaxConnections 10))})
+First, setup postgreSQL and update the configuration in `src/config.clj` to point to it.
+To enable SSL set `ssl` to `true` and optionally change the port to the one you're using, default is 443.
+ ```clojure
+(def blog-config
+  ;;db config
+  {:host "localhost"
+   :schema "blogdb"
+   :user "user"
+   :pass "pass"       
+   :ssl false
+   :ssl-port 443})
 ```
+
 The blog will automatically create the necessary tables for you. 
 When you navigate to the blog on the first run it will present the setup wizard wich will allow you to configure the administrator and the blog title.
 Further configuration can be done on the profile page.   
 
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
-
 ```bash
 lein deps
 lein run
-```
-
-to enable SSL uncomment `secure-login-redirect` in `service.clj` and optionally change the port to the one you're using, default is 443
-```clojure
-(defn secure-login-redirect [handler]
-  (fn [request]
-    (let [{:keys [scheme uri server-name server-port]} request]
-      (if (and (= scheme :http) (or (.contains uri "login") (.contains uri "create-admin")))
-        (ring.util.response/redirect (str "https://" server-name ":443" uri)) ;change SSL port if needed
-        (handler request)))))
-        
-(def handler
-  (-> (server/gen-handler
-        {:mode :prod,
-         :ns 'yuggoth
-         :session-cookie-attrs {:max-age 1800000}})
-   
-    ;;enable this to redirect login to HTTPS
-    ;;make sure that the container has an HTTPS listener setup
-    ;;if you're listening on a non standard SSL port (not 443), you will have to change the port above
-    ;;I haven't found a way to get the port from the container
-    ;secure-login-redirect
-    fix-base-url))        
 ```
 
 to run as standalone
