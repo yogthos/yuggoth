@@ -467,7 +467,7 @@ img {
 	display: none;
 }
 
-.mdhelp th, td {
+table.mdhelp td {
 	border: 1px solid #ccc;
 	padding:5px;
 }
