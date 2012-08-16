@@ -2,7 +2,7 @@
             :description "personal blog engine"
             :dependencies [[org.clojure/clojure "1.4.0"]
                            [noir "1.3.0-beta3" :exclude [org.clojure/clojure]]
-                           [markdown-clj "0.9.7"]
+                           [markdown-clj "0.9.8"]
                            [org.clojure/java.jdbc "0.2.3"]
                            [net.sf.jlue/jlue-core "1.3"]
                            [joda-time "2.0"]
