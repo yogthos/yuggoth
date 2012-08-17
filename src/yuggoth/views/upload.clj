@@ -15,12 +15,11 @@
     "Upload file"
     [:div [:h3 "available files"]
      (into [:ul] 
-           (for [name (db/list-files)]
+           (for [name (db/list-files)]             
              [:li.file-link (link-to (str "/files/" name) name) 
               [:span "  "] 
-              [:div.file
-               (form-to [:post "/delete-file"]
-                        (hidden-field "name" name)                               
+              [:div.file               
+               (form-to [:post (str "/delete-file/" name)]                                               
                         (submit-button {:class "delete"} "delete"))]]))]
     [:br]
     
@@ -46,7 +45,7 @@
     "File upload failed"
     [:p "An error has occured while uploading the file: " (:error params)]))
 
-(util/private-page [:post "/delete-file"] params
+(util/private-page [:post "/delete-file/:name"] params                   
   (db/delete-file (:name params))
   (resp/redirect "/upload"))
 

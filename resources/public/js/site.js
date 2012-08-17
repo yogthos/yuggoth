@@ -13,17 +13,21 @@ $(document).ready(function(){
   	$(".tagon").click(toggleTag);  	
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
     $(".delete").click(function(e){
-    jConfirm('', 
+    	confirm(this.parentNode);
+    	// Always return false here since we don't know what jConfirm is going to do
+    	return false;
+  	});
+ 	
+});
+
+function confirm(form) {	
+	jConfirm('', 
              'Confirm delete?', 
              function(r) {
                // If they confirmed, manually trigger a form submission
-               if (r) $(".delete").parents("FORM").submit();
-             });
-    // Always return false here since we don't know what jConfirm is going to do
-    return false;
-  });
- 	
-});
+               if (r) $(form).submit();
+    		  });
+}
 
 function renderPreview(id) {
 	return function() {

@@ -77,7 +77,7 @@ eg: (transaction add-user email firstname lastname password)"
 (defn list-files []
   (map :name (db-read "select name from file")))
 
-(defn delete-file [name]
+(defn delete-file [name]  
   (sql/with-connection db (sql/delete-rows :file ["name=?" name])))
 
 (defn get-file [name]
