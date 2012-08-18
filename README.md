@@ -45,6 +45,7 @@ to run as standalone
 lein uberjar
 java -jar yuggoth-0.4.0-SNAPSHOT-standalone.jar
 ```
+a compiled jar is available [here](http://yogthos.net/yuggoth-0.4.0-SNAPSHOT-standalone.jar)
 
 valid options for running standalone
 
@@ -55,8 +56,6 @@ to make a deployable WAR
 ```bash
 lein ring uberwar
 ```
-
-
 
 see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
 
