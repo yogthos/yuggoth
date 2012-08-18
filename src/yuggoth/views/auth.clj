@@ -53,8 +53,7 @@
       (render "/setup-blog" (assoc config :error (.getMessage ex))))))
 
 (defpage "/create-admin" {:keys [title handle pass pass1 email error]}
-  (if (db/get-admin)
-    (resp/redirect "/")
+  (if (:setup @blog-config)
     (do
       (schema/reset-blog @config/db)
       (common/layout
@@ -66,7 +65,8 @@
                                  "pass"  "password" pass
                                  "pass1" "confirm password" pass1
                                  "email" "email" email)
-                 [:span.submit {:tabindex 5} "create"])))))
+                 [:span.submit {:tabindex 5} "create"])))
+    (resp/redirect "/")))
 
 (defn check-admin-fields [admin]
   (cond
@@ -82,5 +82,6 @@
       (render "/create-admin" (assoc admin :error error))
       (do
         (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))
+        (swap! blog-config assoc :setup false)
         (resp/redirect "/login")))))
 

@@ -62,14 +62,14 @@ eg: (drop-table :users)"
 
 (defn reset-blog [db]  
   (sql/with-connection 
-    db 
+    db
+    (drop-table :admin)
+    (drop-table :blog)
+    (drop-table :comment)
+    (drop-table :file)
+    (drop-table :tag)
+    (drop-table :tag_map)
     (sql/transaction
-      (drop-table :admin)
-      (drop-table :blog)
-      (drop-table :comment)
-      (drop-table :file)
-      (drop-table :tag)
-      (drop-table :tag_map)
       (create-admin-table)
       (create-blog-table)
       (create-comments-table)

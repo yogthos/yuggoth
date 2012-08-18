@@ -1,7 +1,7 @@
 (ns config
   (:use clojure.java.io yuggoth.models.schema)
   (:import java.io.File
-           javax.sql.DataSource
+           java.sql.DriverManager
            org.postgresql.ds.PGPoolingDataSource))
 
 (def blog-config (atom nil))
@@ -13,15 +13,15 @@
       (doto (new File "blog.properties") (.createNewFile))
       url)))
 
-(defn reset-config [config]  
-  (reset! blog-config (select-keys config [:ssl :ssl-port]))  
+(defn reset-config [config]      
   (reset! db 
           {:datasource 
            (doto (new PGPoolingDataSource)
              (.setServerName   (:host config) )
              (.setDatabaseName (:schema config))                       
              (.setUser         (:user config))                                  
-             (.setPassword     (:pass config)))}))
+             (.setPassword     (:pass config)))})
+  (reset! blog-config (assoc (select-keys config [:ssl :ssl-port]) :setup true)))
 
 (defn init-config []    
   (with-open
@@ -31,6 +31,8 @@
   (println "configuration intialized"))
 
 (defn write-config [config]   
+  (with-open [con (DriverManager/getConnection 
+                    (str "jdbc:postgresql://" (:host config) "/" (:schema config)) (:user config) (:pass config))])
   (with-open [w (clojure.java.io/writer (load-config-file))]
     (.write w (str config))
     (reset-config config)))
