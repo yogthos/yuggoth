@@ -27,6 +27,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 * latest comments view
 * toggle post visibility
 * export/import
+
 ## Usage
 
 The blog requires an instance of postgreSQL. On the first run the blog will guide you through setting up
