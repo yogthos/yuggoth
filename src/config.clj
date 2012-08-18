@@ -9,7 +9,7 @@
 
 (defn load-config-file []
   (let [url (.. (Thread/currentThread) getContextClassLoader (findResource "blog.properties"))] 
-    (if (.. url getPath (endsWith "jar!/blog.properties"))
+    (if (or (nil? url) (.. url getPath (endsWith "jar!/blog.properties")))
       (doto (new File "blog.properties") (.createNewFile))
       url)))
 

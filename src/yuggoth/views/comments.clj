@@ -7,6 +7,8 @@
             [noir.session :as session]
             [noir.response :as resp])
   (:import net.sf.jlue.util.Captcha
+           org.jsoup.Jsoup
+           org.jsoup.safety.Whitelist
            javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
@@ -41,8 +43,7 @@
              [:tr [:td "*italics*"] [:td [:em "italics"]]]
              [:tr [:td "**bold**"] [:td [:b "bold"]]]
              [:tr [:td "~~foo~~"] [:td [:strike "strikethrough"]]]
-             [:tr [:td "[link](http://mylink.com)"] [:td (link-to "http://mylink.com" "link")]]             
-             [:tr [:td ">quoted text"] [:td [:blockquote "quoted text"]]]
+             [:tr [:td "[link](http://mylink.com)"] [:td (link-to "http://mylink.com" "link")]]                          
              [:tr [:td "super^script"] [:td "super" [:sup "script"]]]
              [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
            
@@ -53,12 +54,12 @@
             [:p#post-preview ]]
            (submit-button {:tabindex 5} "submit")))
 
-
 (defpage [:post "/comment"] {:keys [blog-id captcha content author]}
   (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
              (not-empty author) 
              (not-empty content)) 
-    (db/add-comment blog-id (.text (org.jsoup.Jsoup/parse content)) author)
+    (db/add-comment blog-id (Jsoup/clean content (Whitelist/basic)) 
+                    author)
     (util/invalidate-cache :home)
     (util/invalidate-cache (keyword (str "post-" blog-id))))  
   (resp/redirect (str "/blog/" blog-id)))
