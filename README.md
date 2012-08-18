@@ -46,7 +46,7 @@ lein uberjar
 java -jar yuggoth-0.4.0-SNAPSHOT-standalone.jar
 ```
 Builds are available as a [jar](http://yogthos.net/yuggoth-0.4.0-SNAPSHOT-standalone.jar) for running
-standalone and a [war]((http://yogthos.net/yuggoth-0.4.0-SNAPSHOT-standalone.war) for app server deployment. 
+standalone and a [war](http://yogthos.net/yuggoth-0.4.0-SNAPSHOT-standalone.war) for app server deployment. 
  
 
 valid options for running standalone
