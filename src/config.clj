@@ -1,14 +1,17 @@
 (ns config
   (:use clojure.java.io)
-  (:import javax.sql.DataSource
+  (:import java.io.File
+           javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
 
-(def ^{:private true} config-file "blog.properties")
 (def blog-config (atom nil))
 (def db (atom nil))
 
-(defn class-loader []
-  (.. (Thread/currentThread) getContextClassLoader ))
+(defn load-config-file []
+  (let [url (.. (Thread/currentThread) getContextClassLoader (findResource "blog.properties"))] 
+    (if (.. url getPath (endsWith "jar!/blog.properties"))
+      (doto (new File "blog.properties") (.createNewFile))
+      url)))
 
 (defn reset-config [config]
   (reset! blog-config (select-keys config [:ssl :ssl-port]))
@@ -22,13 +25,12 @@
 
 (defn init-config []    
   (with-open
-    [r (java.io.PushbackReader. (reader (.getResourceAsStream (class-loader) config-file)))]    
+    [r (java.io.PushbackReader. (reader (load-config-file)))]    
       (if-let [config (read r nil nil)]
-        (reset-config config)        
-        (println "could not read config file" config-file)))
+        (reset-config config)))
   (println "configuration intialized"))
 
-(defn write-config [config]  
-  (with-open [w (clojure.java.io/writer (.findResource (class-loader) config-file))]
+(defn write-config [config]   
+  (with-open [w (clojure.java.io/writer (load-config-file))]
     (.write w (str config))
     (reset-config config)))
