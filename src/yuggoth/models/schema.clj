@@ -51,3 +51,29 @@
     [:handle "varchar(100)"]
     [:pass   "varchar(100)"]
     [:email  "varchar(50)"]))
+
+(defn drop-table
+  "drops the supplied table from the DB, table name must be a keyword
+eg: (drop-table :users)"
+  [table]
+  (try
+   (sql/drop-table table)
+   (catch Exception _)))
+
+(defn reset-blog [db]  
+  (sql/with-connection 
+    db 
+    (sql/transaction
+      (drop-table :admin)
+      (drop-table :blog)
+      (drop-table :comment)
+      (drop-table :file)
+      (drop-table :tag)
+      (drop-table :tag_map)
+      (create-admin-table)
+      (create-blog-table)
+      (create-comments-table)
+      (create-file-table)
+      (create-tag-table)
+      (create-tag-map-table))    
+    nil))

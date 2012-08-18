@@ -3,14 +3,6 @@
   (:require [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp java.util.Date))
 
-(defn drop-table
-  "drops the supplied table from the DB, table name must be a keyword
-eg: (drop-table :users)"
-  [table]
-  (try
-   (sql/with-connection @db(sql/drop-table table))
-   (catch Exception _)))
-
 (defn db-read
   "returns the result of running the supplied SQL query"
   [query & args]
@@ -25,24 +17,6 @@ eg: (transaction add-user email firstname lastname password)"
   (sql/with-connection @db
     (sql/transaction
       (apply f args))))
-
-(defn reset-blog []  
-  (sql/with-connection 
-    @db 
-    (sql/transaction
-      (drop-table :admin)
-      (drop-table :blog)
-      (drop-table :comment)
-      (drop-table :file)
-      (drop-table :tag)
-      (drop-table :tag_map)
-      (create-admin-table)
-      (create-blog-table)
-      (create-comments-table)
-      (create-file-table)
-      (create-tag-table)
-      (create-tag-map-table))    
-    nil))
 
 ;files
 

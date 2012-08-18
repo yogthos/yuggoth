@@ -1,5 +1,5 @@
 (ns config
-  (:use clojure.java.io)
+  (:use clojure.java.io yuggoth.models.schema)
   (:import java.io.File
            javax.sql.DataSource
            org.postgresql.ds.PGPoolingDataSource))
@@ -13,8 +13,8 @@
       (doto (new File "blog.properties") (.createNewFile))
       url)))
 
-(defn reset-config [config]
-  (reset! blog-config (select-keys config [:ssl :ssl-port]))
+(defn reset-config [config]  
+  (reset! blog-config (select-keys config [:ssl :ssl-port]))  
   (reset! db 
           {:datasource 
            (doto (new PGPoolingDataSource)

@@ -1,6 +1,8 @@
 (ns yuggoth.views.auth
   (:use hiccup.core hiccup.form noir.core config)
-  (:require [yuggoth.views.util :as util] 
+  (:require [config :only db]
+            [yuggoth.models.schema :as schema]
+            [yuggoth.views.util :as util] 
             [yuggoth.views.common :as common]                       
             [noir.util.crypt :as crypt]
             [noir.session :as session]
@@ -45,7 +47,7 @@
     (write-config (-> config
                     (update-in [:ssl] not-empty)
                     (update-in [:ssl-port] #(or % 443))))
-    (init-config)    
+    (init-config)
     (resp/redirect "/create-admin")
     (catch Exception ex
       (render "/setup-blog" (assoc config :error (.getMessage ex))))))
@@ -53,16 +55,18 @@
 (defpage "/create-admin" {:keys [title handle pass pass1 email error]}
   (if (db/get-admin)
     (resp/redirect "/")
-    (common/layout
-      "Create blog"
-      (if error [:h2.error error])
-      (form-to [:post "/create-admin"]
-               (text-field {:placeholder "Blog title"} "title" title)             
-               (util/make-form "handle" "name" handle 
-                               "pass"  "password" pass
-                               "pass1" "confirm password" pass1
-                               "email" "email" email)
-               [:span.submit {:tabindex 5} "create"]))))
+    (do
+      (schema/reset-blog @config/db)
+      (common/layout
+        "Create blog"
+        (if error [:h2.error error])
+        (form-to [:post "/create-admin"]
+                 (text-field {:placeholder "Blog title"} "title" title)             
+                 (util/make-form "handle" "name" handle 
+                                 "pass"  "password" pass
+                                 "pass1" "confirm password" pass1
+                                 "email" "email" email)
+                 [:span.submit {:tabindex 5} "create"])))))
 
 (defn check-admin-fields [admin]
   (cond
