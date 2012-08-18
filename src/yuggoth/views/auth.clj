@@ -1,5 +1,5 @@
 (ns yuggoth.views.auth
-  (:use hiccup.form noir.core)
+  (:use hiccup.core hiccup.form noir.core config)
   (:require [yuggoth.views.util :as util] 
             [yuggoth.views.common :as common]                       
             [noir.util.crypt :as crypt]
@@ -26,17 +26,43 @@
   (session/clear!)
   (resp/redirect "/"))
 
+(defpage "/setup-blog" {:keys [host schema user pass ssl ssl-port error]}
+  (html
+    [:body 
+     [:h2 "Initial Configuration"]
+     (if error [:h2.error error])
+     (form-to [:post "/setup-blog"]
+              (util/make-form "host" "host" host
+                              "schema" "schema" schema
+                              "user"   "user" user
+                              "pass"   "pass" pass
+                              "ssl"    "ssl"  ssl
+                              "ssl-port" "ssl port" ssl-port)
+              (submit-button "initialize"))]))
+
+(defpage [:post "/setup-blog"] config
+  (try
+    (write-config (-> config
+                    (update-in [:ssl] not-empty)
+                    (update-in [:ssl-port] #(or % 443))))
+    (init-config)    
+    (resp/redirect "/create-admin")
+    (catch Exception ex
+      (render "/setup-blog" (assoc config :error (.getMessage ex))))))
+
 (defpage "/create-admin" {:keys [title handle pass pass1 email error]}
-  (common/layout
-    "Create blog"
-    (when error [:h2.error error])
-    (form-to [:post "/create-admin"]
-             (text-field {:placeholder "Blog title"} "title" title)             
-             (util/make-form "handle" "name" handle 
-                             "pass"  "password" pass
-                             "pass1" "confirm password" pass1
-                             "email" "email" email)
-             [:span.submit {:tabindex 5} "create"])))
+  (if (db/get-admin)
+    (resp/redirect "/")
+    (common/layout
+      "Create blog"
+      (if error [:h2.error error])
+      (form-to [:post "/create-admin"]
+               (text-field {:placeholder "Blog title"} "title" title)             
+               (util/make-form "handle" "name" handle 
+                               "pass"  "password" pass
+                               "pass1" "confirm password" pass1
+                               "email" "email" email)
+               [:span.submit {:tabindex 5} "create"]))))
 
 (defn check-admin-fields [admin]
   (cond
@@ -46,7 +72,8 @@
     :else nil))
 
 (defpage [:post "/create-admin"] admin
-  (when (nil? (db/get-admin)) 
+  (if (db/get-admin) 
+    (resp/redirect "/")
     (if-let [error (check-admin-fields admin)] 
       (render "/create-admin" (assoc admin :error error))
       (do

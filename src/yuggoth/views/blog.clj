@@ -1,5 +1,5 @@
 (ns yuggoth.views.blog
-  (:use noir.core hiccup.form hiccup.element hiccup.util)
+  (:use noir.core hiccup.form hiccup.element hiccup.util config)
   (:require markdown
             [yuggoth.views.util :as util]
             [noir.session :as session]
@@ -50,13 +50,13 @@
 
 
 (defpage "/" []
-  (if (db/get-admin)
+  (if @blog-config
     (util/cache 
       :home 
       (if-let [post (db/get-last-public-post)] 
         (entry post)
         (common/layout "Welcome to your new blog" "Nothing here yet...")))
-    (resp/redirect "/create-admin")))
+    (resp/redirect "/setup-blog")))
 
 
 (defpage "/blog-previous/:postid" {:keys [postid]}

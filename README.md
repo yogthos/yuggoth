@@ -29,24 +29,10 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net and allows m
 
 ## Usage
 
-First, setup postgreSQL and update the configuration in `src/config.clj` to point to it.
-To enable SSL set `ssl` to `true` and optionally change the port to the one you're using, default is 443.
- ```clojure
-(def blog-config  
-  {;;db config
-   :host "localhost"
-   :schema "blogdb"
-   :user "user"
-   :pass "pass"       
-   
-   ;;SSL config
-   :ssl false
-   :ssl-port 443})
-```
-
-The blog will automatically create the necessary tables for you. 
-When you navigate to the blog on the first run it will present the setup wizard wich will allow you to configure the administrator and the blog title.
-Further configuration can be done on the profile page.   
+The blog requires an instance of postgreSQL. On the first run the blog will guide you through setting up
+the db connection properties and create the necessary tables for you. Then you will be presented with the 
+setup wizard wich will allow you to configure the administrator and the blog title. Further configuration 
+can be done on the profile page.   
 
 If you use cake, substitute 'lein' with 'cake' below. Everything should work fine.
 ```bash

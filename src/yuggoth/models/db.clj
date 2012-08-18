@@ -1,45 +1,34 @@
 (ns yuggoth.models.db
   (:use yuggoth.models.schema config)
   (:require [clojure.java.jdbc :as sql])
-  (:import java.sql.Timestamp 
-           java.util.Date
-           javax.sql.DataSource
-           org.postgresql.ds.PGPoolingDataSource))
-
-(def db 
-  {:datasource (doto (new PGPoolingDataSource)
-                 (.setServerName   (:host blog-config) )
-                 (.setDatabaseName (:schema blog-config))                       
-                 (.setUser         (:user blog-config))                                  
-                 (.setPassword     (:pass blog-config))
-                 (.setMaxConnections 10))})
+  (:import java.sql.Timestamp java.util.Date))
 
 (defn drop-table
   "drops the supplied table from the DB, table name must be a keyword
 eg: (drop-table :users)"
   [table]
   (try
-   (sql/with-connection db (sql/drop-table table))
+   (sql/with-connection @db(sql/drop-table table))
    (catch Exception _)))
 
 (defn db-read
   "returns the result of running the supplied SQL query"
   [query & args]
   (sql/with-connection 
-    db
+    @db
     (sql/with-query-results res (vec (cons query args)) (doall res))))
 
 (defn transaction
   "runs a function with the supplied arguments in an SQL transaction
 eg: (transaction add-user email firstname lastname password)"
   [f & args]
-  (sql/with-connection db
+  (sql/with-connection @db
     (sql/transaction
       (apply f args))))
 
 (defn reset-blog []  
   (sql/with-connection 
-    db  
+    @db 
     (sql/transaction
       (drop-table :admin)
       (drop-table :blog)
@@ -68,7 +57,7 @@ eg: (transaction add-user email firstname lastname password)"
 
 (defn store-file [{:keys [tempfile filename content-type]}]
   (sql/with-connection 
-    db
+    @db
     (sql/update-or-insert-values
       :file
       ["name=?" filename]
@@ -78,7 +67,7 @@ eg: (transaction add-user email firstname lastname password)"
   (map :name (db-read "select name from file")))
 
 (defn delete-file [name]  
-  (sql/with-connection db (sql/delete-rows :file ["name=?" name])))
+  (sql/with-connection @db (sql/delete-rows :file ["name=?" name])))
 
 (defn get-file [name]
   (first (db-read "select * from file where name=?" name)))
@@ -89,7 +78,7 @@ eg: (transaction add-user email firstname lastname password)"
 (defn update-post [id title content public]
   (let [int-id (Integer/parseInt id)] 
     (sql/with-connection
-      db
+      @db
       (sql/update-values
         :blog
         ["id=?" int-id]
@@ -117,7 +106,7 @@ eg: (transaction add-user email firstname lastname password)"
 
 (defn store-post [title content author public]
   (sql/with-connection 
-    db
+    @db
     (sql/insert-values
       :blog
       [:time :title :content :author :public]
@@ -125,7 +114,7 @@ eg: (transaction add-user email firstname lastname password)"
 
 (defn post-visible [id public]
   (sql/with-connection 
-    db
+    @db
     (sql/update-values
       :blog 
       ["id=?" (Integer/parseInt id)]
@@ -144,7 +133,7 @@ eg: (transaction add-user email firstname lastname password)"
 ;;comments
 (defn add-comment [blog-id content author]
   (sql/with-connection 
-    db
+    @db
     (sql/insert-values
       :comment
       [:blogid :time :content :author]
@@ -169,13 +158,13 @@ eg: (transaction add-user email firstname lastname password)"
 
 (defn add-tag [tag-name]
   (sql/with-connection
-    db
+    @db
     (sql/insert-values
       :tag [:name] [(.toLowerCase tag-name)])))
 
 (defn delete-tags [tags]
   (sql/with-connection
-    db
+    @db
     (doseq [tag tags] 
       (sql/delete-rows :tag_map ["tag=?" tag])
       (sql/delete-rows :tag ["name=?" tag]))))
@@ -190,7 +179,7 @@ eg: (transaction add-user email firstname lastname password)"
 (defn update-tags [blogid tags]    
   (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)]    
     (sql/with-connection
-      db
+      @db
       (sql/transaction
         (sql/delete-rows :tag_map ["blogid=?" id])
         (doseq [tag tags]
@@ -200,19 +189,16 @@ eg: (transaction add-user email firstname lastname password)"
 
 ;;admin user
 (defn set-admin [admin]
-  (sql/with-connection db (sql/insert-record :admin admin)))
+  (sql/with-connection @db (sql/insert-record :admin admin)))
 
 (defn update-admin [admin]
   (sql/with-connection 
-    db
+    @db
     (sql/update-values :admin ["handle=?" (:handle admin)] admin)))
 
 
-(defn get-admin []
-  (try (first (db-read "select * from admin"))
-    (catch java.sql.SQLException ex
-      (when (.contains (.getMessage ex) "relation \"admin\" does not exist")
-        (reset-blog)))))
+(defn get-admin []  
+  (first (db-read "select * from admin")))
 
 
 ;;backup
@@ -227,7 +213,7 @@ eg: (transaction add-user email firstname lastname password)"
     (let [content (read (new java.io.PushbackReader (new java.io.StringReader blog)))
           author (:handle (get-admin))]      
       (sql/with-connection
-        db
+        @db
         (doseq [{:keys [time title content]} (:posts content)]
           (println "importing post" title)          
           (sql/insert-values

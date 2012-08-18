@@ -10,6 +10,7 @@
                            [org.jsoup/jsoup "1.6.3"]
                            [postgresql/postgresql "9.1-901.jdbc4"]]
             :dev-dependencies [[lein-ring "0.7.1"]]
-            :ring {:handler yuggoth.server/handler}
+            :ring {:handler yuggoth.server/handler
+                   :init config/init-config}            
             :main yuggoth.server)
 

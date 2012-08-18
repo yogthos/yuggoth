@@ -20,7 +20,7 @@
     [:h2.info info]
     (link-to "/export" "export blog")
     
-    #_ (form-to [:post "/import"]
+    (form-to [:post "/import"]
                 (text-area "blog")
                 [:br]
                 [:span.submit "import blog"])
@@ -86,3 +86,4 @@
   (db/delete-tags (map second tags))
   (resp/redirect "/profile"))
 
+(hiccup.core/html [:html [:body "foo"]])

@@ -22,7 +22,7 @@
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]            
       (if (and (= scheme :http) (or (.contains uri "login") (.contains uri "create-admin")))      
-        (ring.util.response/redirect (str "https://" server-name ":" (:ssl-port blog-config) uri))
+        (ring.util.response/redirect (str "https://" server-name ":" (:ssl-port @blog-config) uri))
         (handler request)))))
 
 (server/load-views-ns 'yuggoth.views)
@@ -32,7 +32,7 @@
         {:mode :prod, 
          :ns 'yuggoth 
          :session-cookie-attrs {:max-age 1800000}})
-    (#(if (:ssl blog-config) (secure-login-redirect %) %))
+    (#(if (:ssl @blog-config) (secure-login-redirect %) %))
     fix-base-url))
 
 
@@ -47,6 +47,7 @@
              (throw (new Exception (str "invalid option " name val " see -help for valid options")))))))
 
 (defn -main [& args]  
+  (init-config)
   (if (= "-help" (first args))
     (println "valid options:\n-port integer\n-mode dev/prod\n-help this message")
     (let [m (parse-args args)
