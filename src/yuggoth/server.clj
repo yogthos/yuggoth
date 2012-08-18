@@ -9,9 +9,9 @@
 
 ;;hack
 (defn fix-base-url [handler]
-  (fn [request]
+  (fn [request]    
     (with-redefs [noir.options/resolve-url 
-                  (fn [url] 
+                  (fn [url]                    
                     ;prepend context to the relative URLs
                     (if (.contains url "://") 
                       url (str (:context request) url)))]
@@ -20,7 +20,7 @@
 ;;
 (defn secure-login-redirect [handler]
   (fn [request]
-    (let [{:keys [scheme uri server-name server-port]} request]            
+    (let [{:keys [scheme uri server-name server-port]} request]          
       (if (and (= scheme :http) (or (.contains uri "login") (.contains uri "create-admin")))      
         (ring.util.response/redirect (str "https://" server-name ":" (:ssl-port @blog-config) uri))
         (handler request)))))
