@@ -12,12 +12,23 @@
            javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
-(defn append-comment [comments {:keys [author content time]}]
+(defn append-comment [comments {:keys [blogid author content time]}]
   (conj
     comments
     [:div.comment
      [:h4 (util/format-time time) " - " author]
-     [:div#comment-content (markdown/md-to-html-string content)]]))
+     [:div#comment-content 
+      (markdown/md-to-html-string content)
+      (if (session/get :admin) 
+        (form-to [:post "/delete-comment"]
+                 (hidden-field "blogid" blogid)
+                 (hidden-field "author" author)
+                 (hidden-field "time" time)
+                 (submit-button {:class "delete"} "delete")))]]))
+
+(defpage [:post "/delete-comment"] {:keys [blogid time author]}
+  (db/delete-comment (Integer/parseInt blogid) (util/timestamp time) author)
+  (resp/redirect (str "/blog/" blogid)))
 
 (defn get-comments [blog-id]
   (let [header [:div.comments [:h2 "comments"] [:hr]]]

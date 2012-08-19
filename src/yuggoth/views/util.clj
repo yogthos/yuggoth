@@ -22,6 +22,11 @@
   ([time fmt]
     (.format (new java.text.SimpleDateFormat fmt) time)))
 
+(defn timestamp [time-str]
+  (when time-str
+    (new java.sql.Timestamp 
+         (.getTime (.parse (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm:ss.SSS") time-str)))))
+
 (defn get-css []
   (or (not-empty (:style (db/get-admin))) "/css/screen.css"))
 

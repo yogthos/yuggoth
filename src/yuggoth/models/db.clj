@@ -119,6 +119,10 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-latest-comments [n]
   (db-read "select * from comment order by time desc limit ?" n))
 
+(defn delete-comment [blog-id time author]  
+  (sql/with-connection
+    @db 
+    (sql/delete-rows :comment ["blogid=? and time=? and author=?" blog-id time author])))
 
 ;;tags
 (defn tag-post [blogid tag]
