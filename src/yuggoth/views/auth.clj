@@ -28,24 +28,32 @@
   (session/clear!)
   (resp/redirect "/"))
 
-(defpage "/setup-blog" {:keys [host schema user pass ssl ssl-port error]}
-  (html
-    [:body 
-     [:h2 "Initial Configuration"]
-     (if error [:h2.error error])
-     (form-to [:post "/setup-blog"]
-              (util/make-form "host" "host" host
-                              "schema" "schema" schema
-                              "user"   "user" user
-                              "pass"   "pass" pass
-                              "ssl"    "ssl"  ssl
-                              "ssl-port" "ssl port" ssl-port)
-              (submit-button "initialize"))]))
+(defpage "/setup-blog" {:keys [host port schema user pass ssl ssl-port error]}
+  (if (:initialized @blog-config)
+    (resp/redirect "/")
+    (html
+      [:body 
+       [:h2 "Initial Configuration"]
+       (if error [:h2.error error])
+       (form-to [:post "/setup-blog"]
+                (util/make-form "host" "host" host
+                                "port" "port" port
+                                "schema" "schema" schema
+                                "user"   "user" user
+                                "pass"   "pass" pass                              
+                                "ssl-port" "ssl port" ssl-port)
+                (label "ssl" "enable SSL?") (check-box "ssl" false)
+                [:br]
+                (submit-button "initialize"))])))
+
+
 
 (defpage [:post "/setup-blog"] config
   (try
-    (write-config (-> config
-                    (update-in [:ssl] not-empty)
+    (write-config (-> config                    
+                    (assoc :initialized true)
+                    (update-in [:port] #(if (not-empty %) (Integer/parseInt %)))
+                    (update-in [:ssl] #(Boolean/parseBoolean %))
                     (update-in [:ssl-port] #(or % 443))))
     (init-config)
     (resp/redirect "/create-admin")

@@ -18,10 +18,11 @@
           {:datasource 
            (doto (new PGPoolingDataSource)
              (.setServerName   (:host config) )
-             (.setDatabaseName (:schema config))                       
+             (.setDatabaseName (:schema config))
+             (.setPortNumber (or (:port config) 5432))
              (.setUser         (:user config))                                  
              (.setPassword     (:pass config)))})
-  (reset! blog-config (assoc (select-keys config [:ssl :ssl-port]) :setup true)))
+  (reset! blog-config (assoc (select-keys config [:ssl :ssl-port :initialized]) :setup true)))
 
 (defn init-config []    
   (with-open
