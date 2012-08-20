@@ -119,10 +119,10 @@ eg: (transaction add-user email firstname lastname password)"
 (defn get-latest-comments [n]
   (db-read "select * from comment order by time desc limit ?" n))
 
-(defn delete-comment [blog-id time author]  
+(defn delete-comment [id]  
   (sql/with-connection
     @db 
-    (sql/delete-rows :comment ["blogid=? and time=? and author=?" blog-id time author])))
+    (sql/delete-rows :comment ["id=?" (Integer/parseInt id)])))
 
 ;;tags
 (defn tag-post [blogid tag]
@@ -204,3 +204,4 @@ eg: (transaction add-user email firstname lastname password)"
         (println (.getMessage ex))
         (.printStackTrace ex)
         (.getMessage ex)))))
+

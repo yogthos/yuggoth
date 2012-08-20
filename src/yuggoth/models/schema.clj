@@ -24,6 +24,7 @@
 (defn create-comments-table []
   (sql/create-table
     :comment
+    [:id "SERIAL"]
     [:blogid :int]
     [:time :timestamp]    
     [:content "TEXT"]
