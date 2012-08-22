@@ -1,5 +1,5 @@
 (ns yuggoth.views.comments
-  (:use hiccup.core hiccup.element hiccup.form noir.core)
+  (:use hiccup.util hiccup.element hiccup.form noir.core)
   (:require [clojure.string :as string] 
             [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
