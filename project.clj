@@ -6,10 +6,9 @@
                            [org.clojure/java.jdbc "0.2.3"]
                            [net.sf.jlue/jlue-core "1.3"]
                            [joda-time "2.0"]
-                           [clj-rss "0.1.2"]
-                           [org.jsoup/jsoup "1.6.3"]
+                           [clj-rss "0.1.2"]                           
                            [postgresql/postgresql "9.1-901.jdbc4"]]
-            :dev-dependencies [[lein-ring "0.7.1"]]
+            :dev-dependencies [[lein-ring "0.7.3"]]
             :ring {:handler yuggoth.server/handler
                    :init config/init-config}            
             :main yuggoth.server)

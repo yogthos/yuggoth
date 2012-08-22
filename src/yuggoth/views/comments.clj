@@ -1,18 +1,17 @@
 (ns yuggoth.views.comments
-  (:use hiccup.element hiccup.form noir.core)
+  (:use hiccup.core hiccup.element hiccup.form noir.core)
   (:require [clojure.string :as string] 
             [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
             [yuggoth.views.common :as common]
             [noir.session :as session]
             [noir.response :as resp])
-  (:import net.sf.jlue.util.Captcha
-           org.jsoup.Jsoup
+  (:import net.sf.jlue.util.Captcha           
            org.jsoup.safety.Whitelist
            javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
-(defn append-comment [comments {:keys [id blogid author content time]}]
+(defn append-comment [comments {:keys [id blogid author content time]}]  
   (conj
     comments
     [:div.comment
@@ -55,6 +54,7 @@
              [:tr [:td "~~foo~~"] [:td [:strike "strikethrough"]]]
              [:tr [:td "[link](http://mylink.com)"] [:td (link-to "http://mylink.com" "link")]]                          
              [:tr [:td "super^script"] [:td "super" [:sup "script"]]]
+             [:tr [:td ">quoted text"] [:td [:blockquote "quoted text"] ]]
              [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
            
            (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
@@ -64,11 +64,12 @@
             [:p#post-preview ]]
            (submit-button {:tabindex 5} "submit")))
 
-(defpage [:post "/comment"] {:keys [blog-id captcha content author]}
+(defpage [:post "/comment"] {:keys [blog-id captcha content author]}   
   (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
              (not-empty author) 
              (not-empty content)) 
-    (db/add-comment blog-id (Jsoup/clean content (Whitelist/basic)) 
+    (db/add-comment blog-id
+                    (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
                     author)
     (util/invalidate-cache :home)
     (util/invalidate-cache (keyword (str "post-" blog-id))))  
