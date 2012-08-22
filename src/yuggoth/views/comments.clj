@@ -6,8 +6,7 @@
             [yuggoth.views.common :as common]
             [noir.session :as session]
             [noir.response :as resp])
-  (:import net.sf.jlue.util.Captcha           
-           org.jsoup.safety.Whitelist
+  (:import net.sf.jlue.util.Captcha                      
            javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
