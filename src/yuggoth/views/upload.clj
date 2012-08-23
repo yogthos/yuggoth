@@ -10,9 +10,10 @@
         hiccup.form
         hiccup.element))
 
-(util/private-page "/upload" []
+(util/private-page "/upload" {:keys [info]}
   (common/layout
     "Upload file"
+    [:h2.info info]
     [:div [:h3 "available files"]
      (into [:ul] 
            (for [name (db/list-files)]             
@@ -31,19 +32,17 @@
              [:span.submit "upload"])))
 
 (util/private-page [:post "/upload"] params
-  (try
-    (db/store-file (:file params))    
-    (render "/upload")
-    (catch Exception ex
-      (do
-        (.printStackTrace ex)
-        (render "/fail" {:error (.getMessage ex)})))))
+  (render "/upload"
+          {:info 
+           (try
+             (db/store-file (:file params)) 
+             "file uploaded successfully"
+             (catch Exception ex
+               (do
+                 (.printStackTrace ex)
+                 (str "An error has occured while uploading the file: "
+                      (.getMessage ex)))))}))
 
-
-(defpage "/fail" params
-  (common/layout
-    "File upload failed"
-    [:p "An error has occured while uploading the file: " (:error params)]))
 
 (util/private-page [:post "/delete-file/:name"] params                   
   (db/delete-file (:name params))
