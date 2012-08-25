@@ -46,7 +46,7 @@
             
             (comments/get-comments id)            
             (comments/make-comment id)]
-           ["Welcome to your new blog" "Nothing here yet..."])))
+           ["Empty page" "Nothing here yet..."])))
 
 
 (defpage "/" []
@@ -66,9 +66,10 @@
   (display-public-post postid true))
 
 (defpage "/blog/:postid" {:keys [postid]}  
-  (let [id (re-find #"\d+" postid)]
+  (if-let [id (re-find #"\d+" postid)]
     (util/cache (keyword (str "post-" id)) 
-                (entry (db/get-post id)))))
+                (entry (db/get-post id)))
+    (resp/redirect "/")))
 
 
 (defn tag-list [& [post-id]]

@@ -49,5 +49,6 @@
   (resp/redirect "/upload"))
 
 (defpage "/files/:name" {:keys [name]}
-  (let [{:keys [name type data]} (db/get-file name)]
-    (resp/content-type type (new java.io.ByteArrayInputStream data))))
+  (if-let [{:keys [name type data]} (db/get-file name)]
+    (resp/content-type type (new java.io.ByteArrayInputStream data))
+    (resp/status 404 "")))
