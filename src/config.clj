@@ -22,11 +22,11 @@
              (.setPortNumber (or (:port config) 5432))
              (.setUser         (:user config))                                  
              (.setPassword     (:pass config)))})
-  (reset! blog-config (assoc (select-keys config [:ssl :ssl-port :initialized]) :setup true)))
+  (reset! blog-config (select-keys config [:ssl :ssl-port :initialized])))
 
-(defn init-config []    
+(defn init-config []
   (with-open
-    [r (java.io.PushbackReader. (reader (load-config-file)))]    
+    [r (java.io.PushbackReader. (reader (load-config-file)))]
       (if-let [config (read r nil nil)]
         (reset-config config)))
   (println "configuration intialized"))
@@ -37,3 +37,4 @@
   (with-open [w (clojure.java.io/writer (load-config-file))]
     (.write w (str config))
     (reset-config config)))
+

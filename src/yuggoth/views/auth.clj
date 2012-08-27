@@ -9,13 +9,42 @@
             [noir.response :as resp]
             [yuggoth.models.db :as db]))
 
-(defpage "/login" []
+(defn check-admin-fields [admin]
+  (cond
+    (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
+    (empty? (:handle admin)) "administrator name is required"
+    (empty? (:title admin)) "blog title is required"
+    :else nil))
+
+(defpage [:post "/create-admin"] admin  
+  (if (db/get-admin) 
+    (resp/redirect "/")
+    (if-let [error (check-admin-fields admin)] 
+      (render "/login" (assoc admin :error error))
+      (do
+        (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))        
+        (resp/redirect "/login")))))
+
+
+(defn create-admin [{:keys [title handle pass pass1 email]}]
+  (form-to [:post "/create-admin"]
+           (text-field {:placeholder "Blog title"} "title" title)             
+           (util/make-form "handle" "name" handle 
+                           "pass"  "password" pass
+                           "pass1" "confirm password" pass1
+                           "email" "email" email)
+           [:span.submit {:tabindex 5} "create"]))
+
+(defpage "/login" params
   (common/layout
     "Login"
-    (form-to [:post "/login"]           
-           (text-field {:placeholder "User" :tabindex 1} "handle")
-           (password-field {:placeholder "Password" :tabindex 2} "pass")
-           [:span.submit {:tabindex 3} "login"])))
+    [:div.error (:error params)]
+    (if (db/get-admin)
+      (form-to [:post "/login"]           
+               (text-field {:placeholder "User" :tabindex 1} "handle")
+               (password-field {:placeholder "Password" :tabindex 2} "pass")
+               [:span.submit {:tabindex 3} "login"])
+      (create-admin params))))
 
 (defpage [:post "/login"] {:keys [handle pass]}  
   (if-let [admin (db/get-admin)]        
@@ -46,52 +75,15 @@
                 [:br]
                 (submit-button "initialize"))])))
 
-
-
 (defpage [:post "/setup-blog"] config
   (if (:initialized @blog-config)
     (resp/redirect "/")
     (try 
-      (write-config (-> config                    
+      (write-config (-> config
                       (assoc :initialized true)
                       (update-in [:port] #(if (not-empty %) (Integer/parseInt %)))
                       (update-in [:ssl] #(Boolean/parseBoolean %))
-                      (update-in [:ssl-port] #(or % 443))))
-      (init-config)
-      (resp/redirect "/create-admin")
+                      (update-in [:ssl-port] #(or % 443))))      
+      (resp/redirect "/login")
       (catch Exception ex
         (render "/setup-blog" (assoc config :error (.getMessage ex)))))))
-
-(defpage "/create-admin" {:keys [title handle pass pass1 email error]}
-  (if (:setup @blog-config)
-    (do
-      (schema/reset-blog @config/db)
-      (common/layout
-        "Create blog"
-        (if error [:h2.error error])
-        (form-to [:post "/create-admin"]
-                 (text-field {:placeholder "Blog title"} "title" title)             
-                 (util/make-form "handle" "name" handle 
-                                 "pass"  "password" pass
-                                 "pass1" "confirm password" pass1
-                                 "email" "email" email)
-                 [:span.submit {:tabindex 5} "create"])))
-    (resp/redirect "/")))
-
-(defn check-admin-fields [admin]
-  (cond
-    (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
-    (empty? (:handle admin)) "administrator name is required"
-    (empty? (:title admin)) "blog title is required"
-    :else nil))
-
-(defpage [:post "/create-admin"] admin
-  (if (db/get-admin) 
-    (resp/redirect "/")
-    (if-let [error (check-admin-fields admin)] 
-      (render "/create-admin" (assoc admin :error error))
-      (do
-        (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))
-        (swap! blog-config assoc :setup false)
-        (resp/redirect "/login")))))
-
