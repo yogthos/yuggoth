@@ -189,19 +189,33 @@ eg: (transaction add-user email firstname lastname password)"
 (defn import-posts [blog]
   (try 
     (let [content (read (new java.io.PushbackReader (new java.io.StringReader blog)))
-          author (:handle (get-admin))]      
+          admin   (get-admin)
+          author (:handle admin)]
+      
       (sql/with-connection
         @db
-        (doseq [{:keys [time title content]} (:posts content)]
-          (println "importing post" title)          
-          (sql/insert-values
-            :blog
-            [:time :title :content :author]
-            [(new java.sql.Timestamp (.getTime time)) title content author]))))
+        (sql/transaction 
+          (sql/update-or-insert-values :admin ["handle=?" author] (assoc admin :about (:about (:admin content))))
+          (sql/do-commands "ALTER SEQUENCE blog_id_seq RESTART WITH 1")          
+          (sql/do-commands "ALTER SEQUENCE comment_id_seq RESTART WITH 1")
+          (sql/do-commands "delete from blog")
+          (sql/do-commands "delete from comment")          
+          (doseq [{:keys [id time title content comments]} (sort-by :id (:posts content))]
+            (println "importing post" id "-" title)          
+            (let [{:keys [id title]} (sql/insert-values
+                                                 :blog
+                                                 [:time :title :content :author :public]
+                                                 [(new java.sql.Timestamp (.getTime time)) title content author true])] 
+              (println "inserted" id title)
+              (doseq [{:keys [author time content]} comments] 
+              (sql/insert-values
+                :comment
+                [:blogid :time :content :author]
+                [id (new java.sql.Timestamp (.getTime time)) content author])))))))
     "import successful"
     (catch Exception ex 
-      (do
-        (println (.getMessage ex))
-        (.printStackTrace ex)
-        (.getMessage ex)))))
+      (let [next-ex (or (.getNextException ex) ex)]
+        (println (.getMessage next-ex))
+        (.printStackTrace next-ex)
+        (.getMessage next-ex)))))
 
