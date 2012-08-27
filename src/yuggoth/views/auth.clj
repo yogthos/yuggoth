@@ -49,16 +49,18 @@
 
 
 (defpage [:post "/setup-blog"] config
-  (try
-    (write-config (-> config                    
-                    (assoc :initialized true)
-                    (update-in [:port] #(if (not-empty %) (Integer/parseInt %)))
-                    (update-in [:ssl] #(Boolean/parseBoolean %))
-                    (update-in [:ssl-port] #(or % 443))))
-    (init-config)
-    (resp/redirect "/create-admin")
-    (catch Exception ex
-      (render "/setup-blog" (assoc config :error (.getMessage ex))))))
+  (if (:initialized @blog-config)
+    (resp/redirect "/")
+    (try 
+      (write-config (-> config                    
+                      (assoc :initialized true)
+                      (update-in [:port] #(if (not-empty %) (Integer/parseInt %)))
+                      (update-in [:ssl] #(Boolean/parseBoolean %))
+                      (update-in [:ssl-port] #(or % 443))))
+      (init-config)
+      (resp/redirect "/create-admin")
+      (catch Exception ex
+        (render "/setup-blog" (assoc config :error (.getMessage ex)))))))
 
 (defpage "/create-admin" {:keys [title handle pass pass1 email error]}
   (if (:setup @blog-config)
