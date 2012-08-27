@@ -78,11 +78,11 @@
       (pprint (db/export) buf)
       (.toString buf))))
 
-(defpage [:post "/import"] params
+(util/private-page [:post "/import"] params
   (db/import-posts (slurp (:tempfile (:file params))))
   (resp/redirect "/profile"))
 
-(defpage [:post "/update-tags"] tags
+(util/private-page [:post "/update-tags"] tags
   (db/delete-tags (map second tags))
   (resp/redirect "/profile"))
 
