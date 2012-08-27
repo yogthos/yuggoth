@@ -19,11 +19,10 @@
     "Profile"
     [:h2.info info]
     (link-to "/export" "export blog")
-    
-    (form-to [:post "/import"]
-                (text-area "blog")
-                [:br]
-                [:span.submit "import blog"])
+    [:div (form-to {:enctype "multipart/form-data"}
+                   [:post "/import"]             
+                   [:div.file-upload (file-upload :file)]
+                   [:div.file-upload (submit-button "import blog")])]    
     
     (form-to [:post "/update-tags"]
              (label "tags" "select tags to delete ") 
@@ -67,7 +66,8 @@
     (render "/profile"
             (assoc profile 
                    :info
-                   (cond (not (crypt/compare pass (:pass admin))) "wrong password"
+                   (cond (nil? pass) "administrator password is required" 
+                         (not (crypt/compare pass (:pass admin))) "wrong password"
                          (not= pass1 pass2) "passwords do not match"
                          :else (update-profile admin profile))))))
 
@@ -78,8 +78,8 @@
       (pprint (db/export) buf)
       (.toString buf))))
 
-(defpage [:post "/import"] {:keys [blog]}
-  (db/import-posts blog)
+(defpage [:post "/import"] params
+  (db/import-posts (slurp (:tempfile (:file params))))
   (resp/redirect "/profile"))
 
 (defpage [:post "/update-tags"] tags
