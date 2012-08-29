@@ -103,7 +103,6 @@ eg: (transaction add-user email firstname lastname password)"
 (defn last-post-id []
   (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
 
-
 ;;comments
 (defn add-comment [blog-id content author]
   (sql/with-connection 
@@ -111,7 +110,10 @@ eg: (transaction add-user email firstname lastname password)"
     (sql/insert-values
       :comment
       [:blogid :time :content :author]
-      [(Integer/parseInt blog-id) (new Timestamp (.getTime (new Date))) content (.substring author 0 100)])))
+      [(Integer/parseInt blog-id) 
+       (new Timestamp (.getTime (new Date))) 
+       content 
+       (if (> (count author) 100) (.substring author 0 100) author)])))
 
 (defn get-comments [blog-id]
   (db-read "select * from comment where blogid=?" blog-id))
