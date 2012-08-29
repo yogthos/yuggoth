@@ -111,7 +111,7 @@ eg: (transaction add-user email firstname lastname password)"
     (sql/insert-values
       :comment
       [:blogid :time :content :author]
-      [(Integer/parseInt blog-id) (new Timestamp (.getTime (new Date))) content author])))
+      [(Integer/parseInt blog-id) (new Timestamp (.getTime (new Date))) content (.substring author 0 100)])))
 
 (defn get-comments [blog-id]
   (db-read "select * from comment where blogid=?" blog-id))
