@@ -69,7 +69,8 @@
              (not-empty content)) 
     (db/add-comment blog-id
                     (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
-                    (if (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
+                    (if (and (not (session/get :admin)) 
+                             (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author)))
                       "anonymous"
                       (escape-html author)))
     (util/invalidate-cache :home)
