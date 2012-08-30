@@ -50,7 +50,7 @@
 
 
 (defpage "/" []
-  (if @blog-config
+  (if (:initialized @blog-config)
     (util/cache 
       :home 
       (if-let [post (db/get-last-public-post)] 
