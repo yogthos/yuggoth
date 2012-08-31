@@ -81,10 +81,13 @@
     (try 
       (write-config (-> config
                       (assoc :initialized true)
-                      (update-in [:port] #(if (not-empty %) (Integer/parseInt %)))
+                      (update-in [:port] #(Integer/parseInt %))
                       (update-in [:ssl] #(Boolean/parseBoolean %))
-                      (update-in [:ssl-port] #(or % 443))))
+                      (update-in [:ssl-port] #(Integer/parseInt %))))
       (schema/reset-blog @db)      
       (resp/redirect "/login")
       (catch Exception ex
         (render "/setup-blog" (assoc config :error (.getMessage ex)))))))
+
+(-> {:port "123"}
+  (update-in [:port] #(Integer/parseInt %)))
