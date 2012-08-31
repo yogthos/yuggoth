@@ -174,7 +174,7 @@ p#post-time {
     height: auto;
     clear: both;
     margin: 5px 0px 15px 70px;    
-    text-align: left;    
+    text-align: justify;    
     font-size: 16px;
     float: left;     
     max-width: 600px;           
