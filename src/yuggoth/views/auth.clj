@@ -66,11 +66,11 @@
        (if error [:h2.error error])
        (form-to [:post "/setup-blog"]
                 (util/make-form "host" "host" host
-                                "port" "port" port
+                                "port" "port" (or port 5432)
                                 "schema" "schema" schema
                                 "user"   "user" user
                                 "pass"   "pass" pass                              
-                                "ssl-port" "ssl port" ssl-port)
+                                "ssl-port" "ssl port" (or ssl-port 443))
                 (label "ssl" "enable SSL?") (check-box "ssl" false)
                 [:br]
                 (submit-button "initialize"))])))

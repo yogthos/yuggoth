@@ -19,7 +19,7 @@
            (doto (new PGPoolingDataSource)
              (.setServerName   (:host config) )
              (.setDatabaseName (:schema config))
-             (.setPortNumber (or (:port config) 5432))
+             (.setPortNumber   (:port config))
              (.setUser         (:user config))                                  
              (.setPassword     (:pass config)))})
   (reset! blog-config (select-keys config [:ssl :ssl-port :initialized])))
