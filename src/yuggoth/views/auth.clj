@@ -89,5 +89,3 @@
       (catch Exception ex
         (render "/setup-blog" (assoc config :error (.getMessage ex)))))))
 
-(-> {:port "123"}
-  (update-in [:port] #(Integer/parseInt %)))
