@@ -14,15 +14,16 @@
       url)))
 
 (defn reset-config [config]      
-  (reset! db 
-          {:datasource 
-           (doto (new PGPoolingDataSource)
-             (.setServerName   (:host config) )
-             (.setDatabaseName (:schema config))
-             (.setPortNumber   (:port config))
-             (.setUser         (:user config))                                  
-             (.setPassword     (:pass config)))})
-  (reset! blog-config (select-keys config [:ssl :ssl-port :initialized])))
+  (if (not-empty config)
+    (reset! db 
+            {:datasource 
+             (doto (new PGPoolingDataSource)
+               (.setServerName   (:host config) )
+               (.setDatabaseName (:schema config))
+               (.setPortNumber   (:port config))
+               (.setUser         (:user config))                                  
+               (.setPassword     (:pass config)))})
+    (reset! blog-config (select-keys config [:ssl :ssl-port :initialized]))))
 
 (defn init-config []
   (with-open
