@@ -27,8 +27,8 @@
 (defn init-config []
   (with-open
     [r (java.io.PushbackReader. (reader (load-config-file)))]
-      (if-let [config (read r nil nil)]
-        (reset-config config)))
+    (if-let [config (read r nil nil)]
+      (reset-config config)))
   (println "configuration intialized"))
 
 (defn write-config [config]   

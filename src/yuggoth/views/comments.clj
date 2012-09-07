@@ -25,7 +25,7 @@
 
 (defpage [:post "/delete-comment"] {:keys [id blogid]}  
   (db/delete-comment id)
-  (resp/redirect (str "/blog/" blogid)))
+  (util/local-redirect (str "/blog/" blogid)))
 
 (defn get-comments [blog-id]
   (let [header [:div.comments [:h2 "comments"] [:hr]]]
@@ -36,8 +36,8 @@
 (defn make-comment [blog-id]    
   (form-to [:post "/comment"]
            (hidden-field "blog-id" blog-id)           
-           (if-let [admin (session/get :admin)]
-             (hidden-field "author" (:handle admin))
+           (if-let [admin (:handle (session/get :admin))]
+             [:div "Commenting as " admin]             
              [:div
               (text-field {:tabindex 2} "author" "anonymous")
               [:br]
@@ -64,18 +64,24 @@
            (submit-button {:tabindex 5} "submit")))
 
 (defpage [:post "/comment"] {:keys [blog-id captcha content author]}   
-  (when (and (or (session/get :admin) (= captcha (:text (session/get :captcha)))) 
-             (not-empty author) 
-             (not-empty content)) 
-    (db/add-comment blog-id
-                    (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
-                    (if (and (not (session/get :admin)) 
-                             (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author)))
-                      "anonymous"
-                      (escape-html author)))
-    (util/invalidate-cache :home)
-    (util/invalidate-cache (keyword (str "post-" blog-id))))  
-  (resp/redirect (str "/blog/" blog-id)))
+  (let [admin  (session/get :admin)
+        author (or (:handle admin) author)] 
+    (when (and (or admin 
+                   (and (= captcha (:text (session/get :captcha))) 
+                        (not-empty author)))
+               (not-empty content))        
+      (db/add-comment blog-id
+                      (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
+                      (cond
+                        admin author
+                        
+                        (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
+                        "anonymous"
+                        
+                        :else (escape-html author)))
+      (util/invalidate-cache :home)
+      (util/invalidate-cache (keyword (str "post-" blog-id)))))  
+  (util/local-redirect (str "/blog/" blog-id)))
 
 (defn gen-captcha-text []
   (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))

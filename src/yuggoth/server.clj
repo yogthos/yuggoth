@@ -7,17 +7,6 @@
             [yuggoth.views archives auth blog comments common profile rss upload])
   (:gen-class))
 
-;;hack
-(defn fix-base-url [handler]
-  (fn [request]    
-    (with-redefs [noir.options/resolve-url 
-                  (fn [url]                    
-                    ;prepend context to the relative URLs
-                    (if (.contains url "://") 
-                      url (str (:context request) url)))]
-      (handler request))))
-
-;;
 (defn secure-login-redirect [handler]
   (fn [request]
     (let [{:keys [scheme uri server-name server-port]} request]          
@@ -32,8 +21,7 @@
         {:mode :prod, 
          :ns 'yuggoth 
          :session-cookie-attrs {:max-age 1800000}})
-    (#(if (:ssl @blog-config) (secure-login-redirect %) %))
-    fix-base-url))
+    (#(if (:ssl @blog-config) (secure-login-redirect %) %))))
 
 
 (defn parse-args [args]

@@ -18,13 +18,12 @@
 
 (defpage [:post "/create-admin"] admin  
   (if (db/get-admin) 
-    (resp/redirect "/")
+    (util/local-redirect "/")
     (if-let [error (check-admin-fields admin)] 
       (render "/login" (assoc admin :error error))
       (do
         (db/set-admin (update-in (dissoc admin :pass1) [:pass] crypt/encrypt))        
-        (resp/redirect "/login")))))
-
+        (util/local-redirect "/login")))))
 
 (defn create-admin [{:keys [title handle pass pass1 email]}]
   (form-to [:post "/create-admin"]
@@ -51,15 +50,15 @@
     (if (and (= handle (:handle admin)) 
              (crypt/compare pass (:pass admin))) 
       (session/put! :admin admin)))  
-  (resp/redirect "/"))
+  (util/local-redirect "/"))
 
 (defpage "/logout" []
   (session/clear!)
-  (resp/redirect "/"))
+  (util/local-redirect "/"))
 
 (defpage "/setup-blog" {:keys [host port schema user pass ssl ssl-port error]}
   (if (:initialized @blog-config)
-    (resp/redirect "/")
+    (util/local-redirect "/")
     (html
       [:body 
        [:h2 "Initial Configuration"]
@@ -77,7 +76,7 @@
 
 (defpage [:post "/setup-blog"] config
   (if (:initialized @blog-config)
-    (resp/redirect "/")
+    (util/local-redirect "/")
     (try 
       (write-config (-> config
                       (assoc :initialized true)
@@ -85,7 +84,7 @@
                       (update-in [:ssl] #(Boolean/parseBoolean %))
                       (update-in [:ssl-port] #(Integer/parseInt %))))
       (schema/reset-blog @db)      
-      (resp/redirect "/login")
+      (util/local-redirect "/login")
       (catch Exception ex
         (render "/setup-blog" (assoc config :error (.getMessage ex)))))))
 

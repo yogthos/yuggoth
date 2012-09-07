@@ -46,7 +46,7 @@
 
 (util/private-page [:post "/delete-file/:name"] params                   
   (db/delete-file (:name params))
-  (resp/redirect "/upload"))
+  (util/local-redirect "/upload"))
 
 (defpage "/files/:name" {:keys [name]}
   (if-let [{:keys [name type data]} (db/get-file name)]

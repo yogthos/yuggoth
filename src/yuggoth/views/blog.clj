@@ -26,7 +26,7 @@
    (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) "next")])])
 
 (defn display-public-post [postid next?]
-  (resp/redirect 
+  (util/local-redirect 
     (if-let [id (db/get-public-post-id postid next?)]
       (str "/blog/" id)
       "/")))
@@ -56,7 +56,7 @@
       (if-let [post (db/get-last-public-post)] 
         (entry post)
         (common/layout "Welcome to your new blog" "Nothing here yet...")))
-    (resp/redirect "/setup-blog")))
+    (util/local-redirect "/setup-blog")))
 
 
 (defpage "/blog-previous/:postid" {:keys [postid]}
@@ -69,7 +69,7 @@
   (if-let [id (re-find #"\d+" postid)]
     (util/cache (keyword (str "post-" id)) 
                 (entry (db/get-post id)))
-    (resp/redirect "/")))
+    (util/local-redirect "/")))
 
 
 (defn tag-list [& [post-id]]
@@ -137,10 +137,10 @@
       (util/invalidate-cache :home)
       (util/invalidate-cache (keyword (str "post-" post-id)))
       
-      (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
+      (util/local-redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (render "/make-post" (assoc post :error "post title is required"))))
 
 
 (util/private-page [:post "/toggle-post"] {:keys [post-id public]}                                      
   (db/post-visible post-id (not (Boolean/parseBoolean public)))
-  (resp/redirect (str "/blog/" post-id)))
+  (util/local-redirect (str "/blog/" post-id)))
