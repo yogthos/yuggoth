@@ -5,6 +5,7 @@
             [yuggoth.models.db :as db]
             [yuggoth.views.common :as common]
             [noir.session :as session]
+            [noir.request :as request]
             [noir.response :as resp])
   (:import net.sf.jlue.util.Captcha                      
            javax.imageio.ImageIO
@@ -35,13 +36,14 @@
 
 (defn make-comment [blog-id]    
   (form-to [:post "/comment"]
-           (hidden-field "blog-id" blog-id)           
+           (hidden-field "blog-id" blog-id)    
+           (hidden-field "context" (or (:context (request/ring-request)) ""))
            (if-let [admin (:handle (session/get :admin))]
              [:div "Commenting as " admin]             
              [:div
               (text-field {:tabindex 2} "author" "anonymous")
               [:br]
-              [:div#captcha-image(image "/captcha")]
+              [:div#captcha-image (image {:id "captcha-link"} "/captcha")]
               [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]]) 
            
            [:br]
@@ -61,27 +63,30 @@
            [:br]
            [:div.comment-preview
             [:p#post-preview ]]
-           (submit-button {:tabindex 5} "submit")))
+           [:span.submit-comment {:tabindex 5} "submit"]))
 
-(defpage [:post "/comment"] {:keys [blog-id captcha content author]}   
+(defpage [:post "/comment"] {:keys [blogid captcha content author]}
   (let [admin  (session/get :admin)
-        author (or (:handle admin) author)] 
-    (when (and (or admin 
+        author (or (:handle admin) author)]
+    (if (and (or admin 
                    (and (= captcha (:text (session/get :captcha))) 
                         (not-empty author)))
-               (not-empty content))        
-      (db/add-comment blog-id
-                      (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
-                      (cond
-                        admin author
-                        
-                        (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
-                        "anonymous"
-                        
-                        :else (escape-html author)))
-      (util/invalidate-cache :home)
-      (util/invalidate-cache (keyword (str "post-" blog-id)))))  
-  (util/local-redirect (str "/blog/" blog-id)))
+               (not-empty content))
+      (do        
+        (db/add-comment blogid
+                        (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
+                        (cond
+                          admin author
+                          
+                          (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
+                          "anonymous"
+                          
+                          :else (escape-html author)))
+        (util/invalidate-cache :home)
+        (util/invalidate-cache (keyword (str "post-" blogid))) 
+        
+        (resp/json {:result "success"}))
+      (resp/json {:result "error"}))))
 
 (defn gen-captcha-text []
   (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))

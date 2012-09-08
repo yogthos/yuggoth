@@ -472,7 +472,7 @@ table.mdhelp td {
 	padding:5px;
 }
 
-.help, .render-comment-preview {
+.help, .render-comment-preview, .submit-comment {
 	margin-left: 10px;	
 	background-color: #ddd;	
 }

@@ -8,7 +8,9 @@ $(document).ready(function(){
   	$(".help").click(showHelp); 
   	$(".render-preview").click(renderPreview("#content"));
   	$(".render-comment-preview").click(renderPreview("#comment"));
-  	$(".submit").keypress(onEnter);  	
+  	$(".submit").keypress(onEnter);
+  	$(".submit-comment").keypress(onEnter);
+  	$(".submit-comment").click(submitComment);  	
   	$(".tagoff").click(toggleTag);
   	$(".tagon").click(toggleTag);  	
   	$(".submit").click(function(){$(this).parents("FORM").submit();});  	
@@ -59,4 +61,21 @@ function toggleTag(){
 
 function showHelp() {
 	$(".mdhelp").toggle();
+}
+
+function submitComment() {	
+    var context = $('#context').val();
+    var url = context + '/comment';        
+	$.post(url, 
+		  {blogid:  $("#blog-id").val(),
+	 	   author:  $("#author").val(),
+	 	   content: $("#comment").val(),
+	 	   captcha: $("#captcha").val()},
+	 	   function(data){	 	          	     
+    		  if("success" == data.result) {    		      		  	
+    		  	window.location.reload(true);    		  	
+    		  } else {
+    		  	$("#captcha-link").attr("src", context + "/captcha?timestamp=" + new Date().getTime());
+    		  }
+  	 	   }, "json");
 }
