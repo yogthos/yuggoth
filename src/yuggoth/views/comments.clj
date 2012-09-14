@@ -53,7 +53,7 @@
              [:tr [:td "*italics*"] [:td [:em "italics"]]]
              [:tr [:td "**bold**"] [:td [:b "bold"]]]
              [:tr [:td "~~foo~~"] [:td [:strike "strikethrough"]]]
-             [:tr [:td "[link](http://mylink.com)"] [:td (link-to "http://mylink.com" "link")]]                          
+             [:tr [:td "[link](http://http://example.net/)"] [:td (link-to "http://http://example.net/" "link")]]                          
              [:tr [:td "super^script"] [:td "super" [:sup "script"]]]
              [:tr [:td ">quoted text"] [:td [:blockquote "quoted text"] ]]
              [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
