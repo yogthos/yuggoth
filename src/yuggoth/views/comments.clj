@@ -67,14 +67,19 @@
 
 (defpage [:post "/comment"] {:keys [blogid captcha content author]}
   (let [admin  (session/get :admin)
-        author (or (:handle admin) author)]
+        author (or (:handle admin) author)]    
     (if (and (or admin 
                    (and (= captcha (:text (session/get :captcha))) 
                         (not-empty author)))
                (not-empty content))
+      
       (do        
         (db/add-comment blogid
-                        (string/replace (escape-html content) #"\n&gt;" "\n>")                                                           
+                        (string/replace
+                          (.. (as-str content)
+                            (replace "<" "&lt;")
+                            (replace ">" "&gt;"))
+                          #"\n&gt;" "\n>")                                                                                  
                         (cond
                           admin author
                           
