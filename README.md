@@ -12,7 +12,7 @@
 > — H. P. Lovecraft, &quot;The Whisperer in Darkness&quot;
 
 
-Yuggoth is a blog engine which powers my site at http://yogthos.net and allows me to experiment with using Noir.   
+Yuggoth is a blog engine which powers my site at http://yogthos.net   
 
 ## Features
 
