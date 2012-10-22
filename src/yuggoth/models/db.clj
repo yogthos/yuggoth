@@ -5,10 +5,10 @@
 
 (defn db-read
   "returns the result of running the supplied SQL query"
-  [query & args]
+  [& query]
   (sql/with-connection 
     @db
-    (sql/with-query-results res (vec (cons query args)) (doall res))))
+    (sql/with-query-results res (vec query) (doall res))))
 
 ;files
 
