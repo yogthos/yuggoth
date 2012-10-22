@@ -10,14 +10,6 @@
     @db
     (sql/with-query-results res (vec (cons query args)) (doall res))))
 
-(defn transaction
-  "runs a function with the supplied arguments in an SQL transaction
-eg: (transaction add-user email firstname lastname password)"
-  [f & args]
-  (sql/with-connection @db
-    (sql/transaction
-      (apply f args))))
-
 ;files
 
 (defn to-byte-array [x]  
