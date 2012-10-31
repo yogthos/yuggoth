@@ -14,6 +14,11 @@ body {
     margin-right:auto;
     width: 1020px;
 }
+#logo {
+	float: left;
+	width: 20px;
+	height: 20px;
+}
 .header {
     min-height: 50px;    
     width: 800px;
@@ -167,7 +172,7 @@ input[name=public] {
 
 p#post-time {
   margin-top: -15px;   
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .entry-content {
