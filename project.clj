@@ -9,7 +9,8 @@
                            [clj-rss "0.1.2"]                            
                            [postgresql/postgresql "9.1-901.jdbc4"]
                            [clavatar "0.1.0"]]
-            :dev-dependencies [[lein-ring "0.7.3"]]
+            :plugins [[lein-ring "0.7.5"]]
+            :dev-dependencies [[lein-ring "0.7.5"]]
             :ring {:handler yuggoth.server/handler
                    :init config/init-config}            
             :main yuggoth.server)
