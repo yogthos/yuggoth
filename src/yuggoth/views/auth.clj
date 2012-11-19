@@ -1,6 +1,7 @@
 (ns yuggoth.views.auth
   (:use hiccup.core hiccup.form noir.core config)
   (:require [config :only db]
+            [yuggoth.views.locales :as locales]
             [yuggoth.models.schema :as schema]
             [yuggoth.views.util :as util] 
             [yuggoth.views.common :as common]                       
@@ -11,9 +12,9 @@
 
 (defn check-admin-fields [admin]
   (cond
-    (not= (:pass admin) (:pass1 admin)) "entered passwords do not match"
-    (empty? (:handle admin)) "administrator name is required"
-    (empty? (:title admin)) "blog title is required"
+    (not= (:pass admin) (:pass1 admin)) (text :pass-mismatch)
+    (empty? (:handle admin)) (text :admin-required)
+    (empty? (:title admin)) (text :blog-title-required)
     :else nil))
 
 (defpage [:post "/create-admin"] admin  
@@ -27,12 +28,12 @@
 
 (defn create-admin [{:keys [title handle pass pass1 email]}]
   (form-to [:post "/create-admin"]
-           (text-field {:placeholder "Blog title"} "title" title)             
-           (util/make-form "handle" "name" handle 
-                           "pass"  "password" pass
-                           "pass1" "confirm password" pass1
-                           "email" "email" email)
-           [:span.submit {:tabindex 5} "create"]))
+           (text-field {:placeholder (text :blog-title)} "title" title)             
+           (util/make-form "handle" (text :name) handle 
+                           "pass"  (text :password) pass
+                           "pass1" (text :confirm-password) pass1
+                           "email" (text :email) email)
+           [:span.submit {:tabindex 5} (text :create)]))
 
 (defpage "/login" params
   (common/layout
@@ -40,9 +41,9 @@
     [:div.error (:error params)]
     (if (db/get-admin)
       (form-to [:post "/login"]           
-               (text-field {:placeholder "User" :tabindex 1} "handle")
-               (password-field {:placeholder "Password" :tabindex 2} "pass")
-               [:span.submit {:tabindex 3} "login"])
+               (text-field {:placeholder (text :user) :tabindex 1} "handle")
+               (password-field {:placeholder (text :password) :tabindex 2} "pass")
+               [:span.submit {:tabindex 3} (text :login)])
       (create-admin params))))
 
 (defpage [:post "/login"] {:keys [handle pass]}  
@@ -64,22 +65,25 @@
        [:h2 "Initial Configuration"]
        (if error [:h2.error error])
        (form-to [:post "/setup-blog"]
-                (util/make-form "host" "host" host
-                                "port" "port" (or port 5432)
-                                "schema" "schema" schema
-                                "user"   "user" user
-                                "pass"   "pass" pass                              
-                                "ssl-port" "ssl port" (or ssl-port 443))
-                (label "ssl" "enable SSL?") (check-box "ssl" false)
+                (util/make-form "host" (text :host) host
+                                "port" (text :port) (or port 5432)
+                                "schema" (text :schema) schema
+                                "user"   (text :user) user
+                                "pass"   (text :pass) pass                              
+                                "ssl-port" (text :ssl-port) (or ssl-port 443))
+                "locale " (drop-down "locale" (keys locales/dict) "en")
                 [:br]
-                (submit-button "initialize"))])))
+                (label "ssl" (text :ssl?)) (check-box "ssl" false)
+                [:br]
+                (submit-button (text :initialize)))])))
 
-(defpage [:post "/setup-blog"] config
+(defpage [:post "/setup-blog"] config  
   (if (:initialized @blog-config)
     (util/local-redirect "/")
     (try 
       (write-config (-> config
                       (assoc :initialized true)
+                      (update-in [:locale] keyword)
                       (update-in [:port] #(Integer/parseInt %))
                       (update-in [:ssl] #(Boolean/parseBoolean %))
                       (update-in [:ssl-port] #(Integer/parseInt %))))

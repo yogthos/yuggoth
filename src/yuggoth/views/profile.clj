@@ -1,5 +1,5 @@
 (ns yuggoth.views.profile
-  (:use hiccup.form hiccup.element noir.core clojure.pprint)
+  (:use hiccup.form hiccup.element noir.core clojure.pprint config)
   (:require [yuggoth.views.common :as common]
             [yuggoth.views.util :as util]
             [noir.util.crypt :as crypt]
@@ -34,17 +34,17 @@
     
     (let [admin (session/get :admin)]            
       (form-to [:post "/profile"]
-               (util/make-form "handle" "name" (or handle (:handle admin))
-                               "style" "custom css url" (or style (:style admin))
-                               "email" "email" (or email (:email admin))                               
-                               "pass"  "password" nil
-                               "pass1" "new password" nil
-                               "pass2" "confirm password" nil)
+               (util/make-form "handle" (text :name) (or handle (:handle admin))
+                               "style" (text :css-url) (or style (:style admin))
+                               "email" (text :email) (or email (:email admin))                               
+                               "pass"  (text :password) nil
+                               "pass1" (text :new-password) nil
+                               "pass2" (text :confirm-password) nil)
                
-               [:h2 "About"]                             
+               [:h2 (text :about-title)]                             
                (text-area {:id "content" :tabindex 6} "about" (or about (:about admin)))
                [:br]
-               [:span.submit {:tabindex 7} "update profile"]))))
+               [:span.submit {:tabindex 7} (text :update-profile)]))))
 
 (defn get-updated-fields [profile] 
   (let [pass (:pass1 profile)
@@ -57,7 +57,7 @@
       (session/remove! :admin)
       (session/put! :admin updated-admin)
       (db/update-admin updated-admin)      
-      "profile updated successfully"
+      (text :profile-updated)
       (catch Exception ex (.getMessage ex)))))
 
 (util/private-page [:post "/profile"] profile
@@ -66,9 +66,9 @@
     (render "/profile"
             (assoc profile 
                    :info
-                   (cond (nil? pass) "administrator password is required" 
-                         (not (crypt/compare pass (:pass admin))) "wrong password"
-                         (not= pass1 pass2) "passwords do not match"
+                   (cond (nil? pass) (text :admin-pass-required) 
+                         (not (crypt/compare pass (:pass admin))) (text :wrong-password)
+                         (not= pass1 pass2) (text :pass-mismatch)
                          :else (update-profile admin profile))))))
 
 (util/private-page "/export" []
@@ -85,5 +85,3 @@
 (util/private-page [:post "/update-tags"] tags
   (db/delete-tags (map second tags))
   (util/local-redirect "/profile"))
-
-(hiccup.core/html [:html [:body "foo"]])

@@ -4,7 +4,8 @@
             [yuggoth.views.common :as common]
             [yuggoth.views.util :as util]
             [noir.response :as resp])
-  (:use noir.core
+  (:use config
+        noir.core
         hiccup.core
         hiccup.page
         hiccup.form
@@ -12,21 +13,21 @@
 
 (util/private-page "/upload" {:keys [info]}
   (common/layout
-    "Upload file"
+    (text :upload-title)
     [:h2.info info]
-    [:div [:h3 "available files"]
+    [:div [:h3 (text :available-files)]
      (into [:ul] 
            (for [name (db/list-files)]             
              [:li.file-link (link-to (str "/files/" name) name) 
               [:span "  "] 
               [:div.file               
                (form-to [:post (str "/delete-file/" name)]                                               
-                        (submit-button {:class "delete"} "delete"))]]))]
+                        (submit-button {:class "delete"} (text :delete)))]]))]
     [:br]
     
     (form-to {:enctype "multipart/form-data"}
              [:post "/upload"]
-             (label :file "File to upload")
+             (label :file (text :file-to-upload))
              (file-upload :file)
              [:br]
              [:span.submit "upload"])))
@@ -36,11 +37,11 @@
           {:info 
            (try
              (db/store-file (:file params)) 
-             "file uploaded successfully"
+             (text :file-uploaded)
              (catch Exception ex
                (do
                  (.printStackTrace ex)
-                 (str "An error has occured while uploading the file: "
+                 (str (text :error-uploading)
                       (.getMessage ex)))))}))
 
 

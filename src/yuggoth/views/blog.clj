@@ -14,16 +14,16 @@
      [:div (form-to [:post "/toggle-post"]
                     (hidden-field "post-id" post-id)
                     (hidden-field "public" (str visible))
-                    [:span.submit (if visible "hide" "show")])]
+                    [:span.submit (if visible (text :hide) (text :show))])]
      [:div (form-to [:post "/update-post"]
                     (hidden-field "post-id" post-id)
-                    [:span.submit "edit"])]]))
+                    [:span.submit (text :edit)])]]))
 
 
 (defn post-nav [id]
   [:div
-   (if (> id 1) [:div.leftmost (link-to (str "/blog-previous/" id) "previous")])
-   (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) "next")])])
+   (if (> id 1) [:div.leftmost (link-to (str "/blog-previous/" id) (text :previous))])
+   (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) (text :next))])])
 
 (defn display-public-post [postid next?]
   (util/local-redirect 
@@ -40,13 +40,13 @@
             (post-nav id)     
             [:br]
             [:br]
-            [:div "tags "
+            [:div (str (text :tags) " ")
              (for [tag (db/tags-by-post id)]
               [:span.tagon {:id "tag"} tag])]
             
             (comments/get-comments id)            
             (comments/make-comment id)]
-           ["Empty page" "Nothing here yet..."])))
+           [(text :empty-page) (text :nothing-here)])))
 
 
 (defpage "/" []
@@ -55,7 +55,7 @@
       :home 
       (if-let [post (db/get-last-public-post)] 
         (entry post)
-        (common/layout "Welcome to your new blog" "Nothing here yet...")))
+        (common/layout (text :welcome-title) (text :nothing-here))))
     (util/local-redirect "/setup-blog")))
 
 
@@ -82,13 +82,13 @@
                  [(hidden-field (str "tag-" tag))
                   [:span.tagoff tag]]))
              (db/tags))
-     (text-field {:placeholder "other"} "tag-custom")]))
+     (text-field {:placeholder (text :other)} "tag-custom")]))
 
 
 (util/private-page [:post "/update-post"] {:keys [post-id error]}
   (let [{:keys [title content public]} (db/get-post post-id)] 
     (common/layout
-      "Edit post"
+      (text :edit-post)
       (when error [:div.error error])
       (form-to [:post "/make-post"]
                (text-field {:tabindex 1} "title" title)
@@ -97,25 +97,25 @@
                [:br]
                (hidden-field "post-id" post-id)
                (hidden-field "public" (str public))               
-               "tags " (tag-list post-id)
+               (str :tags " ") (tag-list post-id)
                [:br]
-               [:span.submit {:tabindex 3} "post"]))))
+               [:span.submit {:tabindex 3} (text :post)]))))
 
 
 (util/private-page "/make-post" {:keys [content error]}
   (common/layout
-    "New post"
+    (text :new-post)
     (when error [:div.error error])
     [:div#output]
     (form-to [:post "/make-post"]
-             (text-field {:tabindex 1 :placeholder "Title"} "title")
+             (text-field {:tabindex 1 :placeholder (text :title)} "title")
              [:br]
              (text-area {:tabindex 2} "content" content)
              [:br]
              "tags " (tag-list)
              [:br]
              [:div
-              [:div.entry-public "public"]
+              [:div.entry-public (text :publie)]
               (check-box {:tabindex 4} "public" true)                            
               [:div.entry-submit [:span.submit {:tabindex 3} "post"]]])))
 
@@ -138,7 +138,7 @@
       (util/invalidate-cache (keyword (str "post-" post-id)))
       
       (util/local-redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
-    (render "/make-post" (assoc post :error "post title is required"))))
+    (render "/make-post" (assoc post :error (text :title-required)))))
 
 
 (util/private-page [:post "/toggle-post"] {:keys [post-id public]}                                      

@@ -1,5 +1,5 @@
 (ns yuggoth.views.archives
-  (:use noir.core hiccup.element hiccup.form hiccup.util)
+  (:use noir.core hiccup.element hiccup.form hiccup.util config)
   (:require [yuggoth.models.db :as db]             
             [noir.session :as session]
             [noir.response :as resp]
@@ -20,7 +20,7 @@
               (form-to [:post "/archives"]
                        (hidden-field "post-id" id)
                        (hidden-field "visible" (str public))
-                       [:span.submit (if public "hide" "show")]))]))])
+                       [:span.submit (if public (text :hide) (text :show))]))]))])
 
 
 (defn archives-by-date [archives]
@@ -38,7 +38,7 @@
   (util/cache
     :archives
     (common/layout 
-      "Archives"
+      (text :archives-title)
       (archives-by-date (db/get-posts nil false (session/get :admin))))))
 
 (defpage [:post "/archives"] {:keys [post-id visible]}   
