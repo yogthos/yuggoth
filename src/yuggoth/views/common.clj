@@ -1,5 +1,5 @@
 (ns yuggoth.views.common
-  (:use hiccup.element hiccup.form hiccup.util
+  (:use hiccup.element hiccup.form hiccup.util config
         [noir.core]
         [noir.validation :as vali]        
         [hiccup.page :only [include-css include-js html5]])
@@ -20,25 +20,25 @@
    (into
      (if (session/get :admin) 
        [:ul.menu-items          
-        [:li (link-to "/logout" "logout")]
-        [:li (link-to "/profile" "profile")]
-        [:li (link-to "/upload" "upload")]
-        [:li#latest (link-to "/latest-comments" "latest comments")]
-        [:li#new-post (link-to "/make-post" "New post")]]
+        [:li (link-to "/logout" (text :logout))]
+        [:li (link-to "/profile" (text :profile))]
+        [:li (link-to "/upload" (text :upload))]
+        [:li#latest (link-to "/latest-comments" (text :latest-comments-title))]
+        [:li#new-post (link-to "/make-post" (text :new-post))]]
        [:ul.menu-items])     
      [[:li#rss (link-to "/rss" [:div#rss "rss"] (image "/img/rss.jpg"))]      
-      [:li#about (link-to "/about" "About")]      
-      [:li#archives (link-to "/archives" "Archives")]
-      [:li#home (link-to "/" "Home")]])])
+      [:li#about (link-to "/about" (text :about-title))]      
+      [:li#archives (link-to "/archives" (text :archives-title))]
+      [:li#home (link-to "/" (text :home-title))]])])
 
 (defn sidebar [title]
-  (if (or (= "New post" title) (= "Edit post" title))    
+  (if (or (= (text :new-post) title) (= (text :edit-post) title))    
     [:div.sidebar-preview
-     [:h2 [:span.render-preview "Preview (click to redraw)"]]
+     [:h2 [:span.render-preview (text :preview-title)]]
      [:div#post-preview]]
     
     [:div.sidebar
-     [:h2 "Recent posts"]     
+     [:h2 (text :recent-posts-title)]     
      (-> [:ul]       
        (into 
          (for [{:keys [id time title]} (reverse (sort-by :time (db/get-posts 5)))]
@@ -46,15 +46,15 @@
             (link-to (str "/blog/" (str id "-" (url-encode title)))
                      title
                      [:div.date (util/format-time time)])]))
-       (conj [:li (link-to "/archives" "more...")]))
+       (conj [:li (link-to "/archives" (text :more))]))
      (tag-list)]))
 
 (defn footer []
   [:div.footer
    [:p "Copyright (C) 2012 " 
     (:handle (db/get-admin)) 
-    (when (not (session/get :admin)) [:span " (" (link-to "/login" "login") ")"]) 
-    " - Powered by: "
+    (when (not (session/get :admin)) [:span " (" (link-to "/login" (text :login)) ")"]) 
+    (text :powered-by)
     (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
 
 (defpartial layout [title & content]
@@ -67,15 +67,21 @@
        (include-css (util/get-css)
                     "/css/jquery.alerts.css"
                     "/css/shCoreYuggoth.css")]      
-      [:body       
+      [:body              
        (hidden-field "selected" 
-                     (condp = (first (.split html-title " "))
-                       "Archives" "#archives"
-                       "Latest"   "#latest"
-                       "Login"    "#login"
-                       "About"    "#about"
-                       "New"      "#new-post"
-                       "#home"))
+                     (cond
+                       (.startsWith html-title (text :archives-title))        
+                       "#archives"
+                       (.startsWith html-title (text :latest-comments-title)) 
+                       "#latest"
+                       (.startsWith html-title (text :login-title))
+                       "#login"
+                       (.startsWith html-title (text :about-title))
+                       "#about"
+                       (.startsWith html-title (text :new-post))
+                       "#new-post"
+                       
+                       :else "#home"))
        [:div.container
         (header)
         (menu)

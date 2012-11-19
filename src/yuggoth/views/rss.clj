@@ -1,5 +1,5 @@
 (ns yuggoth.views.rss
-  (:use noir.core)  
+  (:use noir.core config)  
   (:require markdown 
             [clojure.xml :as xml]
             [clj-rss.core :as rss]
@@ -41,7 +41,7 @@
 (defn feed [admin posts]
   (let [{:keys [handle title]} (db/get-admin)
         posts                  (db/get-posts 10 true)
-        feed-title             (or (:title (first posts)) "nothing here yet...")]
+        feed-title             (or (:title (first posts)) (text :nothing-here))]
     (update-in (make-channel feed-title handle posts)
                [:attrs]
                assoc 

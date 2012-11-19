@@ -1,5 +1,5 @@
 (ns yuggoth.views.comments
-  (:use hiccup.util hiccup.element hiccup.form noir.core)
+  (:use hiccup.util hiccup.element hiccup.form noir.core config)
   (:require [clojure.string :as string] 
             [yuggoth.views.util :as util]
             [yuggoth.models.db :as db]
@@ -22,14 +22,14 @@
         (form-to [:post "/delete-comment"]
                  (hidden-field "id" id)
                  (hidden-field "blogid" blogid)
-                 (submit-button {:class "delete"} "delete")))]]))
+                 (submit-button {:class "delete"} (text :delete))))]]))
 
 (defpage [:post "/delete-comment"] {:keys [id blogid]}  
   (db/delete-comment id)
   (util/local-redirect (str "/blog/" blogid)))
 
 (defn get-comments [blog-id]
-  (let [header [:div.comments [:h2 "comments"] [:hr]]]
+  (let [header [:div.comments [:h2 (text :comments)] [:hr]]]
     (if-let [comments (db/get-comments blog-id)]
       (conj (reduce append-comment header comments) [:hr])
       header)))
@@ -39,31 +39,31 @@
            (hidden-field "blog-id" blog-id)    
            (hidden-field "context" (or (:context (request/ring-request)) ""))
            (if-let [admin (:handle (session/get :admin))]
-             [:div "Commenting as " admin]             
+             [:div (text :commenting-as) admin]             
              [:div
-              (text-field {:tabindex 2} "author" "anonymous")
+              (text-field {:tabindex 2} "author" (text :anonymous))
               [:br]
               [:div#captcha-image (image {:id "captcha-link"} "/captcha")]
-              [:div#captcha-text (text-field  {:placeholder "captcha" :tabindex 3} "captcha")]]) 
+              [:div#captcha-text (text-field  {:placeholder (text :captcha) :tabindex 3} "captcha")]]) 
            
            [:br]
-           [:p "Markdown markup is supported in comments " [:span.help "help"]]
+           [:p (text :markdown-help) [:span.help (text :help)]]
            
            [:table.mdhelp
-             [:tr [:td "*italics*"] [:td [:em "italics"]]]
-             [:tr [:td "**bold**"] [:td [:b "bold"]]]
-             [:tr [:td "~~foo~~"] [:td [:strike "strikethrough"]]]
-             [:tr [:td "[link](http://http://example.net/)"] [:td (link-to "http://http://example.net/" "link")]]                          
-             [:tr [:td "super^script"] [:td "super" [:sup "script"]]]
-             [:tr [:td ">quoted text"] [:td [:blockquote "quoted text"] ]]
-             [:tr [:td "4 spaces indented code"] [:td [:code "4 spaces indented code"]]]]
+             [:tr [:td (text :italics-help)] [:td [:em (text :italics-example)]]]
+             [:tr [:td (text :bold-help)] [:td [:b (text :bold-example)]]]
+             [:tr [:td (text :strikethrough-help)] [:td [:strike (text :strikethrough-example)]]]
+             [:tr [:td (text :link-help)] [:td (link-to "http://http://example.net/" (text :link-example))]]                          
+             [:tr [:td (text :superscript-help)] [:td (text :super-example) [:sup (text :script-example)]]]
+             [:tr [:td (text :quote-help)] [:td [:blockquote (text :auote-example)] ]]
+             [:tr [:td (text :code-help)] [:td [:code (text :code-help)]]]]
            
-           (text-area {:id "comment" :placeholder "comment" :tabindex 4} "content") [:br]
-           [:span.render-comment-preview "preview"]
+           (text-area {:id "comment" :placeholder (text :comment) :tabindex 4} "content") [:br]
+           [:span.render-comment-preview (text :preview)]
            [:br]
            [:div.comment-preview
             [:p#post-preview ]]
-           [:span.submit-comment {:tabindex 5} "submit"]))
+           [:span.submit-comment {:tabindex 5} (text :submit)]))
 
 (defpage [:post "/comment"] {:keys [blogid captcha content author]}
   (let [admin  (session/get :admin)
@@ -84,7 +84,7 @@
                           admin author
                           
                           (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
-                          "anonymous"
+                          (text :anonymous)
                           
                           :else (escape-html author)))
         (util/invalidate-cache :home)
@@ -111,7 +111,7 @@
 
 (util/private-page "/latest-comments" []
   (common/layout
-    "Latest comments"
+    (text :latest-comments-title)
     (into [:table] 
         (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
           [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]]))))

@@ -16,11 +16,13 @@
 
 (server/load-views-ns 'yuggoth.views)
 
+(def params 
+  {:mode :prod, 
+   :ns 'yuggoth 
+   :session-cookie-attrs {:max-age 1800000}})
+
 (def handler
-  (-> (server/gen-handler 
-        {:mode :prod, 
-         :ns 'yuggoth 
-         :session-cookie-attrs {:max-age 1800000}})
+  (-> (server/gen-handler params)
     (#(if (:ssl @blog-config) (secure-login-redirect %) %))))
 
 
@@ -42,4 +44,4 @@
           mode (get m :mode :dev)         
           port (get m :port (new Integer 8080))]
       (println "starting in mode" mode " on port " port)
-      (server/start port {:mode mode :ns 'yuggoth :session-cookie-attrs {:max-age 1800000}}))))
+      (server/start port (assoc params :mode mode))))) 
