@@ -10,7 +10,7 @@
     :profile-title "Profile"
     :welcome-title "Welcome to your new blog"
     :latest-comments-title "Latest comments"
-    :upload-title "Upoload file"
+    :upload-title "Upload file"
     :blog-title "Blog title"
     :preview-title "Preview (click to redraw)"
     :recent-posts-title "Recent posts"
@@ -20,7 +20,7 @@
     :blog-title-required "blog title is required"
     
     :host "host"
-    :porst "port"
+    :port "port"
     :schema "schema"
     :ssl-port "ssl port"
     :ssl? "enable SSL"
