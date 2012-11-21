@@ -3,12 +3,15 @@
   (:require [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp java.util.Date))
 
+(defmacro with-db [f & body]
+  `(sql/with-connection
+    (deref config/db) (~f ~@body)))
+
 (defn db-read
   "returns the result of running the supplied SQL query"
   [& query]
-  (sql/with-connection 
-    @db
-    (sql/with-query-results res (vec query) (doall res))))
+  (with-db sql/with-query-results res (vec query) (doall res)))
+
 
 ;files
 
@@ -22,18 +25,16 @@
   (.replaceAll filename "[^a-zA-Z0-9-\\.]" ""))
 
 (defn store-file [{:keys [tempfile filename content-type]}]
-  (sql/with-connection 
-    @db
-    (sql/update-or-insert-values
-      :file
-      ["name=?" filename]
-      {:type content-type :name (fix-file-name filename) :data (to-byte-array tempfile)})))
+  (with-db sql/update-or-insert-values
+    :file
+    ["name=?" filename]
+    {:type content-type :name (fix-file-name filename) :data (to-byte-array tempfile)}))
 
 (defn list-files []
   (map :name (db-read "select name from file")))
 
 (defn delete-file [name]  
-  (sql/with-connection @db (sql/delete-rows :file ["name=?" name])))
+  (with-db sql/delete-rows :file ["name=?" name]))
 
 (defn get-file [name]
   (first (db-read "select * from file where name=?" name)))
@@ -43,12 +44,10 @@
 
 (defn update-post [id title content public]
   (let [int-id (Integer/parseInt id)] 
-    (sql/with-connection
-      @db
-      (sql/update-values
-        :blog
-        ["id=?" int-id]
-        {:id int-id :title title :content content :public (Boolean/parseBoolean public)}))))
+    (with-db sql/update-values
+      :blog
+      ["id=?" int-id]
+      {:id int-id :title title :content content :public (Boolean/parseBoolean public)})))
 
 (defn get-posts [& [limit full? private?]]    
   (try
@@ -71,20 +70,16 @@
 
 
 (defn store-post [title content author public]
-  (sql/with-connection 
-    @db
-    (sql/insert-values
-      :blog
-      [:time :title :content :author :public]
-      [(new Timestamp (.getTime (new Date))) title content author (Boolean/parseBoolean public)])))
+  (with-db sql/insert-values
+    :blog
+    [:time :title :content :author :public]
+    [(new Timestamp (.getTime (new Date))) title content author (Boolean/parseBoolean public)]))
 
 (defn post-visible [id public]
-  (sql/with-connection 
-    @db
-    (sql/update-values
-      :blog 
-      ["id=?" (Integer/parseInt id)]
-      {:public public})))
+  (with-db sql/update-values
+    :blog 
+    ["id=?" (Integer/parseInt id)]
+    {:public public}))
 
 (defn get-last-post [] 
   (first (db-read "select * from blog where id = (select max(id) from blog)")))
@@ -97,15 +92,13 @@
 
 ;;comments
 (defn add-comment [blog-id content author]
-  (sql/with-connection 
-    @db
-    (sql/insert-values
-      :comment
-      [:blogid :time :content :author]
-      [(Integer/parseInt blog-id) 
-       (new Timestamp (.getTime (new Date))) 
-       content 
-       (if (> (count author) 100) (.substring author 0 100) author)])))
+  (with-db sql/insert-values
+    :comment
+    [:blogid :time :content :author]
+    [(Integer/parseInt blog-id) 
+     (new Timestamp (.getTime (new Date))) 
+     content 
+     (if (> (count author) 100) (.substring author 0 100) author)]))
 
 (defn get-comments [blog-id]
   (db-read "select * from comment where blogid=?" blog-id))
@@ -114,9 +107,7 @@
   (db-read "select * from comment order by time desc limit ?" n))
 
 (defn delete-comment [id]  
-  (sql/with-connection
-    @db 
-    (sql/delete-rows :comment ["id=?" (Integer/parseInt id)])))
+  (with-db sql/delete-rows :comment ["id=?" (Integer/parseInt id)]))
 
 ;;tags
 (defn tag-post [blogid tag]
@@ -129,10 +120,8 @@
   (map :name (db-read "select * from tag")))
 
 (defn add-tag [tag-name]
-  (sql/with-connection
-    @db
-    (sql/insert-values
-      :tag [:name] [(.toLowerCase tag-name)])))
+  (with-db sql/insert-values
+    :tag [:name] [(.toLowerCase tag-name)]))
 
 (defn delete-tags [tags]
   (sql/with-connection
@@ -150,23 +139,19 @@
 
 (defn update-tags [blogid tags]    
   (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)]    
-    (sql/with-connection
-      @db
-      (sql/transaction
-        (sql/delete-rows :tag_map ["blogid=?" id])
+    (with-db sql/transaction
+      (sql/delete-rows :tag_map ["blogid=?" id])
         (doseq [tag tags]
           (if (nil? (sql/with-query-results res ["select * from tag where name=?" tag] (doall res)))
             (sql/insert-values :tag [:name] [tag]))
-          (tag-post id tag))))))
+          (tag-post id tag)))))
 
 ;;admin user
 (defn set-admin [admin]
-  (sql/with-connection @db (sql/insert-record :admin admin)))
+  (with-db sql/insert-record :admin admin))
 
 (defn update-admin [admin]
-  (sql/with-connection 
-    @db
-    (sql/update-values :admin ["handle=?" (:handle admin)] admin)))
+  (with-db sql/update-values :admin ["handle=?" (:handle admin)] admin))
 
 
 (defn get-admin []  
@@ -186,26 +171,24 @@
           admin   (get-admin)
           author (:handle admin)]
       
-      (sql/with-connection
-        @db
-        (sql/transaction 
-          (sql/update-or-insert-values :admin ["handle=?" author] (assoc admin :about (:about (:admin content))))
-          (sql/do-commands "ALTER SEQUENCE blog_id_seq RESTART WITH 1")          
-          (sql/do-commands "ALTER SEQUENCE comment_id_seq RESTART WITH 1")
-          (sql/do-commands "delete from blog")
-          (sql/do-commands "delete from comment")          
-          (doseq [{:keys [id time title content comments]} (sort-by :id (:posts content))]
-            (println "importing post" id "-" title)          
-            (let [{:keys [id title]} (sql/insert-values
-                                                 :blog
-                                                 [:time :title :content :author :public]
-                                                 [(new java.sql.Timestamp (.getTime time)) title content author true])] 
-              (println "inserted" id title)
-              (doseq [{:keys [author time content]} comments] 
+      (with-db sql/transaction 
+        (sql/update-or-insert-values :admin ["handle=?" author] (assoc admin :about (:about (:admin content))))
+        (sql/do-commands "ALTER SEQUENCE blog_id_seq RESTART WITH 1")          
+        (sql/do-commands "ALTER SEQUENCE comment_id_seq RESTART WITH 1")
+        (sql/do-commands "delete from blog")
+        (sql/do-commands "delete from comment")          
+        (doseq [{:keys [id time title content comments]} (sort-by :id (:posts content))]
+          (println "importing post" id "-" title)          
+          (let [{:keys [id title]} (sql/insert-values
+                                     :blog
+                                     [:time :title :content :author :public]
+                                     [(new java.sql.Timestamp (.getTime time)) title content author true])] 
+            (println "inserted" id title)
+            (doseq [{:keys [author time content]} comments] 
               (sql/insert-values
                 :comment
                 [:blogid :time :content :author]
-                [id (new java.sql.Timestamp (.getTime time)) content author])))))))
+                [id (new java.sql.Timestamp (.getTime time)) content author]))))))
     "import successful"
     (catch Exception ex 
       (let [next-ex (or (.getNextException ex) ex)]
