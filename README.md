@@ -1,7 +1,7 @@
 # Yuggoth
 
 <img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg" 
- style="margin-left:100px; padding: 5px; border-style:solid; border-width:1px; border-color:#ccc; -moz-box-shadow: 4px 4px 6px -1px #222; -webkit-box-shadow: 4px 4px 6px -1px #222; box-shadow: 4px 4px 6px -1px #222;"
+ style="margin-left:50px; padding: 5px; border-style:solid; border-width:1px; border-color:#ccc;"
  hspace="20"
  alt="Yuggoth logo" title="a strange dark orb" align="right" width="200" height="200"/>
  
