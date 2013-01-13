@@ -97,4 +97,5 @@
   (GET "/login" {params :params} (login params))
   (POST "/login" [handle pass] (login handle pass))  
   (GET "/logout" [] (do (session/clear!)
+                        (cache/invalidate! :home)
                         (resp/redirect "/"))))
