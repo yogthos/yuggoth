@@ -9,6 +9,7 @@
         compojure.core)  
   (:require [yuggoth.config :as config] 
             [noir.util.middleware :as middleware]
+            [noir.response :as resp]
             [noir.session :as session]
             [noir.util.cache :as cache]
             [compojure.route :as route]))
@@ -30,6 +31,22 @@
 (defn private-page [method url params] 
   (session/get :admin))
 
+(defn wrap-ssl-if-selected [app]  
+  (if (:ssl @config/blog-config)
+    (fn [req]      
+      (if (or (not-any? #(= (:uri req) (str (:context req) %)) ["/login"])
+              (= :https (:scheme req))
+              (= "https" ((:headers req) "x-forwarded-proto")))
+        (app req)
+        (let [host  (-> req
+                        (:headers)
+                        (get "host")
+                        (clojure.string/split #":")
+                        (first))              
+              ssl-port (:ssl-port @config/blog-config)]          
+          (resp/redirect (str "https://" host ":" ssl-port (:uri req)) :permanent))))    
+    app))
+
 ;;append your application routes to the all-routes vector
 (def all-routes [auth-routes
                  archive-routes
@@ -41,5 +58,6 @@
                  app-routes])
 (def app (-> all-routes
            (middleware/app-handler)
+           (wrap-ssl-if-selected)
            (middleware/wrap-access-rules private-page)))
 (def war-handler (middleware/war-handler app))
