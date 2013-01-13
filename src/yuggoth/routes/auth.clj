@@ -79,7 +79,7 @@
   (if (:initialized @blog-config)
     (resp/redirect "/")
     (try 
-      (write-config (-> config
+      (save (-> config
                       (assoc :initialized true)
                       (update-in [:locale] keyword)
                       (update-in [:port] #(Integer/parseInt %))

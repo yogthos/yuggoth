@@ -7,7 +7,8 @@
         yuggoth.routes.profile
         yuggoth.routes.rss
         compojure.core)  
-  (:require [noir.util.middleware :as middleware]
+  (:require [yuggoth.config :as config] 
+            [noir.util.middleware :as middleware]
             [noir.session :as session]
             [noir.util.cache :as cache]
             [compojure.route :as route]))
@@ -22,6 +23,7 @@
    an app server such as Tomcat
    put any initialization code here"
   []
+  (config/init)
   (cache/set-size! 20)
   (println "yuggoth started successfully..."))
 
