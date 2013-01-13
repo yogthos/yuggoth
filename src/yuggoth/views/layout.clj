@@ -1,9 +1,11 @@
-(ns yuggoth.views.common
-  (:use hiccup.element hiccup.form hiccup.util config
-        [noir.core]
-        [noir.validation :as vali]        
+(ns yuggoth.views.layout
+  (:use yuggoth.config        
+        hiccup.element 
+        hiccup.form 
+        hiccup.util                        
         [hiccup.page :only [include-css include-js html5]])
-  (:require [yuggoth.views.util :as util]
+  (:require [yuggoth.util :as util]
+            [noir.validation :as vali]
             [yuggoth.models.db :as db]
             [noir.session :as session]))
 
@@ -57,9 +59,9 @@
     (text :powered-by)
     (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
 
-(defpartial layout [title & content]
+(defn common [title & content]  
   (let [html-title (if (string? title) title (:title title))
-        title-elements (when (map? title) (:elements title))]        
+        title-elements (when (map? title) (:elements title))]            
     (html5
       [:head
        [:link {:rel "alternate" :type "application/rss+xml" :title (:title (db/get-admin)) :href "/rss"}]       
@@ -91,7 +93,7 @@
           [:div.entry-content content]]
          (sidebar html-title)]          
         (footer)]
-              
+       
        (include-js "/js/markdown.js"
                    "/js/shCore.js"
                    "/js/brushes/shBrushClojure.js"

@@ -1,5 +1,5 @@
-(ns config
-  (:use clojure.java.io yuggoth.models.schema yuggoth.views.locales)
+(ns yuggoth.config
+  (:use clojure.java.io yuggoth.models.schema yuggoth.locales)
   (:import java.io.File
            java.sql.DriverManager
            org.postgresql.ds.PGPoolingDataSource))
@@ -8,7 +8,7 @@
 (def db (atom nil))
 
 (defn text [tag]
-  (get (get dict (get @blog-config :locale :en)) tag (name tag)))
+  (get (get dict (get @blog-config :locale :en)) tag "<no translation available>"))
 
 (defn load-config-file []
   (let [url (resource "blog.properties")]    

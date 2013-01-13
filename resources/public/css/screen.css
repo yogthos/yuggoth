@@ -144,7 +144,7 @@ body {
 	white-space: pre-wrap; 
 	white-space: -moz-pre-wrap !important;
 	word-wrap: break-word;	
-	background-color: #DEDEDE;	
+	background-color: #dedede;	
 	padding: 5px;	
 	
 	border:1px solid;
@@ -167,10 +167,11 @@ span {
 }
 
 .post {
-	float: left;
+    float: left;
     border-right: 1px solid #ccc;
     width: 720px;
     padding-bottom: 10px;
+    text-align:left;
 }
 
 .entry-title {
@@ -215,11 +216,11 @@ p#post-time {
 }
 
 .entry-content {
-	width: 600px;
+    text-align:left;
+    width: 600px;
     height: auto;
     clear: both;
     margin: 5px 0px 15px 70px;    
-    text-align: justify;    
     font-size: 16px;
     float: left;                    
 }
@@ -282,7 +283,6 @@ div#comment-content {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
-
 
 #preview {
 	display:none;
@@ -557,4 +557,5 @@ table.mdhelp td {
 
 b {
 	color: #555;
+
 }

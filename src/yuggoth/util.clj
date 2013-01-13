@@ -1,10 +1,11 @@
-(ns yuggoth.views.util
+(ns yuggoth.util
   (:use hiccup.form clavatar.core [clojure.java.io :only [as-url]])
   (:require [noir.response :as resp]
             [noir.session :as session]
-            [yuggoth.models.db :as db]))
-
-(def cached (atom {}))
+            [yuggoth.models.db :as db]
+            [noir.io :as io]
+            [markdown.core :as md])
+  (:import net.sf.jlue.util.Captcha))
 
 (defn make-form [& fields]
   (reduce-kv 
@@ -18,6 +19,8 @@
     (vec (partition 3 fields))))
 
 (defn format-time
+  "formats the time using SimpleDateFormat, the default format is
+   \"dd MMM, yyyy\" and a custom one can be passed in as the second argument"
   ([time] (format-time time "dd MMM, yyyy"))
   ([time fmt]
     (.format (new java.text.SimpleDateFormat fmt) time)))
@@ -30,37 +33,23 @@
 (defn get-css []
   (or (not-empty (:style (db/get-admin))) "/css/screen.css"))
 
-
-(defmacro local-redirect [url]
-  `(noir.response/redirect 
-     (if-let [context# (:context (noir.request/ring-request))]
-       (str context# ~url) ~url)))
-
-(defmacro private-page [path params & content]
-  `(noir.core/defpage 
-     ~path 
-     ~params 
-     (if (session/get :admin) (do ~@content) (yuggoth.views.util/local-redirect "/"))))
-
-(defn invalidate-cache [k]
-  (swap! cached assoc-in [k :invalid] true))
- 
-
-(defmacro cache [id content]
-  `(if (session/get :admin)
-     ~content
-     (let [last-updated# (:time (get @cached ~id))
-           invalid#  (:invalid (get @cached ~id))
-           cur-time# (.getTime (new java.util.Date))]
-       (if (or invalid# 
-               (nil? last-updated#)
-               (> (- cur-time# last-updated#) 300000))
-         (swap! cached assoc ~id {:time cur-time# :content ~content}))
-       (:content (get @cached ~id))))) 
+(defn md->html
+  "reads a markdown file from public/md and returns an HTML string"
+  [filename]
+  (->> 
+    (io/slurp-resource "md" filename)      
+    (md/md-to-html-string)))
 
 (defn gravatar-url [email]
   (let [url (gravatar email :default :404)] 
     (try (javax.imageio.ImageIO/read (as-url url))
       url
       (catch Exception ex nil))))
-  
+
+(defn gen-captcha-text []
+  (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))
+
+(defn gen-captcha []
+  (let [text (gen-captcha-text)
+        captcha (doto (new Captcha))]
+    (session/put! :captcha {:text text :image (.gen captcha text 250 40)})))

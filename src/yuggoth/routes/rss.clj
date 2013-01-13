@@ -1,11 +1,11 @@
-(ns yuggoth.views.rss
-  (:use noir.core config)  
-  (:require markdown 
+(ns yuggoth.routes.rss
+  (:use compojure.core yuggoth.config)  
+  (:require [markdown.core :as markdown] 
             [clojure.xml :as xml]
             [clj-rss.core :as rss]
             [noir.response :as resp]
             [yuggoth.models.db :as db]
-            [yuggoth.views.util :as util]))
+            [yuggoth.util :as util]))
 
 (def site-url "http://yogthos.net/")
 
@@ -48,12 +48,14 @@
                :xmlns:dc "http://purl.org/dc/elements/1.1/"
                :xmlns:sy "http://purl.org/rss/1.0/modules/syndication/")))
 
-(defpage "/rss" []
-  (resp/content-type 
-    "application/rss+xml" 
-    (new java.io.ByteArrayInputStream 
-         (->
-           (feed (db/get-admin) (db/get-posts 10 true false))
-           xml/emit
-           with-out-str
-           .getBytes))))
+(defroutes rss-routes 
+  (GET "/rss" []
+       (resp/content-type 
+         "application/rss+xml" 
+         (new java.io.ByteArrayInputStream 
+              (->
+                (feed (db/get-admin) (db/get-posts 10 true false))
+                xml/emit
+                with-out-str
+                .getBytes)))))
+

@@ -1,12 +1,18 @@
-(ns yuggoth.views.blog
-  (:use noir.core hiccup.form hiccup.element hiccup.util config)
-  (:require markdown
-            [yuggoth.views.util :as util]
+(ns yuggoth.routes.blog
+  (:use compojure.core         
+        noir.util.route
+        hiccup.form 
+        hiccup.element 
+        hiccup.util 
+        yuggoth.config)
+  (:require [markdown.core :as markdown] 
+            [yuggoth.views.layout :as layout]
+            [yuggoth.util :as util]
             [noir.session :as session]
-            [noir.response :as resp]
-            [yuggoth.views.common :as common]
+            [noir.response :as resp]   
+            [noir.util.cache :as cache]
             [yuggoth.models.db :as db]
-            [yuggoth.views.comments :as comments]))
+            [yuggoth.routes.comments :as comments]))
 
 (defn admin-forms [post-id visible]  
   (when (session/get :admin) 
@@ -26,13 +32,13 @@
    (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) (text :next))])])
 
 (defn display-public-post [postid next?]
-  (util/local-redirect 
+  (resp/redirect 
     (if-let [id (db/get-public-post-id postid next?)]
       (str "/blog/" id)
       "/")))
 
-(defn entry [{:keys [id time title content author public]}]
-   (apply common/layout         
+(defn entry [{:keys [id time title content author public]} req]
+   (apply layout/common         
          (if id
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
@@ -45,32 +51,8 @@
               [:span.tagon {:id "tag"} tag])]
             
             (comments/get-comments id)            
-            (comments/make-comment id)]
+            (comments/comment-form id (:context req))]
            [(text :empty-page) (text :nothing-here)])))
-
-
-(defpage "/" []
-  (if (:initialized @blog-config)
-    (util/cache 
-      :home 
-      (if-let [post (db/get-last-public-post)] 
-        (entry post)
-        (common/layout (text :welcome-title) (text :nothing-here))))
-    (util/local-redirect "/setup-blog")))
-
-
-(defpage "/blog-previous/:postid" {:keys [postid]}
-  (display-public-post postid false))
-
-(defpage "/blog-next/:postid" {:keys [postid]}
-  (display-public-post postid true))
-
-(defpage "/blog/:postid" {:keys [postid]}  
-  (if-let [id (re-find #"\d+" postid)]
-    (util/cache (keyword (str "post-" id)) 
-                (entry (db/get-post id)))
-    (util/local-redirect "/")))
-
 
 (defn tag-list [& [post-id]]
   (let [post-tags (set (if post-id (db/tags-by-post (Integer/parseInt post-id))))] 
@@ -84,13 +66,12 @@
              (db/tags))
      (text-field {:placeholder (text :other)} "tag-custom")]))
 
-
-(util/private-page [:post "/update-post"] {:keys [post-id error]}
+(defn update-post [post-id error]
   (let [{:keys [title content public]} (db/get-post post-id)] 
-    (common/layout
+    (layout/common
       (text :edit-post)
       (when error [:div.error error])
-      (form-to [:post "/make-post"]
+      (form-to [:post "/save-post"]
                (text-field {:tabindex 1} "title" title)
                [:br]
                (text-area {:tabindex 2} "content" content)
@@ -101,13 +82,12 @@
                [:br]
                [:span.submit {:tabindex 3} (text :post)]))))
 
-
-(util/private-page "/make-post" {:keys [content error]}
-  (common/layout
+(defn make-post [content error]  
+  (layout/common
     (text :new-post)
     (when error [:div.error error])
     [:div#output]
-    (form-to [:post "/make-post"]
+    (form-to [:post "/save-post"]
              (text-field {:tabindex 1 :placeholder (text :title)} "title")
              [:br]
              (text-area {:tabindex 2} "content" content)
@@ -119,11 +99,9 @@
               (check-box {:tabindex 4} "public" true)                            
               [:div.entry-submit [:span.submit {:tabindex 3} "post"]]])))
 
-
-(util/private-page [:post "/make-post"] post                   
-  (if (not-empty (:title post)) 
-    (let [{:keys [post-id title content public]} post
-          tags (->> post (filter #(.startsWith (name (first %)) "tag-")) 
+(defn save-post [{:keys [post-id title content public] :as post}]  
+  (if (not-empty title) 
+    (let [tags (->> post (filter #(.startsWith (name (first %)) "tag-")) 
                  (map second) 
                  (remove empty?))]        
       (if post-id
@@ -134,13 +112,36 @@
           (:id (db/store-post title content (:handle (session/get :admin)) public))
           tags))
       
-      (util/invalidate-cache :home)
-      (util/invalidate-cache (keyword (str "post-" post-id)))
+      (cache/invalidate! :home)
+      (cache/invalidate! (str "post-" post-id))
       
-      (util/local-redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
-    (render "/make-post" (assoc post :error (text :title-required)))))
+      (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
+    (make-post content (assoc post :error (text :title-required)))))
 
+(defn home-page [req]   
+  (if (:initialized @blog-config)
+    (cache/cache! 
+      :home 
+      (if-let [post (db/get-last-public-post)] 
+        (entry post req)
+        (layout/common (text :welcome-title) (text :nothing-here))))
+    (resp/redirect "/setup-blog")))
 
-(util/private-page [:post "/toggle-post"] {:keys [post-id public]}                                      
-  (db/post-visible post-id (not (Boolean/parseBoolean public)))
-  (util/local-redirect (str "/blog/" post-id)))
+(defn about-page []
+  (layout/common
+   "this is the story of yuggoth... work in progress"))
+
+(defroutes blog-routes   
+  (GET "/blog-previous/:postid" [postid] (display-public-post postid false))
+  (GET "/blog-next/:postid" [postid] (display-public-post postid true))
+  (GET "/blog/:postid" [postid :as req] 
+       (if-let [id (re-find #"\d+" postid)]
+         (cache/cache! (str "post-" id) (entry (db/get-post id) req))
+         (resp/redirect "/")))  
+  (restricted GET "/make-post" [content error] (make-post content error))
+  (restricted POST "/update-post" [post-id error] (update-post post-id error))
+  (restricted POST "/save-post" {post :params} (save-post post))
+  (restricted POST "/toggle-post" [post-id public] 
+              (do (db/post-visible post-id (not (Boolean/parseBoolean public)))
+                  (resp/redirect (str "/blog/" post-id))))
+  (GET "/" req (home-page req)))

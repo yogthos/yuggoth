@@ -1,10 +1,11 @@
-(ns yuggoth.views.archives
-  (:use noir.core hiccup.element hiccup.form hiccup.util config)
+(ns yuggoth.routes.archives
+  (:use compojure.core hiccup.element hiccup.form hiccup.util yuggoth.config)
   (:require [yuggoth.models.db :as db]             
             [noir.session :as session]
             [noir.response :as resp]
-            [yuggoth.views.util :as util]
-            [yuggoth.views.common :as common]))
+            [noir.util.cache :as cache]
+            [yuggoth.util :as util]
+            [yuggoth.views.layout :as layout]))
 
 (defn make-list [date items]
   [:div 
@@ -34,19 +35,21 @@
       (group-by #(util/format-time (:time %) "yyyy MMMM")))))
 
 
-(defpage "/archives" []
-  (util/cache
+(defn archives []
+  (cache/cache!
     :archives
-    (common/layout 
+    (layout/common 
       (text :archives-title)
       (archives-by-date (db/get-posts nil false (session/get :admin))))))
 
-(defpage [:post "/archives"] {:keys [post-id visible]}   
-  (db/post-visible post-id (not (Boolean/parseBoolean visible)))
-  (util/local-redirect "/archives"))
-
-
-(defpage "/tag/:tagname" {:keys [tagname]}
-  (common/layout
+(defn show-tag [tagname] 
+  (layout/common
     tagname    
     (archives-by-date (db/posts-by-tag tagname))))
+
+(defroutes archive-routes
+  (GET "/archives" [] (archives))
+  (POST "/archives" [post-id visible] 
+        (do (db/post-visible post-id (not (Boolean/parseBoolean visible)))
+            (resp/redirect "/archives")))
+  (GET "/tag/:tagname" [tagname] (show-tag tagname)))
