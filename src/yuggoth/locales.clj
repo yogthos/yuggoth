@@ -1,4 +1,4 @@
-(ns yuggoth.views.locales)
+(ns yuggoth.locales)
 
 (def dict  
   {:en 
@@ -95,3 +95,5 @@
     :quote-help ">quoted text"
     :quote-example "quoted text"
     :code-help "4 spaces indented code"}})
+
+

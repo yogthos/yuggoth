@@ -1,14 +1,20 @@
-(ns yuggoth.views.comments
-  (:use hiccup.util hiccup.element hiccup.form noir.core config)
+(ns yuggoth.routes.comments
+  (:use compojure.core
+        hiccup.util
+        hiccup.element
+        hiccup.form
+        noir.util.route
+        yuggoth.config)
   (:require [clojure.string :as string] 
-            [yuggoth.views.util :as util]
+            [yuggoth.util :as util]
             [yuggoth.models.db :as db]
-            [yuggoth.views.common :as common]
+            [yuggoth.views.layout :as layout]
             [noir.session :as session]
             [noir.request :as request]
-            [noir.response :as resp])
-  (:import net.sf.jlue.util.Captcha                      
-           javax.imageio.ImageIO
+            [noir.response :as resp] 
+            [noir.util.cache :as cache]
+            [markdown.core :as markdown])
+  (:import javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
 (defn append-comment [comments {:keys [id blogid author content time]}]  
@@ -16,7 +22,7 @@
     comments
     [:div.comment
      [:h4 (util/format-time time) " - " author]
-     [:div#comment-content 
+     [:dnv#comment-content 
       (markdown/md-to-html-string content)
       (if (session/get :admin) 
         (form-to [:post "/delete-comment"]
@@ -24,20 +30,16 @@
                  (hidden-field "blogid" blogid)
                  (submit-button {:class "delete"} (text :delete))))]]))
 
-(defpage [:post "/delete-comment"] {:keys [id blogid]}  
-  (db/delete-comment id)
-  (util/local-redirect (str "/blog/" blogid)))
-
 (defn get-comments [blog-id]
   (let [header [:div.comments [:h2 (text :comments)] [:hr]]]
     (if-let [comments (db/get-comments blog-id)]
       (conj (reduce append-comment header comments) [:hr])
       header)))
 
-(defn make-comment [blog-id]    
+(defn comment-form [blog-id context]    
   (form-to [:post "/comment"]
            (hidden-field "blog-id" blog-id)    
-           (hidden-field "context" (or (:context (request/ring-request)) ""))
+           (hidden-field "context" context)
            (if-let [admin (:handle (session/get :admin))]
              [:div (text :commenting-as) admin]             
              [:div
@@ -65,13 +67,13 @@
             [:p#post-preview ]]
            [:span.submit-comment {:tabindex 5} (text :submit)]))
 
-(defpage [:post "/comment"] {:keys [blogid captcha content author]}
+(defn make-comment [blogid captcha content author]
   (let [admin  (session/get :admin)
         author (or (:handle admin) author)]    
     (if (and (or admin 
-                   (and (= captcha (:text (session/get :captcha))) 
-                        (not-empty author)))
-               (not-empty content))
+                 (and (= captcha (:text (session/get :captcha))) 
+                      (not-empty author)))
+             (not-empty content))
       
       (do        
         (db/add-comment blogid
@@ -86,33 +88,35 @@
                           (= (.toLowerCase (:handle (db/get-admin))) (.toLowerCase author))
                           (text :anonymous)
                           
-                          :else (escape-html author)))
-        (util/invalidate-cache :home)
-        (util/invalidate-cache (keyword (str "post-" blogid))) 
+                          :else (escape-html author)))        
+        (cache/invalidate! :home)
+        (cache/invalidate! (str "post-" blogid)) 
         
         (resp/json {:result "success"}))
       (resp/json {:result "error"}))))
 
-(defn gen-captcha-text []
-  (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))
-
-(defn gen-captcha []
-  (let [text (gen-captcha-text)
-        captcha (doto (new Captcha))]
-    (session/put! :captcha {:text text :image (.gen captcha text 250 40)})))
-
-(defpage "/captcha" []
-  (gen-captcha)
+(defn display-captcha []
+  (util/gen-captcha)
   (resp/content-type 
     "image/jpeg" 
     (let [out (new ByteArrayOutputStream)]
       (ImageIO/write (:image (session/get :captcha)) "jpeg" out)
       (new ByteArrayInputStream (.toByteArray out)))))
 
-(util/private-page "/latest-comments" []
-  (common/layout
+(defn latest-comments []
+  (layout/common
     (text :latest-comments-title)
     (into [:table] 
         (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
           [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]]))))
 
+(defroutes comments-routes   
+  (POST "/comment" [blogid captcha content author]   
+        (make-comment blogid captcha content author))
+  (restricted POST "/delete-comment" [id blogid]  
+    (do (db/delete-comment id)
+        (cache/invalidate! :home)
+        (cache/invalidate! (str "post-" blogid))
+        (resp/redirect (str "/blog/" blogid))))
+  (GET "/captcha" [] (display-captcha))
+  (GET "/latest-comments" [] (latest-comments)))

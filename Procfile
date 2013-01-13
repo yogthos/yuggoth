@@ -1,1 +1,1 @@
-web: lein trampoline run -m yuggoth.server
+web: lein with-profile production ring server

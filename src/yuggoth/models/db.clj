@@ -1,11 +1,11 @@
 (ns yuggoth.models.db
-  (:use yuggoth.models.schema config)
+  (:use yuggoth.models.schema yuggoth.config)
   (:require [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp java.util.Date))
 
 (defmacro with-db [f & body]
   `(sql/with-connection
-    (deref config/db) (~f ~@body)))
+    (deref yuggoth.config/db) (~f ~@body)))
 
 (defn db-read
   "returns the result of running the supplied SQL query"
@@ -24,7 +24,7 @@
 (defn fix-file-name [filename]
   (.replaceAll filename "[^a-zA-Z0-9-\\.]" ""))
 
-(defn store-file [{:keys [tempfile filename content-type]}]
+(defn store-file [{:keys [tempfile filename content-type] :as file}]  
   (with-db sql/update-or-insert-values
     :file
     ["name=?" filename]
@@ -152,7 +152,6 @@
 
 (defn update-admin [admin]
   (with-db sql/update-values :admin ["handle=?" (:handle admin)] admin))
-
 
 (defn get-admin []  
   (first (db-read "select * from admin")))

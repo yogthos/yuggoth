@@ -1,21 +1,27 @@
-(ns yuggoth.views.profile
-  (:use hiccup.form hiccup.element noir.core clojure.pprint config)
-  (:require [yuggoth.views.common :as common]
-            [yuggoth.views.util :as util]
+(ns yuggoth.routes.profile
+  (:use compojure.core
+        noir.util.route
+        hiccup.form
+        hiccup.element
+        clojure.pprint
+        yuggoth.config)
+  (:require [yuggoth.views.layout :as layout]
+            [yuggoth.util :as util]
             [noir.util.crypt :as crypt]
-            [noir.session :as session]
+            [noir.session :as session]            
+            [markdown.core :as markdown]
             [yuggoth.models.db :as db]
             [noir.response :as resp]))
 
-(defpage "/about" []
+(defn about []
   (let [{:keys [about style handle email]} (db/get-admin)]   
-    (common/layout
+    (layout/common
       (str "About " handle)            
       (markdown/md-to-html-string (str about))
       [:p [:b email]])))
 
-(util/private-page "/profile" {:keys [title handle style email about pass pass1 pass2 info]}
-  (common/layout
+(defn profile [{:keys [title handle style email about pass pass1 pass2 info]}]
+  (layout/common
     "Profile"
     [:h2.info info]
     (link-to "/export" "export blog")
@@ -51,37 +57,48 @@
         updated-profile (select-keys profile [:title :handle :email :style :about])] 
     (if (not-empty pass) (assoc updated-profile :pass (when  (crypt/encrypt pass))) updated-profile)))
 
-(defn update-profile [admin profile]  
-  (let [updated-admin (merge admin (get-updated-fields profile))]    
-    (try
-      (session/remove! :admin)
-      (session/put! :admin updated-admin)
-      (db/update-admin updated-admin)      
-      (text :profile-updated)
-      (catch Exception ex (.getMessage ex)))))
+(defn update-profile 
+  ([params]    
+    (let [{:keys [pass pass1 pass2]} params        
+          admin (session/get :admin)]     
+      (profile
+        (assoc params 
+               :info
+               (cond (nil? pass) (text :admin-pass-required) 
+                     (not (crypt/compare pass (:pass admin))) (text :wrong-password)
+                     (not= pass1 pass2) (text :pass-mismatch)
+                     :else (update-profile admin params))))))
+  
+  ([admin profile]  
+    (let [updated-admin (merge admin (get-updated-fields profile))]    
+      (try
+        (session/remove! :admin)
+        (session/put! :admin updated-admin)
+        (db/update-admin updated-admin)      
+        (text :profile-updated)
+        (catch Exception ex (.getMessage ex))))))
 
-(util/private-page [:post "/profile"] profile
-  (let [{:keys [pass pass1 pass2]} profile        
-        admin (session/get :admin)]     
-    (render "/profile"
-            (assoc profile 
-                   :info
-                   (cond (nil? pass) (text :admin-pass-required) 
-                         (not (crypt/compare pass (:pass admin))) (text :wrong-password)
-                         (not= pass1 pass2) (text :pass-mismatch)
-                         :else (update-profile admin profile))))))
 
-(util/private-page "/export" []
+
+(defn export-blog []
   (resp/content-type 
     "text/plain" 
     (let [buf (new java.io.StringWriter)] 
       (pprint (db/export) buf)
       (.toString buf))))
 
-(util/private-page [:post "/import"] params
+(defn import-blog [params]
   (db/import-posts (slurp (:tempfile (:file params))))
-  (util/local-redirect "/profile"))
+  (resp/redirect "/profile"))
 
-(util/private-page [:post "/update-tags"] tags
+(defn update-tags [tags]
   (db/delete-tags (map second tags))
-  (util/local-redirect "/profile"))
+  (resp/redirect "/profile"))
+
+(defroutes profile-routes
+  (GET "/about" [] (about))
+  (restricted GET "/profile" {params :params} (profile params))
+  (restricted GET "/export"  [] (export-blog))
+  (restricted POST "/import" {params :params} (import-blog params))
+  (restricted POST "/profile" {params :params} (update-profile params))  
+  (restricted POST "/update-tags" {tags :params} (update-tags tags)))
