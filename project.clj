@@ -1,4 +1,4 @@
-(defproject yuggoth "0.1.0-SNAPSHOT"
+(defproject yuggoth "0.5.0-SNAPSHOT"
   
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
