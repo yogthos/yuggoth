@@ -63,8 +63,7 @@ function showHelp() {
 	$(".mdhelp").toggle();
 }
 
-function submitComment() {	
-    var context = $('#context').val();
+function submitComment() {	    
     var url = context + '/comment';        
 	$.post(url, 
 		  {blogid:  $("#blog-id").val(),

@@ -1,5 +1,6 @@
 (ns yuggoth.views.layout
-  (:use yuggoth.config        
+  (:use yuggoth.config   
+        noir.request
         hiccup.element 
         hiccup.form 
         hiccup.util                        
@@ -68,7 +69,8 @@
        [:title html-title]
        (include-css (util/get-css)
                     "/css/jquery.alerts.css"
-                    "/css/shCoreYuggoth.css")]      
+                    "/css/shCoreYuggoth.css")
+       [:script {:type "text/javascript"} (str "var context=\"" (:context *request*) "\";")]]      
       [:body              
        (hidden-field "selected" 
                      (cond
