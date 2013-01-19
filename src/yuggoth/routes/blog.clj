@@ -37,7 +37,7 @@
       (str "/blog/" id)
       "/")))
 
-(defn entry [{:keys [id time title content author public]} req]
+(defn entry [{:keys [id time title content author public]}]
    (apply layout/common         
          (if id
            [{:title title :elements (admin-forms id public)}
@@ -51,7 +51,7 @@
               [:span.tagon {:id "tag"} tag])]
             
             (comments/get-comments id)            
-            (comments/comment-form id (:context req))]
+            (comments/comment-form id)]
            [(text :empty-page) (text :nothing-here)])))
 
 (defn tag-list [& [post-id]]
@@ -118,12 +118,12 @@
       (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (make-post content (assoc post :error (text :title-required)))))
 
-(defn home-page [req]   
+(defn home-page []   
   (if (:initialized @blog-config)
     (cache/cache! 
       :home 
       (if-let [post (db/get-last-public-post)] 
-        (entry post req)
+        (entry post)
         (layout/common (text :welcome-title) (text :nothing-here))))
     (resp/redirect "/setup-blog")))
 
@@ -134,9 +134,9 @@
 (defroutes blog-routes   
   (GET "/blog-previous/:postid" [postid] (display-public-post postid false))
   (GET "/blog-next/:postid" [postid] (display-public-post postid true))
-  (GET "/blog/:postid" [postid :as req] 
+  (GET "/blog/:postid" [postid] 
        (if-let [id (re-find #"\d+" postid)]
-         (cache/cache! (str "post-" id) (entry (db/get-post id) req))
+         (cache/cache! (str "post-" id) (entry (db/get-post id)))
          (resp/redirect "/")))  
   (restricted GET "/make-post" [content error] (make-post content error))
   (restricted POST "/update-post" [post-id error] (update-post post-id error))
@@ -144,4 +144,4 @@
   (restricted POST "/toggle-post" [post-id public] 
               (do (db/post-visible post-id (not (Boolean/parseBoolean public)))
                   (resp/redirect (str "/blog/" post-id))))
-  (GET "/" req (home-page req)))
+  (GET "/" [] (home-page)))

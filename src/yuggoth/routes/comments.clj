@@ -36,10 +36,9 @@
       (conj (reduce append-comment header comments) [:hr])
       header)))
 
-(defn comment-form [blog-id context]    
+(defn comment-form [blog-id]    
   (form-to [:post "/comment"]
-           (hidden-field "blog-id" blog-id)    
-           (hidden-field "context" context)
+           (hidden-field "blog-id" blog-id)               
            (if-let [admin (:handle (session/get :admin))]
              [:div (text :commenting-as) admin]             
              [:div
