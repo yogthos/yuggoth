@@ -67,7 +67,7 @@
                                 "port" (text :port) (or port 5432)
                                 "schema" (text :schema) schema
                                 "user"   (text :user) user
-                                "pass"   (text :pass) pass                              
+                                "pass"   (text :password) pass                              
                                 "ssl-port" (text :ssl-port) (or ssl-port 443))
                 "locale " (drop-down "locale" (keys locales/dict) "en")
                 [:br]
