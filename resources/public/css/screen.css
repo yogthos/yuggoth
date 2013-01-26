@@ -9,8 +9,9 @@ body {
     background-size: auto;
     display: block;
     margin-left: 20px;
-	margin-right: 20px;
+    margin-right: 20px;
 }
+
 .container {
     height: auto;
     margin-top: 50px;
@@ -19,11 +20,13 @@ body {
     margin-right:auto;
     width: 1020px;
 }
+
 #logo {
 	float: left;
 	width: 20px;
 	height: 20px;
 }
+
 .header {
     min-height: 50px;    
     width: 800px;
@@ -36,11 +39,11 @@ body {
 
 .menu {
     border:1px solid;
-	border-color:#ccc;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	padding: 10px;
+    border-color:#ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 10px;
     text-align: right;
     min-width: 1000px;
 }
@@ -54,7 +57,7 @@ body {
 }
 
 #rss div {
-	float: left;	
+    float: left;	
 }
 
 .menu a {
@@ -92,7 +95,7 @@ body {
 }
 
 .menu-items {
-	width: 990px;
+    width: 990px;
 }
 
 .contents {    
@@ -105,7 +108,7 @@ body {
     font-family: 'Oswald', Helvetica, Arial, sans-serif;    
     float: left;
     margin-left: 20px;            
-	text-transform: uppercase;        
+    text-transform: uppercase;        
     line-height: 10px;
     text-align: left;    
     max-width: 250px;
@@ -129,7 +132,7 @@ body {
 
 
 .sidebar .date {
-	text-transform: none;    
+    text-transform: none;    
     color: #555;        
     margin-top: 5px;  
     margin-bottom: 20px; 
@@ -285,31 +288,31 @@ div#comment-content {
 }
 
 #preview {
-	display:none;
+    display:none;
 }
 
 .render-preview {
-	cursor:pointer;
+    cursor:pointer;
 }
 
 .entry-content p {
- 	line-height: 135%;
+    line-height: 135%;
 }
 
 .entry-content h1 {
-font-size: 25px;
+    font-size: 25px;
 }
 
 .entry-content h2 {
-font-size: 22px;
+    font-size: 22px;
 }
 
 .entry-content h3 {
-font-size: 19px;
+    font-size: 19px;
 }
 
 .entry-content h4 {
-font-size: 15px;
+    font-size: 15px;
 }
 
 .entry-content a img {
@@ -468,10 +471,10 @@ img {
     text-align: center;
     min-width: 1000px;
     border:1px solid;
-	border-color:#ccc;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
+    border-color:#ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
 }
 
 input {
@@ -552,10 +555,9 @@ table.mdhelp td {
 	padding-right: 21px;
 }
 .toolbar {
-        display: none;
+    display: none;
 }
 
 b {
-	color: #555;
-
+    color: #555;
 }
