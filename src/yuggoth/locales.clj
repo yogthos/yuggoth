@@ -76,8 +76,6 @@
     :profile-updated "profile updated successfully"
     :admin-pass-required "administrator password is required"
     
-    :export-blog "export blog"
-    :import-blog "import blog"
     :delete-tags "select tags to delete "
     :update-tags "update tags"
     
@@ -170,8 +168,6 @@
     :profile-updated "perfil actualizado satisfactoriamente"
     :admin-pass-required "la contraseña del administrador es requerida"
     
-    :export-blog "exportar blog"
-    :import-blog "importar blog"
     :delete-tags "seleciona tags para borrar "
     :update-tags "actualiza tags"
     
@@ -189,5 +185,4 @@
     :quote-help ">texto citado"
     :quote-example "texto citado"
     :code-help "codigo identado a 4 espacios"}})
-
 
