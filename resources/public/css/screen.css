@@ -14,23 +14,17 @@ body {
 
 .container {
     height: auto;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
     margin-left:auto;
     margin-right:auto;
     width: 1020px;
 }
 
-#logo {
-	float: left;
-	width: 20px;
-	height: 20px;
-}
-
 .header {
-    min-height: 50px;    
-    width: 800px;
-    color: #555;
+	background-color: white;
+	width: 100%;
+    float: left;
+    color: #333;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
     font-weight: bold;
     font-size: 30px;    
@@ -38,15 +32,26 @@ body {
 }
 
 .menu {
-    border:1px solid;
-    border-color:#ccc;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: right;
-    min-width: 1000px;
+	color: #eee;
+	background-color: #585858;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#585858), to(#3d3d3d));
+	background-image: -webkit-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -moz-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -ms-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -o-linear-gradient(top, #585858, #3d3d3d);
+	background-image: linear-gradient(top, #585858, #3d3d3d);
+	clear: both;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#585858, endColorstr=#3d3d3d);
+	padding-top: 11px;
+	padding-bottom: 10px;
+	
+	background-color: #f9f9f9;
+	border: 1px solid #e5e5e5;
+
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 }
+
 .menu img {		       
     height: 11px;
     width: 11px;
@@ -61,16 +66,18 @@ body {
 }
 
 .menu a {
-    color: #666;
+    color: #eee;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
     font-size: 18px;
     margin: 0 10px;
     padding: 10px 0;
     text-decoration: none;
     text-transform: uppercase;
+    cursor: pointer;
 }
 .menu a:hover {
-    color: #000;
+    color: white;
+    background-color: #343434;
 }
 .menu ul {
     list-style: none;
@@ -86,7 +93,10 @@ body {
     display: block;
 }
 .menu ul li.selected > a {
-    color: #111;
+	padding-left: 5px;
+	padding-right: 5px;
+    background-color: #343434;
+    border: 1px solid #9a9a9a;
 }
 .menu ul:after {
     clear: both;
@@ -107,11 +117,11 @@ body {
 .sidebar {
     font-family: 'Oswald', Helvetica, Arial, sans-serif;    
     float: left;
-    margin-left: 20px;            
+    margin-left: 15px;            
     text-transform: uppercase;        
     line-height: 10px;
     text-align: left;    
-    max-width: 250px;
+    max-width: 220px;
 }
 
 .sidebar-preview {
@@ -171,11 +181,20 @@ span {
 
 .post {
     float: left;
-    border-right: 1px solid #ccc;
     width: 720px;
     padding-bottom: 10px;
     text-align:left;
+    
+    margin: 10px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+	background-color: #f9f9f9;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
+
+	padding: 20px;
 }
+
 
 .entry-title {
     color: #555;
@@ -464,17 +483,31 @@ img {
 
 .footer {    
     clear: both;
-    color: #555;
     font-size: 11px;
     font-weight: bold;
     height: auto;    
     text-align: center;
     min-width: 1000px;
-    border:1px solid;
-    border-color:#ccc;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
+    
+    color: #eee;
+	background-color: #585858;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#585858), to(#3d3d3d));
+	background-image: -webkit-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -moz-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -ms-linear-gradient(top, #585858, #3d3d3d);
+	background-image: -o-linear-gradient(top, #585858, #3d3d3d);
+	background-image: linear-gradient(top, #585858, #3d3d3d);
+	clear: both;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#585858, endColorstr=#3d3d3d);
+	margin-bottom: 20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	
+	-webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+	background-color: #f9f9f9;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
 }
 
 input {
@@ -492,6 +525,11 @@ input {
 .footer a {
     color: #36bcab;
     text-decoration: none;
+}
+
+.footer span {
+	border:none;
+	box-shadow: none;
 }
 
 .tags {
