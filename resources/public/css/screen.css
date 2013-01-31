@@ -77,7 +77,6 @@ body {
 }
 .menu a:hover {
     color: white;
-	text-decoration: underline overline;
 }
 .menu ul {
     list-style: none;
