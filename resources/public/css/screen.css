@@ -203,7 +203,7 @@ span {
     text-align: left;
     text-decoration: none;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    padding-bottom: 5px;
 }
 .entry-title div {
 	float: right;
