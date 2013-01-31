@@ -58,7 +58,7 @@ body {
     padding-right: 0px;  
     padding-top: 2px;
     padding-left: 2px;         
-    float: left;        
+    float: left;    
 }
 
 #rss div {
@@ -121,7 +121,7 @@ body {
     text-transform: uppercase;        
     line-height: 10px;
     text-align: left;    
-    max-width: 220px;
+    max-width: 260px;
 }
 
 .sidebar-preview {
@@ -181,7 +181,7 @@ span {
 
 .post {
     float: left;
-    width: 720px;
+    width: 650px;
     padding-bottom: 10px;
     text-align:left;
     
@@ -199,8 +199,7 @@ span {
 .entry-title {
     color: #555;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;    
-    line-height: 10px;
-    margin-left:70px;    
+    line-height: 10px;    
     text-align: left;
     text-decoration: none;
     text-transform: uppercase;
@@ -239,10 +238,8 @@ p#post-time {
 
 .entry-content {
     text-align:left;
-    width: 600px;
     height: auto;
     clear: both;
-    margin: 5px 0px 15px 70px;    
     font-size: 16px;
     float: left;                    
 }
