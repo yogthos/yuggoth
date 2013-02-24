@@ -82,7 +82,7 @@
                [:br]
                [:span.submit {:tabindex 3} (text :post)]))))
 
-(defn make-post [content error]  
+(defn make-post [content error]    
   (layout/common
     (text :new-post)
     (when error [:div.error error])
@@ -95,7 +95,7 @@
              "tags " (tag-list)
              [:br]
              [:div
-              [:div.entry-public (text :publie)]
+              [:div.entry-public (text :public)]
               (check-box {:tabindex 4} "public" true)                            
               [:div.entry-submit [:span.submit {:tabindex 3} "post"]]])))
 
