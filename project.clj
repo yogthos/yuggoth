@@ -5,15 +5,16 @@
   
   :dependencies
   [[org.clojure/clojure "1.4.0"]
-   [lib-noir "0.3.4"]
-   [compojure "1.1.3"]
+   [lib-noir "0.4.7"]
+   [compojure "1.1.5"]
    [hiccup "1.0.2"]
-   [ring-server "0.2.5"]
+   [ring-server "0.2.7"]
    [clavatar "0.2.1"]
    [clj-rss "0.1.2"]
-   [com.taoensso/timbre "1.2.0"]   
-   [markdown-clj "0.9.18"]
+   [com.taoensso/timbre "1.5.1"]   
+   [markdown-clj "0.9.19"]
    [net.sf.jlue/jlue-core "1.3"]
+   [com.draines/postal "1.9.0"]
    [org.clojure/java.jdbc "0.2.3"]   
    [postgresql/postgresql "9.1-901.jdbc4"]]
   

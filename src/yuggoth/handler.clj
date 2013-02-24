@@ -14,7 +14,7 @@
             [noir.util.cache :as cache]
             [compojure.route :as route]))
 
-(defroutes app-routes  
+(defroutes app-routes    
   (route/resources "/")
   (route/not-found "Not Found"))
 
@@ -28,8 +28,8 @@
   (cache/set-size! 20)
   (println "yuggoth started successfully..."))
 
-(defn private-page [method url params] 
-  (session/get :admin))
+(defn private-page [method url params]   
+  (not (nil? (session/get :admin))))
 
 (defn wrap-ssl-if-selected [app]  
   (if (:ssl @config/blog-config)
