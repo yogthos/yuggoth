@@ -14,7 +14,6 @@
    [com.taoensso/timbre "1.5.1"]   
    [markdown-clj "0.9.19"]
    [net.sf.jlue/jlue-core "1.3"]
-   [com.draines/postal "1.9.0"]
    [org.clojure/java.jdbc "0.2.3"]   
    [postgresql/postgresql "9.1-901.jdbc4"]]
   

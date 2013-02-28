@@ -112,7 +112,8 @@
           (:id (db/store-post title content (:handle (session/get :admin)) public))
           tags))
       
-      (cache/invalidate! :home)
+      (cache/invalidate! :home)      
+      (cache/invalidate! :archives)
       (cache/invalidate! (str "post-" post-id))
       
       (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
