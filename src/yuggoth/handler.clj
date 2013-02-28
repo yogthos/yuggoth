@@ -5,9 +5,10 @@
         yuggoth.routes.comments
         yuggoth.routes.upload
         yuggoth.routes.profile
-        yuggoth.routes.rss
+        yuggoth.routes.rss        
         compojure.core)  
-  (:require [yuggoth.config :as config] 
+  (:require [yuggoth.config :as config]
+            [yuggoth.views.layout :as layout]
             [noir.util.middleware :as middleware]
             [noir.response :as resp]
             [noir.session :as session]
@@ -25,7 +26,7 @@
    put any initialization code here"
   []
   (config/init)
-  (cache/set-size! 20)
+  (cache/set-size! 5)
   (println "yuggoth started successfully..."))
 
 (defn private-page [method url params]   
@@ -47,6 +48,17 @@
           (resp/redirect (str "https://" host ":" ssl-port (:uri req)) :permanent))))    
     app))
 
+(defn wrap-exceptions [app]
+  (fn [request]
+    (try 
+      (app request)
+      (catch Exception ex
+        (.printStackTrace ex)
+        {:status 500
+         :headers {"Content-Type" "text/html"}
+         :body (layout/common (config/text :welcome-title) 
+                              (config/text :nothing-here))}))))
+
 ;;append your application routes to the all-routes vector
 (def all-routes [auth-routes
                  archive-routes
@@ -56,8 +68,9 @@
                  rss-routes
                  blog-routes                 
                  app-routes])
-(def app (-> all-routes
+(def app (-> all-routes           
            (middleware/app-handler)
+           (wrap-exceptions)
            (wrap-ssl-if-selected)
            (middleware/wrap-access-rules private-page)))
 (def war-handler (middleware/war-handler app))
