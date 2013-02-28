@@ -29,7 +29,7 @@
         [:li#latest (link-to "/latest-comments" (text :latest-comments-title))]
         [:li#new-post (link-to "/make-post" (text :new-post))]]
        [:ul.menu-items])     
-     [[:li#rss (link-to "/rss" [:div#rss "rss"] (image "/img/rss.jpg"))]      
+     [[:li#rss (link-to "/rss" [:div#rss "rss"] #_(image "/img/rss.jpg"))]      
       [:li#about (link-to "/about" (text :about-title))]      
       [:li#archives (link-to "/archives" (text :archives-title))]
       [:li#home (link-to "/" (text :home-title))]])])

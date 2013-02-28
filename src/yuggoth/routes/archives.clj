@@ -30,7 +30,7 @@
   (->> archives      
     (group-by compare-time)
     (vec)
-    (sort-by first)
+    (sort-by #(util/parse-time (first %) "yyyy MMMM"))
     (reverse)
     (reduce
       (fn [groups [date items]]
