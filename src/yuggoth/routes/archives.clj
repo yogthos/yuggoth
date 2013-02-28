@@ -12,7 +12,7 @@
    date
    [:hr]
    (into [:ul] 
-         (for [{:keys [id time title public]} items] 
+         (for [{:keys [id time title public]} (reverse (sort-by :time items))] 
            [:li.archive 
             (link-to {:class "archive"} 
                      (str "/blog/" (str id "-" (url-encode title))) 
@@ -23,6 +23,8 @@
                        (hidden-field "visible" (str public))
                        [:span.submit (if public (text :hide) (text :show))]))]))])
 
+(defn compare-time [post]
+  (util/format-time (:time post) "yyyy MMMM"))
 
 (defn archives-by-date [archives]
   (reduce
@@ -30,10 +32,10 @@
       (conj groups (make-list date items)))
     [:div]
     (->> archives
-      (sort-by :time)
-      reverse
-      (group-by #(util/format-time (:time %) "yyyy MMMM")))))
-
+      (group-by compare-time)
+      vec
+      (sort-by compare-time)
+      reverse)))
 
 (defn archives []
   (cache/cache!
