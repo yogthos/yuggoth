@@ -26,8 +26,7 @@
                     :init init
                     :auto-reload? true                    
                     :join true
-                    :open-browser? false}))
-    (println "Server started on port [" port "].")
+                    :open-browser? false}))    
     (println (str "You can view the site at http://localhost:" port))))
 
 (defn stop-server []
@@ -35,3 +34,5 @@
   (reset! server nil))
 
 #_(start-server)
+
+#_(stop-server)
