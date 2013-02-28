@@ -5,7 +5,7 @@
   
   :dependencies
   [[org.clojure/clojure "1.4.0"]
-   [lib-noir "0.4.7"]
+   [lib-noir "0.4.8"]
    [compojure "1.1.5"]
    [hiccup "1.0.2"]
    [ring-server "0.2.7"]
