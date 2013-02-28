@@ -27,22 +27,22 @@
   (util/format-time (:time post) "yyyy MMMM"))
 
 (defn archives-by-date [archives]
-  (reduce
-    (fn [groups [date items]]
-      (conj groups (make-list date items)))
-    [:div]
-    (->> archives
-      (group-by compare-time)
-      vec
-      (sort-by compare-time)
-      reverse)))
+  (->> archives      
+    (group-by compare-time)
+    (vec)
+    (sort-by first)
+    (reverse)
+    (reduce
+      (fn [groups [date items]]
+        (conj groups (make-list date items)))
+      [:div])))
 
 (defn archives []
   (cache/cache!
     :archives
     (layout/common 
       (text :archives-title)
-      (archives-by-date (db/get-posts nil false (session/get :admin))))))
+      (archives-by-date (db/get-posts false false (boolean (session/get :admin)))))))
 
 (defn show-tag [tagname] 
   (layout/common
