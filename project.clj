@@ -4,13 +4,13 @@
   :url "http://example.com/FIXME"
   
   :dependencies
-  [[org.clojure/clojure "1.4.0"]
-   [lib-noir "0.4.8"]
+  [[org.clojure/clojure "1.5.1"]
+   [lib-noir "0.4.9"]
    [compojure "1.1.5"]
    [hiccup "1.0.2"]
    [ring-server "0.2.7"]
    [clavatar "0.2.1"]
-   [clj-rss "0.1.2"]
+   [clj-rss "0.1.3"]
    [com.taoensso/timbre "1.5.1"]   
    [markdown-clj "0.9.19"]
    [net.sf.jlue/jlue-core "1.3"]
@@ -26,6 +26,6 @@
    {:ring
     {:open-browser? false, :stacktraces? false, :auto-reload? false}}
    :dev 
-   {:dependencies [[ring-mock "0.1.3"] [ring/ring-devel "1.1.0"]]}}
+   {:dependencies [[ring-mock "0.1.3"] [ring/ring-devel "1.1.8"]]}}
    
-  :plugins [[lein-ring "0.8.0"]])
+  :plugins [[lein-ring "0.8.3"]])

@@ -28,7 +28,7 @@
 
 (defn post-nav [id]
   [:div
-   (if (> id 1) [:div.leftmost (link-to (str "/blog-previous/" id) (text :previous))])
+   (if (> id 1)                 [:div.leftmost (link-to (str "/blog-previous/" id) (text :previous))])
    (if (< id (db/last-post-id)) [:div.rightmost (link-to (str "/blog-next/" id) (text :next))])])
 
 (defn display-public-post [postid next?]

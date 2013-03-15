@@ -32,7 +32,7 @@
 
 (defn get-comments [blog-id]
   (let [header [:div.comments [:h2 (text :comments)] [:hr]]]
-    (if-let [comments (db/get-comments blog-id)]
+    (if-let [comments (sort-by :time (db/get-comments blog-id))]
       (conj (reduce append-comment header comments) [:hr])
       header)))
 
