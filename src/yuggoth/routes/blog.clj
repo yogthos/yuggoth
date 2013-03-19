@@ -1,6 +1,7 @@
 (ns yuggoth.routes.blog
-  (:use compojure.core         
+  (:use compojure.core                 
         noir.util.route
+        hiccup.core
         hiccup.form 
         hiccup.element 
         hiccup.util 
@@ -37,21 +38,21 @@
       (str "/blog/" id)
       "/")))
 
-(defn entry [{:keys [id time title content author public]}]
-   (apply layout/common         
+(defn entry [{:keys [id time title content author public]}]  
+  (apply layout/common         
          (if id
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
-            (markdown/md-to-html-string content)
+            (cache/cache! (str id) (markdown/md-to-html-string content))
             (post-nav id)     
             [:br]
             [:br]
             [:div (str (text :tags) " ")
              (for [tag (db/tags-by-post id)]
-              [:span.tagon {:id "tag"} tag])]
-            
+               [:span.tagon {:id "tag"} tag])]
             (comments/get-comments id)            
             (comments/comment-form id)]
+           
            [(text :empty-page) (text :nothing-here)])))
 
 (defn tag-list [& [post-id]]
@@ -111,21 +112,17 @@
         (db/update-tags 
           (:id (db/store-post title content (:handle (session/get :admin)) public))
           tags))
-      
-      (cache/invalidate! :home)      
-      (cache/invalidate! :archives)
-      (cache/invalidate! (str "post-" post-id))
+               
+      (cache/invalidate! post-id)
       
       (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
     (make-post content (assoc post :error (text :title-required)))))
 
 (defn home-page []   
   (if (:initialized @blog-config)
-    (cache/cache! 
-      :home 
-      (if-let [post (db/get-last-public-post)] 
-        (entry post)
-        (layout/common (text :welcome-title) (text :nothing-here))))
+    (if-let [post (db/get-last-public-post)] 
+      (entry post)
+      (layout/common (text :welcome-title) (text :nothing-here)))
     (resp/redirect "/setup-blog")))
 
 (defn about-page []
@@ -137,7 +134,7 @@
   (GET "/blog-next/:postid" [postid] (display-public-post postid true))
   (GET "/blog/:postid" [postid] 
        (if-let [id (re-find #"\d+" postid)]
-         (cache/cache! (str "post-" id) (entry (db/get-post id)))
+         (entry (db/get-post id))
          (resp/redirect "/")))  
   (restricted GET "/make-post" [content error] (make-post content error))
   (restricted POST "/update-post" [post-id error] (update-post post-id error))
