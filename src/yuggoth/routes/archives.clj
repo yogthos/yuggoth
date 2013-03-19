@@ -2,8 +2,7 @@
   (:use compojure.core hiccup.element hiccup.form hiccup.util yuggoth.config)
   (:require [yuggoth.models.db :as db]             
             [noir.session :as session]
-            [noir.response :as resp]
-            [noir.util.cache :as cache]
+            [noir.response :as resp]            
             [yuggoth.util :as util]
             [yuggoth.views.layout :as layout]))
 
@@ -38,11 +37,9 @@
       [:div])))
 
 (defn archives []
-  (cache/cache!
-    :archives
-    (layout/common 
-      (text :archives-title)
-      (archives-by-date (db/get-posts false false (boolean (session/get :admin)))))))
+  (layout/common 
+    (text :archives-title)
+    (archives-by-date (db/get-posts false false (boolean (session/get :admin))))))
 
 (defn show-tag [tagname] 
   (layout/common

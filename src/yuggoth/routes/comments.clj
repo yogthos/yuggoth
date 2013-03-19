@@ -11,8 +11,7 @@
             [yuggoth.views.layout :as layout]
             [noir.session :as session]
             [noir.request :as request]
-            [noir.response :as resp] 
-            [noir.util.cache :as cache]
+            [noir.response :as resp]             
             [markdown.core :as markdown])
   (:import javax.imageio.ImageIO
            [java.io ByteArrayInputStream ByteArrayOutputStream]))
@@ -88,8 +87,6 @@
                           (text :anonymous)
                           
                           :else (escape-html author)))        
-        (cache/invalidate! :home)
-        (cache/invalidate! (str "post-" blogid)) 
         
         (resp/json {:result "success"}))
       (resp/json {:result "error"}))))
@@ -113,9 +110,7 @@
   (POST "/comment" [blogid captcha content author]   
         (make-comment blogid captcha content author))
   (restricted POST "/delete-comment" [id blogid]  
-    (do (db/delete-comment id)
-        (cache/invalidate! :home)
-        (cache/invalidate! (str "post-" blogid))
+    (do (db/delete-comment id)        
         (resp/redirect (str "/blog/" blogid))))
   (GET "/captcha" [] (display-captcha))
   (GET "/latest-comments" [] (latest-comments)))
