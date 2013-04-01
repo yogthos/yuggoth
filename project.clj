@@ -6,8 +6,7 @@
   :dependencies
   [[org.clojure/clojure "1.5.1"]
    [lib-noir "0.4.9"]
-   [compojure "1.1.5"]
-   [hiccup "1.0.2"]
+   [compojure "1.1.5"]   
    [ring-server "0.2.7"]
    [clavatar "0.2.1"]
    [clj-rss "0.1.3"]
