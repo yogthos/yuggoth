@@ -40,9 +40,8 @@
 
 (defn feed [admin posts]
   (let [{:keys [handle title]} (db/get-admin)
-        posts                  (db/get-posts 10 true)
-        feed-title             (or (:title (first posts)) (text :nothing-here))]
-    (update-in (make-channel feed-title handle posts)
+        posts                  (db/get-posts 10 true)]
+    (update-in (make-channel title handle posts)
                [:attrs]
                assoc 
                :xmlns:dc "http://purl.org/dc/elements/1.1/"
