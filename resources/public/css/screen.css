@@ -584,6 +584,9 @@ table.mdhelp td {
 	padding-left: 21px;
 	padding-right: 21px;
 }
+.comment-preview {
+    padding-top: 10px;
+}
 .toolbar {
     display: none;
 }
