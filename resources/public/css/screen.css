@@ -27,6 +27,8 @@ body {
     font-weight: bold;
     font-size: 30px;    
     text-rendering: optimizeLegibility;
+    background-image:url('../img/header.png');
+    color: rgba(0, 0, 0, 0);
 }
 
 .menu {
