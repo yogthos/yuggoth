@@ -34,7 +34,7 @@ function confirm(form) {
 function renderPreview(id) {
 	return function() {
 		var md = $(id).val();
-		$("#post-preview").html(markdown.mdToHtml(md));
+		$("#post-preview").html(markdown.core.mdToHtml(md));
 	}   	
 }
 
