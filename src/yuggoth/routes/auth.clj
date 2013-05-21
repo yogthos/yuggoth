@@ -69,7 +69,7 @@
                                 "user"   (text :user) user
                                 "pass"   (text :password) pass                              
                                 "ssl-port" (text :ssl-port) (or ssl-port 443))
-                "locale " (drop-down "locale" (keys locales/dict) "en")
+                "locale " (drop-down "locale" (map name (keys locales/dict)) "en")
                 [:br]
                 (label "ssl" (text :ssl?)) (check-box "ssl" false)
                 [:br]
