@@ -21,7 +21,7 @@ body {
 .header {
     background: #474747 url(../img/header.png);
     width: 100%;
-    height: 60px;
+    height: 66px;
     float: left;
     color: #333;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
@@ -32,7 +32,7 @@ body {
 }
 
 .header h1 {
-	margin-top: -1px;	
+	margin-top: 2px;	
 	font-size: 45px;
 	text-align: center;
 	color: #555;
