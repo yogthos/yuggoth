@@ -5,12 +5,12 @@
   
   :dependencies
   [[org.clojure/clojure "1.5.1"]
-   [lib-noir "0.5.5"]
+   [lib-noir "0.6.0"]
    [compojure "1.1.5"]   
    [ring-server "0.2.8"]
    [clavatar "0.2.1"]
    [clj-rss "0.1.3"]
-   [com.taoensso/timbre "1.5.1"]   
+   [com.taoensso/timbre "1.6.0"]   
    [markdown-clj "0.9.25"]
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.2.3"]   
