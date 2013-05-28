@@ -115,7 +115,7 @@
                
       (cache/invalidate! post-id)
       
-      (resp/redirect (if post-id (str "/blog/" (str post-id "-" (url-encode title))) "/")))
+      (resp/redirect (if post-id (str "/blog/" (util/format-title-url post-id title)) "/")))
     (make-post content (assoc post :error (text :title-required)))))
 
 (defn home-page []   

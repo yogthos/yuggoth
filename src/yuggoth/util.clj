@@ -1,11 +1,19 @@
 (ns yuggoth.util
-  (:use hiccup.form clavatar.core [clojure.java.io :only [as-url]])
+  (:use hiccup.form hiccup.util clavatar.core [clojure.java.io :only [as-url]])
   (:require [noir.response :as resp]
             [noir.session :as session]
             [yuggoth.models.db :as db]
             [noir.io :as io]
             [markdown.core :as md])
   (:import net.sf.jlue.util.Captcha))
+
+(defn format-title-url [id title]
+  (if title
+    (let [sb (new StringBuffer)]
+      (doseq [c (.toLowerCase title)]
+        (if (and (> (int c) 96) (< (int c) 123)) 
+          (.append sb c)))      
+      (str id "-" (url-encode (.toString sb))))))
 
 (defn make-form [& fields]
   (reduce-kv 
