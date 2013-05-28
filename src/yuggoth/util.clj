@@ -11,7 +11,7 @@
   (if title
     (let [sb (new StringBuffer)]
       (doseq [c (.toLowerCase title)]
-        (if (and (> (int c) 96) (< (int c) 123)) 
+        (if (or (= (int c) 32) (and (> (int c) 96) (< (int c) 123))) 
           (.append sb c)))      
       (str id "-" (url-encode (.toString sb))))))
 
