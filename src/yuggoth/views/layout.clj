@@ -46,7 +46,7 @@
        (into 
          (for [{:keys [id time title]} (reverse (sort-by :time (db/get-posts 5)))]
            [:li 
-            (link-to (str "/blog/" (str id "-" (url-encode title)))
+            (link-to (str "/blog/" (util/format-title-url id title))
                      title
                      [:div.date (util/format-time time)])]))
        (conj [:li (link-to "/archives" (text :more))]))

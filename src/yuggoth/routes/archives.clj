@@ -14,7 +14,7 @@
          (for [{:keys [id time title public]} (reverse (sort-by :time items))] 
            [:li.archive 
             (link-to {:class "archive"} 
-                     (str "/blog/" (str id "-" (url-encode title))) 
+                     (str "/blog/" (util/format-title-url id title)) 
                      (str (util/format-time time "MMMM dd") " - " title))             
             (if (session/get :admin) 
               (form-to [:post "/archives"]
