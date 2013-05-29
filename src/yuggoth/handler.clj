@@ -59,18 +59,17 @@
          :body (layout/common (config/text :welcome-title) 
                               (config/text :nothing-here))}))))
 
-;;append your application routes to the all-routes vector
-(def all-routes [auth-routes
-                 archive-routes
-                 comments-routes
-                 upload-routes
-                 profile-routes
-                 rss-routes
-                 blog-routes                 
-                 app-routes])
-(def app (-> all-routes           
-           (middleware/app-handler)
-           (wrap-exceptions)
-           (wrap-ssl-if-selected)
-           (middleware/wrap-access-rules private-page)))
+(def app (middleware/app-handler
+           [auth-routes
+            archive-routes
+            comments-routes
+            upload-routes
+            profile-routes
+            rss-routes
+            blog-routes                 
+            app-routes] 
+           :middleware [wrap-exceptions
+                        wrap-ssl-if-selected]
+           :access-rules [[private-page]]))
+
 (def war-handler (middleware/war-handler app))
