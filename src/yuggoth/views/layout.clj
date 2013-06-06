@@ -8,7 +8,8 @@
   (:require [yuggoth.util :as util]
             [noir.validation :as vali]
             [yuggoth.models.db :as db]
-            [noir.session :as session]))
+            [noir.session :as session])
+  (:import java.util.Calendar)
 
 (defn header []
   [:div.header [:h1 [:div.site-title (:title (db/get-admin))]]])
@@ -54,7 +55,7 @@
 
 (defn footer []
   [:div.footer
-   [:p "Copyright (C) 2012 " 
+   [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR)) 
     (:handle (db/get-admin)) 
     (when (not (session/get :admin)) [:span " (" (link-to "/login" (text :login)) ")"]) 
     (text :powered-by)
