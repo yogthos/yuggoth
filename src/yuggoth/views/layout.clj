@@ -8,16 +8,15 @@
   (:require [yuggoth.util :as util]
             [noir.validation :as vali]
             [yuggoth.models.db :as db]
-            [noir.session :as session])
-  (:import java.util.Calendar)
+            [noir.session :as session]))
 
 (defn header []
   [:div.header [:h1 [:div.site-title (:title (db/get-admin))]]])
 
 (defn tag-list []
-  (into [:p.taglist] 
-        (for [tag (db/tags)]
-          [:div.tag (link-to (str "/tag/" tag) [:span.tagon tag])])))
+  [:p.taglist
+   (for [tag (db/tags)]
+     [:div.tag (link-to (str "/tag/" tag) [:span.tagon tag])])])
 
 (defn menu []
   [:div.menu 
@@ -43,14 +42,14 @@
     
     [:div.sidebar
      [:h2 (text :recent-posts-title)]     
-     (-> [:ul]       
-       (into 
-         (for [{:keys [id time title]} (reverse (sort-by :time (db/get-posts 5)))]
-           [:li 
-            (link-to (str "/blog/" (util/format-title-url id title))
-                     title
-                     [:div.date (util/format-time time)])]))
-       (conj [:li (link-to "/archives" (text :more))]))
+     (conj
+       [:ul
+        (for [{:keys [id time title]} (reverse (sort-by :time (db/get-posts 5)))]
+          [:li 
+           (link-to (str "/blog/" (util/format-title-url id title))
+                    title
+                    [:div.date (util/format-time time)])])]
+       [:li (link-to "/archives" (text :more))])
      (tag-list)]))
 
 (defn footer []

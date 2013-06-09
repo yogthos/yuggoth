@@ -102,9 +102,9 @@
 (defn latest-comments []
   (layout/common
     (text :latest-comments-title)
-    (into [:table] 
-        (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
-          [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]]))))
+    [:table
+     (for [{:keys [blogid time content author]} (db/get-latest-comments 10)]
+       [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]])]))
 
 (defroutes comments-routes   
   (POST "/comment" [blogid captcha content author]   

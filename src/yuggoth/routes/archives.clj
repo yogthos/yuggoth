@@ -10,17 +10,17 @@
   [:div 
    date
    [:hr]
-   (into [:ul] 
-         (for [{:keys [id time title public]} (reverse (sort-by :time items))] 
-           [:li.archive 
-            (link-to {:class "archive"} 
-                     (str "/blog/" (util/format-title-url id title)) 
-                     (str (util/format-time time "MMMM dd") " - " title))             
-            (if (session/get :admin) 
-              (form-to [:post "/archives"]
-                       (hidden-field "post-id" id)
-                       (hidden-field "visible" (str public))
-                       [:span.submit (if public (text :hide) (text :show))]))]))])
+   [:ul
+    (for [{:keys [id time title public]} (reverse (sort-by :time items))] 
+      [:li.archive 
+       (link-to {:class "archive"} 
+                (str "/blog/" (util/format-title-url id title)) 
+                (str (util/format-time time "MMMM dd") " - " title))             
+       (if (session/get :admin) 
+         (form-to [:post "/archives"]
+                  (hidden-field "post-id" id)
+                  (hidden-field "visible" (str public))
+                  [:span.submit (if public (text :hide) (text :show))]))])]])
 
 (defn compare-time [post]
   (util/format-time (:time post) "yyyy MMMM"))

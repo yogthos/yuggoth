@@ -17,13 +17,13 @@
     (text :upload-title)
     [:h2.info info]
     [:div [:h3 (text :available-files)]
-     (into [:ul] 
-           (for [name (db/list-files)]             
-             [:li.file-link (link-to (str "/files/" name) name) 
-              [:span "  "] 
-              [:div.file               
-               (form-to [:post (str "/delete-file/" name)]                                               
-                        (submit-button {:class "delete"} (text :delete)))]]))]
+     [:ul
+      (for [name (db/list-files)]             
+        [:li.file-link (link-to (str "/files/" name) name) 
+         [:span "  "] 
+         [:div.file               
+          (form-to [:post (str "/delete-file/" name)]                                               
+                   (submit-button {:class "delete"} (text :delete)))]])]]
     [:br]
     
     (form-to {:enctype "multipart/form-data"}
