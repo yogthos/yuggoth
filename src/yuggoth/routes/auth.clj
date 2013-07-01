@@ -91,11 +91,12 @@
         (setup-blog (assoc config :error (.getMessage ex)))))))
 
 (defroutes auth-routes  
-  (POST "/create-admin" {admin :params} (create-admin admin))
-  (GET "/setup-blog" {params :params} (setup-blog params))
-  (POST "/setup-blog" {config :params} (handle-setup-blog config))
-  (GET "/login" {params :params} (login params))
-  (POST "/login" [handle pass] (login handle pass))  
-  (GET "/logout" [] (do (session/clear!)
-                        (cache/invalidate! :home)
-                        (resp/redirect "/"))))
+  (POST "/create-admin" {admin :params}  (create-admin admin))
+  (GET "/setup-blog"    {params :params} (setup-blog params))
+  (POST "/setup-blog"   {config :params} (handle-setup-blog config))
+  (GET "/login"         {params :params} (login params))
+  (POST "/login"        [handle pass]    (login handle pass))  
+  (GET "/logout" []
+       (session/clear!)
+       (cache/invalidate! :home)
+       (resp/redirect "/")))

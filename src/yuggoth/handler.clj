@@ -29,8 +29,8 @@
   (cache/set-size! 5)
   (println "yuggoth started successfully..."))
 
-(defn private-page [method url params]   
-  (not (nil? (session/get :admin))))
+(defn admin-page [req]   
+  (session/get :admin))
 
 (defn wrap-ssl-if-selected [app]  
   (if (:ssl @config/blog-config)
@@ -70,6 +70,6 @@
             app-routes] 
            :middleware [wrap-exceptions
                         wrap-ssl-if-selected]
-           :access-rules [[private-page]]))
+           :access-rules [admin-page]))
 
 (def war-handler (middleware/war-handler app))

@@ -129,17 +129,20 @@
   (layout/common
    "this is the story of yuggoth... work in progress"))
 
+(defn toggle-post [post-id public]
+  (db/post-visible post-id (not (Boolean/parseBoolean public)))
+  (resp/redirect (str "/blog/" post-id)))
+
 (defroutes blog-routes   
   (GET "/blog-previous/:postid" [postid] (display-public-post postid false))
-  (GET "/blog-next/:postid" [postid] (display-public-post postid true))
+  (GET "/blog-next/:postid"     [postid] (display-public-post postid true))
   (GET "/blog/:postid" [postid] 
        (if-let [id (re-find #"\d+" postid)]
          (entry (db/get-post id))
-         (resp/redirect "/")))  
-  (restricted GET "/make-post" [content error] (make-post content error))
-  (restricted POST "/update-post" [post-id error] (update-post post-id error))
-  (restricted POST "/save-post" {post :params} (save-post post))
-  (restricted POST "/toggle-post" [post-id public] 
-              (do (db/post-visible post-id (not (Boolean/parseBoolean public)))
-                  (resp/redirect (str "/blog/" post-id))))
-  (GET "/" [] (home-page)))
+         (resp/redirect "/"))) 
+  
+  (GET "/make-post"    [content error]  (restricted (make-post content error)))
+  (POST "/update-post" [post-id error]  (restricted (update-post post-id error)))
+  (POST "/save-post"   {post :params}   (restricted (save-post post)))
+  (POST "/toggle-post" [post-id public] (restricted (toggle-post post-id public)))
+  (GET "/"             []               (home-page)))
