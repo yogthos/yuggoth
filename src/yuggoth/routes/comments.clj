@@ -99,6 +99,10 @@
       (ImageIO/write (:image (session/get :captcha)) "jpeg" out)
       (new ByteArrayInputStream (.toByteArray out)))))
 
+(defn delete-comment [id blogid]
+  (db/delete-comment id)        
+  (resp/redirect (str "/blog/" blogid)))
+
 (defn latest-comments []
   (layout/common
     (text :latest-comments-title)
@@ -107,10 +111,7 @@
        [:tr.padded [:td (link-to (str "/blog/" blogid) content " - " author)]])]))
 
 (defroutes comments-routes   
-  (POST "/comment" [blogid captcha content author]   
-        (make-comment blogid captcha content author))
-  (restricted POST "/delete-comment" [id blogid]  
-    (do (db/delete-comment id)        
-        (resp/redirect (str "/blog/" blogid))))
-  (GET "/captcha" [] (display-captcha))
-  (GET "/latest-comments" [] (latest-comments)))
+  (POST "/comment"        [blogid captcha content author] (make-comment blogid captcha content author))
+  (POST "/delete-comment" [id blogid]                     (restricted (delete-comment id blogid)))
+  (GET "/captcha"         []                              (display-captcha))
+  (GET "/latest-comments" []                              (latest-comments)))

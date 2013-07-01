@@ -79,7 +79,7 @@
   (resp/redirect "/profile"))
 
 (defroutes profile-routes
-  (GET "/about" [] (about))
-  (restricted GET "/profile" {params :params} (profile params))
-  (restricted POST "/profile" {params :params} (update-profile params))  
-  (restricted POST "/update-tags" {tags :params} (update-tags tags)))
+  (GET "/about"        []               (about))
+  (GET "/profile"      {params :params} (restricted (profile params)))
+  (POST "/profile"     {params :params} (restricted (update-profile params)))  
+  (POST "/update-tags" {tags :params}   (restricted (update-tags tags))))
