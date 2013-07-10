@@ -1,17 +1,16 @@
-(ns yuggoth.models.db
-  (:use yuggoth.models.schema yuggoth.config)
-  (:require [clojure.java.jdbc :as sql])
+(ns yuggoth.models.db  
+  (:require [yuggoth.models.schema :refer :all]
+            [yuggoth.config :refer [db]]
+            [clojure.java.jdbc :as sql]
+            [clojure.java.jdbc.sql :refer [where]])
   (:import java.sql.Timestamp java.util.Date))
 
-(defmacro with-db [f & body]
-  `(sql/with-connection
-    (deref yuggoth.config/db) (~f ~@body)))
-
-(defn db-read
-  "returns the result of running the supplied SQL query"
-  [& query]
-  (with-db sql/with-query-results res (vec query) (doall res)))
-
+(defn db-update-or-insert [db table record where-clause]
+  (sql/db-transaction [t-con db]
+    (let [result (sql/update! t-con table record where-clause)]
+      (if (zero? (first result))
+        (sql/insert! t-con table record)
+        result))))
 
 ;files
 
@@ -25,133 +24,134 @@
   (.replaceAll filename "[^a-zA-Z0-9-\\.]" ""))
 
 (defn store-file [{:keys [tempfile filename content-type] :as file}]  
-  (with-db sql/update-or-insert-values
+  (db-update-or-insert @db
     :file
-    ["name=?" filename]
-    {:type content-type :name (fix-file-name filename) :data (to-byte-array tempfile)}))
+    {:type content-type :name (fix-file-name filename) :data (to-byte-array tempfile)}
+    ["name=?" filename]))
 
 (defn list-files []
-  (map :name (db-read "select name from file")))
+  (map :name (sql/query @db ["select name from file"])))
 
 (defn delete-file [name]  
-  (with-db sql/delete-rows :file ["name=?" name]))
+  (println name)
+  (sql/delete! @db :file (where {:name name})))
 
 (defn get-file [name]
-  (first (db-read "select * from file where name=?" name)))
+  (first (sql/query @db ["select * from file where name=?" name])))
 
 
 ;;blog posts
 
 (defn update-post [id title content public]
   (let [int-id (Integer/parseInt id)] 
-    (with-db sql/update-values
+    (sql/update! @db
       :blog
-      ["id=?" int-id]
-      {:id int-id :title title :content content :public (Boolean/parseBoolean public)})))
+      {:id int-id :title title :content content :public (Boolean/parseBoolean public)}
+      ["id=?" int-id])))
 
 (defn get-posts [& [limit full? private?]]    
   (try
-    (db-read (str "select id, time, title, public" (if full? ", content") 
-                  " from blog " (if (not private?) "where public='true'") " order by id desc " 
-                  (if limit (str "limit " limit))))
+    (sql/query @db
+      [(str "select id, time, title, public" (if full? ", content") 
+            " from blog " (if (not private?) "where public='true'") " order by id desc " 
+            (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
 
 (defn get-post [id]  
-  (first (db-read "select * from blog where id=?" (Integer/parseInt id))))
+  (first (sql/query @db ["select * from blog where id=?" (Integer/parseInt id)])))
 
 (defn get-public-post-id [id next?]
   (:id
     (first
-      (db-read 
-        (if next?
-          "select id from blog where id > ? and public='true' order by id asc limit 1"
-          "select id from blog where id < ? and public='true' order by id desc limit 1") 
+      (sql/query @db 
+        [(if next?
+           "select id from blog where id > ? and public='true' order by id asc limit 1"
+           "select id from blog where id < ? and public='true' order by id desc limit 1")] 
         (Integer/parseInt id)))))
 
 
 (defn store-post [title content author public]
-  (with-db sql/insert-values
+  (sql/insert! @db
     :blog
-    [:time :title :content :author :public]
-    [(new Timestamp (.getTime (new Date))) title content author (Boolean/parseBoolean public)]))
+    {:time (new Timestamp (.getTime (new Date)))
+     :title title
+     :content content
+     :author author
+     :public (Boolean/parseBoolean public)}))
 
 (defn post-visible [id public]
-  (with-db sql/update-values
-    :blog 
-    ["id=?" (Integer/parseInt id)]
-    {:public public}))
+  (sql/update! @db
+    :blog
+    {:public public}
+    ["id=?" (Integer/parseInt id)]))
 
 (defn get-last-post [] 
-  (first (db-read "select * from blog where id = (select max(id) from blog)")))
+  (first (sql/query @db ["select * from blog where id = (select max(id) from blog)"])))
 
 (defn get-last-public-post []
-  (first (db-read "select * from blog where public='true' order by id desc limit 1")))
+  (first (sql/query @db ["select * from blog where public='true' order by id desc limit 1"])))
 
 (defn last-post-id []
-  (or (:id (first (db-read "select id from blog order by id desc limit 1"))) 0))
+  (or (:id (first (sql/query @db ["select id from blog order by id desc limit 1"]))) 0))
 
 ;;comments
 (defn add-comment [blog-id content author]
-  (with-db sql/insert-values
+  (sql/insert! @db
     :comment
-    [:blogid :time :content :author]
-    [(Integer/parseInt blog-id) 
-     (new Timestamp (.getTime (new Date))) 
-     content 
-     (if (> (count author) 100) (.substring author 0 100) author)]))
+    {:blogid (Integer/parseInt blog-id)
+     :time (new Timestamp (.getTime (new Date)))
+     :content content
+     :author (if (> (count author) 100) (.substring author 0 100) author)}))
 
 (defn get-comments [blog-id]
-  (db-read "select * from comment where blogid=?" blog-id))
+  (sql/query @db ["select * from comment where blogid=?" blog-id]))
 
 (defn get-latest-comments [n]
-  (db-read "select * from comment order by time desc limit ?" n))
+  (sql/query @db ["select * from comment order by time desc limit ?" n]))
 
 (defn delete-comment [id]  
-  (with-db sql/delete-rows :comment ["id=?" (Integer/parseInt id)]))
+  (sql/delete! @db :comment (where {:id (Integer/parseInt id)})))
 
 ;;tags
-(defn tag-post [blogid tag]
-  (sql/insert-values
+(defn tag-post [blogid tag & [db]]
+  (sql/insert! (or db @db)
     :tag_map
-    [:blogid :tag]
-    [blogid tag]))
+    {:blogid blogid :tag tag}))
 
 (defn tags []
-  (map :name (db-read "select * from tag")))
+  (map :name (sql/query @db ["select * from tag"])))
 
-(defn add-tag [tag-name]
-  (with-db sql/insert-values
-    :tag [:name] [(.toLowerCase tag-name)]))
+(defn add-tag [tag-name & [db]]
+  (sql/insert! (or db @db)
+    :tag {:name (.toLowerCase tag-name)}))
 
 (defn delete-tags [tags]
-  (sql/with-connection
-    @db
-    (doseq [tag tags] 
-      (sql/delete-rows :tag_map ["tag=?" tag])
-      (sql/delete-rows :tag ["name=?" tag]))))
+  (doseq [tag tags] 
+    (sql/delete! @db :tag_map (where {:tag tag}))
+    (sql/delete! @db :tag (where {:name tag}))))
 
 (defn posts-by-tag [tag-name]
-  (db-read "select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
-           tag-name))
+  (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
+                  tag-name]))
 
 (defn tags-by-post [postid]
-  (mapcat vals (db-read "select tag from tag_map where blogid=?" postid)))
+  (mapcat vals (sql/query @db ["select tag from tag_map where blogid=?" postid])))
 
-(defn update-tags [blogid tags]    
-  (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)]    
-    (with-db sql/transaction
-      (sql/delete-rows :tag_map ["blogid=?" id])
-        (doseq [tag tags]
-          (if (nil? (sql/with-query-results res ["select * from tag where name=?" tag] (doall res)))
-            (sql/insert-values :tag [:name] [tag]))
-          (tag-post id tag)))))
+(defn update-tags [blogid blog-tags]    
+  (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)
+        current-tags (tags)]    
+    (sql/db-transaction [t-con @db]
+      (sql/delete! t-con :tag_map (where {:blogid id}))
+        (doseq [tag blog-tags]
+          (if-not (some #{tag} current-tags) (add-tag tag t-con))
+          (tag-post id tag t-con)))))
 
 ;;admin user
 (defn set-admin [admin]
-  (with-db sql/insert-record :admin admin))
+  (sql/insert! @db :admin admin))
 
 (defn update-admin [admin]
-  (with-db sql/update-values :admin ["handle=?" (:handle admin)] admin))
+  (sql/update! @db :admin admin ["handle=?" (:handle admin)]))
 
 (defn get-admin []  
-  (first (db-read "select * from admin")))
+  (first (sql/query @db ["select * from admin"])))
