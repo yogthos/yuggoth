@@ -1,7 +1,7 @@
 (defproject yuggoth "0.5.0-SNAPSHOT"
   
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "yuggoth, a pure Clojure blogging engine"
+  :url "http://github.com/yogthos/yuggoth"
   
   :dependencies
   [[org.clojure/clojure "1.5.1"]
