@@ -6,13 +6,13 @@
   :dependencies
   [[org.clojure/clojure "1.5.1"]
    [lib-noir "0.6.4"]
-   [compojure "1.1.5"]   
+   [compojure "1.1.5" :exclusions [[org.clojure/tools.macro] ring/ring-core]] 
    [ring-server "0.2.8"]
    [clavatar "0.2.1"]
    [clj-rss "0.1.3"]
    [com.taoensso/timbre "1.6.0"]   
    [markdown-clj "0.9.25"]
-   [net.sf.jlue/jlue-core "1.3"]
+   [net.sf.jlue/jlue-core "1.3" :exclusions [commons-codec]]
    [org.clojure/java.jdbc "0.3.0-alpha4"]     
    [postgresql/postgresql "9.1-901.jdbc4"]]
   
