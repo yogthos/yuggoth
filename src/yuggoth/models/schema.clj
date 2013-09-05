@@ -16,8 +16,9 @@
     [:id "SERIAL"]
     [:time :timestamp]
     [:title "varchar(100)"]
+    [:tease "TEXT"]
     [:content "TEXT"]
-    [:author "varchar(100)"]    
+    [:author "varchar(100)"]
     [:public :boolean]))
 
 ;;comment table 
@@ -34,13 +35,15 @@
 (defn create-tag-table []
   (sql/create-table
     :tag
-    [:name "varchar(50)"]))
+    [:id "SERIAL"]
+    [:name "varchar(50)"]
+    [:slug "varchar(50)"]))
 
 (defn create-tag-map-table []
   (sql/create-table
     :tag_map
     [:blogid :int]
-    [:tag "varchar(50)"]))
+    [:tagid :int]))
 
 ;;admin table
 (defn create-admin-table []
