@@ -52,7 +52,7 @@
 (defn get-posts [& [limit full? private?]]    
   (try
     (sql/query @db
-      [(str "select id, time, title, public" (if full? ", content") 
+      [(str "select id, time, title, author, public" (if full? ", content") 
             " from blog " (if (not private?) "where public='true'") " order by id desc " 
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
