@@ -110,3 +110,52 @@
        [:script {:type "text/javascript", :src "//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"}]
        (include-js "/js/jquery.alerts.js"
                    "/js/site.js")])))
+
+(defn admin [title & content]  
+  (let [html-title (if (string? title) title (:title title))
+        title-elements (when (map? title) (:elements title))
+        site-title (:title (db/get-admin))]
+    (html5
+     [:head
+      [:meta {:charset "utf-8"}]
+      [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1"}]
+      [:meta {:name "viewport"
+              :content "width=device-width, initial-scale=1, maximum-scale=1"}]
+      [:title (str site-title " - " title)]
+      (include-css "/bootstrap/css/bootstrap.css")
+      (include-css "/bootstrap/css/bootstrap-responsive.css")
+      (include-js "/js/jquery.min.js")
+      (include-js  "/bootstrap/js/bootstrap.js")]
+     [:body
+      [:div {:class "navbar offset1 span12"}
+       [:div {:class "navbar-inner"}
+        [:a {:class "brand" :href "/admin"} site-title]
+        [:ul {:class "nav"}
+         [:li [:a {:href "/admin/posts"} "Posts"]]
+         [:li [:a {:href "/admin/tags"} "Tags"]]
+         [:li [:a {:href "/admin/comments"} "Comments"]]
+         #_(for [nav nav_links]
+           (nav-item nav url_base))]]]
+      ;(page-nav url_base)
+      [:div {:id "header"}]
+      [:div {:id "content" :class "container offset1 span12"}
+       [:legend html-title] content]
+      ;(if (not (nil? init_script)) [:script init_script])
+      ])))
+
+(comment
+       #_(include-js "/js/markdown.js"
+                   "/js/shCore.js"
+                   "/js/brushes/shBrushClojure.js"
+                   "/js/brushes/shBrushBash.js"
+                   "/js/brushes/shBrushCss.js"
+                   "/js/brushes/shBrushJava.js"
+                   "/js/brushes/shBrushJScript.js"
+                   "/js/brushes/shBrushPlain.js"
+                   "/js/brushes/shBrushXml.js")
+       ;;workaround for hiccup not handling URLs without protocol correctly
+       ;[:script {:type "text/javascript", :src "//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"}]
+       #_(include-js "/js/jquery.alerts.js"
+                   "/js/site.js")
+)
+
