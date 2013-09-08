@@ -118,6 +118,7 @@
       (resp/redirect (if post-id (str "/blog/" (util/format-title-url post-id title)) "/")))
     (make-post content (assoc post :error (text :title-required)))))
 
+;; TODO: Modify to optionally show last N posts (sans comments) instead of latest post
 (defn home-page []   
   (if (:initialized @blog-config)
     (if-let [post (db/get-last-public-post)] 
