@@ -134,6 +134,7 @@
          [:li [:a {:href "/admin/posts"} "Posts"]]
          [:li [:a {:href "/admin/tags"} "Tags"]]
          [:li [:a {:href "/admin/comments"} "Comments"]]
+         [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]
          #_(for [nav nav_links]
            (nav-item nav url_base))]]]
       ;(page-nav url_base)

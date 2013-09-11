@@ -19,7 +19,7 @@
 (defn admin-list-posts
   "Posts listing in table with links to delete, edit"
   []
-  (let [posts (into [] (db/get-posts))]
+  (let [posts (into [] (db/admin-get-posts))]
     (layout/admin "Blog Posts"
      [:table {:class "table table-striped"}
       [:thead
@@ -27,7 +27,7 @@
         [:th "ID"]
         [:th "Title"]
         [:th "Time"]
-        [:th "Public?"]
+        [:th "Published?"]
         [:th "Author"]
         [:th "Actions"]]]
       (for [post posts]
@@ -68,15 +68,36 @@
             [:td (text :code-help)]
             [:td [:code (text :code-help)]]]])
 
+(defn admin-tag-list [& [post-id]]
+  (let [post-tags (set (if post-id (db/tag-ids-by-post (Integer/parseInt post-id))))]
+    (prn (str "POST-TAGS: " post-tags))
+    [:div {:class "controls"}
+     (for [tag (db/tags)]
+       (if (contains? post-tags (:id tag))
+         [:label {:class "checkbox"} (check-box {} (str "tag-" (:id tag)) true
+                                                       (:id tag)) (:name tag)]
+         [:label {:class "checkbox"} (check-box {} (str "tag-" (:id tag)) false
+                                                       (:id tag)) (:name tag)]
+         ))
+     #_(mapcat (fn [tag]
+               (if (contains? post-tags (:id tag))
+                 (check-box {} (str "tag-" (:id tag)) true (:id tag))
+                 (check-box {} (str "tag-" (:id tag)) false (:id tag))
+                 ))
+             (db/tags))]
+    ))
+
 (defn admin-edit-post
   "Post edit form, used for creating and editing posts."
   [post-id error]
   (let [new? (if (= post-id :new) true false)
-        {:keys [title content public]} (if new?
-                                         {:title "" :content "" :public false}
-                                         (db/get-post post-id))
+        {:keys [title content tease public]} (if new?
+                                               {:title "post title" :tease ""
+                                                :content "" :public false}
+                                               (into {} (db/get-post post-id)))
         page-title (if new? "Create Post" "Edit Post")
-        tags (if new? (br/tag-list) (br/tag-list post-id))]
+        tags (if new? (br/tag-list) (br/tag-list post-id))
+        #_all-tags ]
     (layout/admin
       page-title
       (when error [:div.error error])
@@ -91,52 +112,55 @@
                     (label {:class "control-label"} "title" "Title")
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "title" title)]]
-                   #_(text-area {:tabindex 2} "content" CONTENT)
+                   [:div {:class "control-group"}
+                    (label {:class "control-label"} "tease" "Tease")
+                    [:div {:class "controls"}
+                     (text-area {:tabindex 2 :class "input-xxlarge" :rows 5}
+                                "tease" tease)]]
                    [:div {:class "control-group"}
                     (label {:class "control-label"} "content" "Body")
                     [:div {:class "controls"}
-                     (text-area {:tabindex 2 :class "input-xxlarge" :rows 10}
+                     (text-area {:tabindex 3 :class "input-xxlarge" :rows 10}
                                 "content" content)]]
-
-                   (hidden-field "post-id" post-id)
-                   (hidden-field "public" (str public))               
-                   (str :tags " ") tags
-                   [:span.submit {:tabindex 3} (text :post)])]
+                   [:div {:class "control-group"}
+                    (label {:class "control-label"} "tags" "Tags")
+                    (admin-tag-list post-id)]
+                   [:div {:class "control-group" :style "clear:both"}
+                    [:div {:class "controls"}
+                     (submit-button {:class "btn"} "Submit")]]
+                   (hidden-field "postid" post-id)
+                   (hidden-field "public" (str public)))]
          [:div {:class "span4" :align "center"} [:h5"Markdown Help"] [:hr]
-          (markdown-help-block)
-          ]]]]
+          (markdown-help-block)]]]]
       )))
 
-#_(defn- product-form
-  ([title db_id] (product-form title db_id (blank-product)))
-  ([title db_id product]
-     (let [form_action "/admin/product/save"
-           useragency (session/get :useragency)
-           agency (agency-from-id useragency)
-           carrier_id (:db/id (:product/carrier product))
-           product_prodtype (:db/id (:product/prodtype product))
-           prod_types (prodtypes-for-agency useragency)
-           ptype_vector (prodtypes-as-vector prod_types)]
-       (form-to
-        {:class "form-horizontal"} [:post form_action]
-        (hidden-field :product_type_id db_id )
-        (if (= db_id "new")
-          (common/btst-drop-down :product_type "Product Type" nil ptype_vector)
-          (common/btst-hidden-pair :product_type product_prodtype
-                                     "Product Type" "Product Type" ))
-        (if (= db_id "new")
-          (common/btst-drop-down :carrier "Carrier" nil [])
-          (common/btst-hidden-pair :carrier carrier_id
-                                   (carrier-name carrier_id useragency)
-                                   "Carrier"))
-        (common/btst-text-input :product_name (:product/name product)
-                                "Product Name" "Enter product name")
-        (common/btst-submit-button)))))
+(defn admin-save-post
+  [postid title tease content public]
+  (do
+;    (prn (str "PARAMS: " (:params request)))
+    (prn (str "POSTID: " postid))
+    (if (= postid "new")
+      (db/store-post title tease content "Doug" public)
+      (do
+        ;; Update post (blog) record and invalidate its cache entry
+        (db/update-post postid title tease content public)
+        (cache/invalidate! (str postid))))
+    #_(let [{keys [postid title tease content public]} (:params request)]
+        )
+    (resp/redirect "/admin/posts"))
+  )
+
+(defn admin-clear-cache
+  []
+  (cache/clear!)
+  (resp/redirect "/admin/posts"))
 
 (defroutes admin-routes
   (GET "/admin" [] (resp/redirect "/admin/posts"))
   (GET "/admin/posts" [] (restricted (admin-list-posts)))
   (GET "/admin/post/new" [] (restricted (admin-edit-post :new false)))
   (GET "/admin/post/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
-;  (POST "/admin/post/save" {post :params} (restricted (save-post post)))
+  (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
+  (POST "/admin/post/save" [postid title tease content public]
+        (restricted (admin-save-post postid title tease content public)))
   )

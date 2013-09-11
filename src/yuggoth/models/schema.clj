@@ -29,15 +29,18 @@
     [:blogid :int]
     [:time :timestamp]    
     [:content "TEXT"]
+    [:approved :boolean]
     [:author "varchar(100)"]))
 
 ;;tag table
 (defn create-tag-table []
-  (sql/create-table
-    :tag
-    [:id "SERIAL"]
-    [:name "varchar(50)"]
-    [:slug "varchar(50)"]))
+  (do
+    (sql/create-table
+     :tag
+     [:id "SERIAL"]
+     [:name "varchar(50)"]
+     [:slug "varchar(50)"])
+    #_(create-index :tag_slug :tag [:slug] :unique)))
 
 (defn create-tag-map-table []
   (sql/create-table
