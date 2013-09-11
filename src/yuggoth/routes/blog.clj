@@ -38,12 +38,14 @@
       (str "/blog/" id)
       "/")))
 
-(defn entry [{:keys [id time title content author public]}]  
+(defn entry [{:keys [id time tease title content author public]}]  
   (apply layout/common         
          (if id
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
-            (cache/cache! (str id) (markdown/md-to-html-string content))
+            (cache/cache! (str id) (if-not (nil? tease)
+                                     (markdown/md-to-html-string (str tease "<br>" content))
+                                     (markdown/md-to-html-string content)))
             (post-nav id)     
             [:br]
             [:br]

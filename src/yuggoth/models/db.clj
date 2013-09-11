@@ -41,13 +41,26 @@
 
 
 ;;blog posts
-
-(defn update-post [id title content public]
+(defn update-post [id title tease content public]
   (let [int-id (Integer/parseInt id)] 
     (sql/update! @db
       :blog
-      {:id int-id :title title :content content :public (Boolean/parseBoolean public)}
+      {:id int-id :title title :tease tease :content content
+       :public (Boolean/parseBoolean public)}
       ["id=?" int-id])))
+
+(defn admin-get-posts [& [limit offset]]
+  (try
+    (sql/query @db
+               [(str "select id, time, title, author, public from blog "
+                     "order by id desc "
+                     (if (and (not (nil? limit))
+                              (> limit 0)) (str "limit " limit
+                                                (if (and (not (nil? offset))
+                                                         (> offset 0))
+                                                  (str " offset " offset)))))])
+    (catch Exception ex nil)))
+                     
 
 (defn get-posts [& [limit full? private?]]    
   (try
@@ -70,11 +83,12 @@
         (Integer/parseInt id)))))
 
 
-(defn store-post [title content author public]
+(defn store-post [title tease content author public]
   (sql/insert! @db
     :blog
     {:time (new Timestamp (.getTime (new Date)))
      :title title
+     :tease tease
      :content content
      :author author
      :public (Boolean/parseBoolean public)}))
@@ -113,15 +127,17 @@
   (sql/delete! @db :comment (where {:id (Integer/parseInt id)})))
 
 ;;tags
-(defn tag-post [blogid tag & [db]]
+(defn tag-post [blogid tagid & [db]]
   (sql/insert! (or db @db)
     :tag_map
-    {:blogid blogid :tag tag}))
+    {:blogid blogid :tagid tagid}))
 
 (defn tags []
-  (map :name (sql/query @db ["select * from tag"])))
+  (sql/query @db ["select * from tag order by name asc"])
+  #_(map :name ))
 
 (defn add-tag [tag-name & [db]]
+  ; TODO insert slug value here also - need regex to strip out non-slug chars
   (sql/insert! (or db @db)
     :tag {:name (.toLowerCase tag-name)}))
 
@@ -134,8 +150,11 @@
   (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
                   tag-name]))
 
+(defn tag-ids-by-post [postid]
+  (mapcat vals (sql/query @db ["select tagid from tag_map where blogid = ?" postid])))
+
 (defn tags-by-post [postid]
-  (mapcat vals (sql/query @db ["select tag from tag_map where blogid=?" postid])))
+  (mapcat vals (sql/query @db ["select id, name, slug from tag t, tag_map tm where t.id = tm.tagid and blogid=?" postid])))
 
 (defn update-tags [blogid blog-tags]    
   (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)
