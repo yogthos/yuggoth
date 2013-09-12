@@ -9,18 +9,21 @@
 
 (def site-url "http://yogthos.net/")
 
-(defn parse-content [content]
-  (markdown/md-to-html-string (if (> (count content) 500) (str (.substring content 0 500) " [...]") content)))
+(defn parse-content [content tease]
+  (let [body (if-not (nil? tease) (str tease "\n\n" content) content)]
+    (markdown/md-to-html-string (if (> (count body) 500)
+                                  (str (.substring body 0 500) " [...]")
+                                  body))))
 
 (defn posts-to-items [author posts]
   (map
-    (fn [{:keys [id title content time]}]
+    (fn [{:keys [id title content tease time]}]
       (let [link (str site-url "blog/" id )]
         {:guid link
          :link link
          :title title
          :dc:creator author
-         :description (parse-content content)
+         :description (parse-content content tease)
          :pubDate time
          :category "clojure"}))
     posts))

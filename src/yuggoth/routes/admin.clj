@@ -6,7 +6,8 @@
         hiccup.element 
         hiccup.util 
         yuggoth.config)
-  (:require [markdown.core :as markdown] 
+  (:require [clojure.set :as set]
+            [markdown.core :as markdown] 
             [yuggoth.views.layout :as layout]
             [yuggoth.util :as util]
             [noir.session :as session]
@@ -20,7 +21,7 @@
   "Posts listing in table with links to delete, edit"
   []
   (let [posts (into [] (db/admin-get-posts))]
-    (layout/admin "Blog Posts"
+    (layout/admin "Blog Posts" {:link "/admin/post/new" :text "New Post"}
      [:table {:class "table table-striped"}
       [:thead
        [:tr
@@ -69,30 +70,25 @@
             [:td [:code (text :code-help)]]]])
 
 (defn admin-tag-list [& [post-id]]
-  (let [post-tags (set (if post-id (db/tag-ids-by-post (Integer/parseInt post-id))))]
+  (let [post-tags (set (if (and post-id (not (= post-id :new)))
+                         (db/tag-ids-by-post (Integer/parseInt post-id))
+                         []))]
     (prn (str "POST-TAGS: " post-tags))
     [:div {:class "controls"}
-     (for [tag (db/tags)]
+     (for [tag (db/admin-tags)]
        (if (contains? post-tags (:id tag))
          [:label {:class "checkbox"} (check-box {} (str "tag-" (:id tag)) true
                                                        (:id tag)) (:name tag)]
          [:label {:class "checkbox"} (check-box {} (str "tag-" (:id tag)) false
                                                        (:id tag)) (:name tag)]
-         ))
-     #_(mapcat (fn [tag]
-               (if (contains? post-tags (:id tag))
-                 (check-box {} (str "tag-" (:id tag)) true (:id tag))
-                 (check-box {} (str "tag-" (:id tag)) false (:id tag))
-                 ))
-             (db/tags))]
-    ))
+         ))]))
 
 (defn admin-edit-post
   "Post edit form, used for creating and editing posts."
   [post-id error]
   (let [new? (if (= post-id :new) true false)
         {:keys [title content tease public]} (if new?
-                                               {:title "post title" :tease ""
+                                               {:title "" :tease ""
                                                 :content "" :public false}
                                                (into {} (db/get-post post-id)))
         page-title (if new? "Create Post" "Edit Post")
@@ -123,6 +119,10 @@
                      (text-area {:tabindex 3 :class "input-xxlarge" :rows 10}
                                 "content" content)]]
                    [:div {:class "control-group"}
+                    (label {:class "control-label"} "public" "Published?")
+                    [:div {:class "controls"}
+                     (check-box {} "public" public true)]]
+                   [:div {:class "control-group"}
                     (label {:class "control-label"} "tags" "Tags")
                     (admin-tag-list post-id)]
                    [:div {:class "control-group" :style "clear:both"}
@@ -135,15 +135,30 @@
       )))
 
 (defn admin-save-post
-  [postid title tease content public]
-  (do
-;    (prn (str "PARAMS: " (:params request)))
-    (prn (str "POSTID: " postid))
+  [postid title tease content public p]
+  (let [tags (filter #(= "tag-" (apply str (take 4 (name (first %))))) p)
+        sel_tag_ids (set (map #(Integer/parseInt (apply str (drop 4 (name (first %))))) tags))
+        published? (if-not (nil? public) "true" "false")]
+;    (prn (str "Raw tags: " tags))
+;    (prn (str "POSTID: " postid))
+;    (prn (str "Posted Tags are: " sel_tag_ids))
     (if (= postid "new")
-      (db/store-post title tease content "Doug" public)
-      (do
+      (let [id (:id (db/store-post title tease content "Doug" published?))]
+;        (prn (str "id after insert is: " id))
+;        (prn (str "Class of id is: " (class id)))
+        (doseq [tag_id sel_tag_ids]
+          (db/tag-post id tag_id)))
+      (let [existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
+            new_tags (set/difference sel_tag_ids existing_tags)
+            removed_tags (set/difference existing_tags sel_tag_ids)]
         ;; Update post (blog) record and invalidate its cache entry
-        (db/update-post postid title tease content public)
+        ;(prn (str "PUBLISHED value is: " published?))
+;        (prn (str "NEW TAGS are: " new_tags))
+        (db/update-post postid title tease content published?)
+        (doseq [removed_tag removed_tags]
+          (db/untag-post (Integer/parseInt postid) removed_tag))
+        (doseq [new_tag new_tags]
+          (db/tag-post (Integer/parseInt postid) new_tag))
         (cache/invalidate! (str postid))))
     #_(let [{keys [postid title tease content public]} (:params request)]
         )
@@ -161,6 +176,6 @@
   (GET "/admin/post/new" [] (restricted (admin-edit-post :new false)))
   (GET "/admin/post/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
   (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
-  (POST "/admin/post/save" [postid title tease content public]
-        (restricted (admin-save-post postid title tease content public)))
+  (POST "/admin/post/save" [postid title tease content public :as {p :params}]
+        (restricted (admin-save-post postid title tease content public p)))
   )
