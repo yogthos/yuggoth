@@ -159,6 +159,12 @@
   (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
                   tag-name]))
 
+(defn posts-by-tag-slug [slug]
+  (sql/query @db ["select blog.id id, time, title, public from blog, tag_map, tag where blog.id = blogid and tagid = tag.id and tag.slug=?" slug]))
+
+(defn tag-by-slug [slug]
+  (first (sql/query @db ["select name from tag where slug = ?" slug])))
+
 (defn tag-ids-by-post [postid]
   (mapcat vals (sql/query @db ["select tagid from tag_map where blogid = ?" postid])))
 
