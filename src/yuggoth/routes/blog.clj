@@ -34,9 +34,9 @@
 
 (defn display-public-post [postid next?]
   (resp/redirect 
-    (if-let [id (db/get-public-post-id postid next?)]
-      (str "/blog/" id)
-      "/")))
+     (if-let [id (db/get-public-post-id postid next?)]
+       (str "/blog/" id)
+       "/")))
 
 (defn entry [{:keys [id time tease title content author public]}]  
   (apply layout/common         
@@ -44,32 +44,32 @@
            [{:title title :elements (admin-forms id public)}
             [:p#post-time (util/format-time time)]
             (cache/cache! (str id) (if-not (nil? tease)
-                                     (markdown/md-to-html-string (str tease "<br>" content))
+                                     (markdown/md-to-html-string (str tease "\n\n" content))
                                      (markdown/md-to-html-string content)))
             (post-nav id)     
             [:br]
             [:br]
             [:div (str (text :tags) " ")
              (for [tag (db/tags-by-post id)]
-               [:span.tagon {:id "tag"} tag])]
+               [:span.tagon {:id (str "tag-" (:id tag))} (:name tag)])]
             (comments/get-comments id)            
             (comments/comment-form id)]
            
            [(text :empty-page) (text :nothing-here)])))
 
 (defn tag-list [& [post-id]]
-  (let [post-tags (set (if post-id (db/tags-by-post (Integer/parseInt post-id))))] 
+  (let [post-tags (set (if post-id (db/tag-ids-by-post (Integer/parseInt post-id))))] 
     [:div
      (mapcat (fn [tag]
-               (if (contains? post-tags tag)
-                 [(hidden-field (str "tag-" tag) tag)
-                  [:span.tagon tag]]
-                 [(hidden-field (str "tag-" tag))
-                  [:span.tagoff tag]]))
+               (if (contains? post-tags (:id tag))
+                 [(hidden-field (str "tag-" (:id tag)) (:id tag))
+                  [:span.tagon (:name tag)]]
+                 [(hidden-field (str "tag-" (:id tag)))
+                  [:span.tagoff (:name tag)]]))
              (db/tags))
      (text-field {:placeholder (text :other)} "tag-custom")]))
 
-(defn update-post [post-id error]
+#_(defn update-post [post-id error]
   (let [{:keys [title content public]} (db/get-post post-id)] 
     (layout/common
       (text :edit-post)
@@ -85,7 +85,7 @@
                [:br]
                [:span.submit {:tabindex 3} (text :post)]))))
 
-(defn make-post [content error]    
+#_(defn make-post [content error]    
   (layout/common
     (text :new-post)
     (when error [:div.error error])
@@ -102,7 +102,7 @@
               (check-box {:tabindex 4} "public" true)                            
               [:div.entry-submit [:span.submit {:tabindex 3} "post"]]])))
 
-(defn save-post [{:keys [post-id title content public] :as post}]  
+#_(defn save-post [{:keys [post-id title content public] :as post}]  
   (if (not-empty title) 
     (let [tags (->> post (filter #(.startsWith (name (first %)) "tag-")) 
                  (map second) 
@@ -132,7 +132,7 @@
   (layout/common
    "this is the story of yuggoth... work in progress"))
 
-(defn toggle-post [post-id public]
+#_(defn toggle-post [post-id public]
   (db/post-visible post-id (not (Boolean/parseBoolean public)))
   (resp/redirect (str "/blog/" post-id)))
 
@@ -144,8 +144,8 @@
          (entry (db/get-post id))
          (resp/redirect "/"))) 
   
-  (GET "/make-post"    [content error]  (restricted (make-post content error)))
-  (POST "/update-post" [post-id error]  (restricted (update-post post-id error)))
-  (POST "/save-post"   {post :params}   (restricted (save-post post)))
-  (POST "/toggle-post" [post-id public] (restricted (toggle-post post-id public)))
+  #_(GET "/make-post"    [content error]  (restricted (make-post content error)))
+  #_(POST "/update-post" [post-id error]  (restricted (update-post post-id error)))
+  #_(POST "/save-post"   {post :params}   (restricted (save-post post)))
+  #_(POST "/toggle-post" [post-id public] (restricted (toggle-post post-id public)))
   (GET "/"             []               (home-page)))

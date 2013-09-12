@@ -17,7 +17,7 @@
 (defn tag-list []
   [:p.taglist
    (for [tag (db/tags)]
-     [:div.tag (link-to (str "/tag/" tag) [:span.tagon tag])])])
+     [:div.tag (link-to (str "/tag/" (:slug tag)) [:span.tagon (:name tag)])])])
 
 (defn menu []
   [:div.menu 
@@ -25,10 +25,10 @@
      (if (session/get :admin) 
        [:ul.menu-items          
         [:li (link-to "/logout" (text :logout))]
-        [:li (link-to "/profile" (text :profile))]
-        [:li (link-to "/upload" (text :upload))]
-        [:li#latest (link-to "/latest-comments" (text :latest-comments-title))]
-        [:li#new-post (link-to "/make-post" (text :new-post))]]
+        [:li (link-to "/admin" "Admin")]
+        #_[:li (link-to "/upload" (text :upload))]
+        #_[:li#latest (link-to "/latest-comments" (text :latest-comments-title))]
+        #_[:li#new-post (link-to "/make-post" (text :new-post))]]
        [:ul.menu-items])     
      [[:li#rss (link-to "/rss" [:div#rss "rss"] #_(image "/img/rss.jpg"))]      
       [:li#about (link-to "/about" (text :about-title))]      
@@ -55,9 +55,9 @@
 
 (defn footer []
   [:div.footer
-   [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR)) 
-    (:handle (db/get-admin)) 
-    (when (not (session/get :admin)) [:span " (" (link-to "/login" (text :login)) ")"]) 
+   [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " ") 
+    (clojure.string/capitalize (:handle (db/get-admin))) 
+    (when-not (session/get :admin) [:span " (" (link-to "/login" (text :login)) ")"]) 
     (text :powered-by)
     (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
 
@@ -111,38 +111,44 @@
        (include-js "/js/jquery.alerts.js"
                    "/js/site.js")])))
 
-(defn admin [title & content]  
-  (let [html-title (if (string? title) title (:title title))
-        title-elements (when (map? title) (:elements title))
-        site-title (:title (db/get-admin))]
-    (html5
-     [:head
-      [:meta {:charset "utf-8"}]
-      [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1"}]
-      [:meta {:name "viewport"
-              :content "width=device-width, initial-scale=1, maximum-scale=1"}]
-      [:title (str site-title " - " title)]
-      (include-css "/bootstrap/css/bootstrap.css")
-      (include-css "/bootstrap/css/bootstrap-responsive.css")
-      (include-js "/js/jquery.min.js")
-      (include-js  "/bootstrap/js/bootstrap.js")]
-     [:body
-      [:div {:class "navbar offset1 span12"}
-       [:div {:class "navbar-inner"}
-        [:a {:class "brand" :href "/admin"} site-title]
-        [:ul {:class "nav"}
-         [:li [:a {:href "/admin/posts"} "Posts"]]
-         [:li [:a {:href "/admin/tags"} "Tags"]]
-         [:li [:a {:href "/admin/comments"} "Comments"]]
-         [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]
-         #_(for [nav nav_links]
-           (nav-item nav url_base))]]]
-      ;(page-nav url_base)
-      [:div {:id "header"}]
-      [:div {:id "content" :class "container offset1 span12"}
-       [:legend html-title] content]
-      ;(if (not (nil? init_script)) [:script init_script])
-      ])))
+(defn admin
+  ([title content] (admin title nil content))
+  ([title link content]  
+     (let [html-title (if (string? title) title (:title title))
+           title-elements (when (map? title) (:elements title))
+           site-title (:title (db/get-admin))]
+       (html5
+        [:head
+         [:meta {:charset "utf-8"}]
+         [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1"}]
+         [:meta {:name "viewport"
+                 :content "width=device-width, initial-scale=1, maximum-scale=1"}]
+         [:title (str site-title " - " title)]
+         (include-css "/bootstrap/css/bootstrap.css")
+         (include-css "/bootstrap/css/bootstrap-responsive.css")
+         (include-js "/js/jquery.min.js")
+         (include-js  "/bootstrap/js/bootstrap.js")]
+        [:body
+         [:div {:class "navbar offset1 span12"}
+          [:div {:class "navbar-inner"}
+           [:a {:class "brand" :href "/admin"} site-title]
+           [:ul {:class "nav"}
+            [:li [:a {:href "/admin/posts"} "Posts"]]
+            [:li [:a {:href "/admin/tags"} "Tags"]]
+            [:li [:a {:href "/admin/comments"} "Comments"]]
+            [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]
+            #_(for [nav nav_links]
+                (nav-item nav url_base))]]]
+                                        ;(page-nav url_base)
+         [:div {:id "header"}]
+         [:div {:id "content" :class "container offset1 span12"}
+          [:row
+           [:legend html-title]
+           (if-not (nil? link) [:div {:align "right"} (link-to (:link link) (:text link))])]
+          content]
+                                        ;(if (not (nil? init_script)) [:script init_script])
+         ])))
+  )
 
 (comment
        #_(include-js "/js/markdown.js"

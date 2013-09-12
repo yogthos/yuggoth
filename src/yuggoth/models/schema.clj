@@ -10,6 +10,7 @@
     [:data "bytea"]))
 
 ;;blog table
+; DONE - Add columns for page? and slug to support "static" pages
 (defn create-blog-table []
   (sql/create-table
     :blog
@@ -19,7 +20,9 @@
     [:tease "TEXT"]
     [:content "TEXT"]
     [:author "varchar(100)"]
-    [:public :boolean]))
+    [:slug "varchar(100)"]
+    [:public :boolean]
+    [:page :boolean]))
 
 ;;comment table 
 (defn create-comments-table []
