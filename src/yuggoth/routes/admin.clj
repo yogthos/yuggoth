@@ -73,7 +73,6 @@
   (let [post-tags (set (if (and post-id (not (= post-id :new)))
                          (db/tag-ids-by-post (Integer/parseInt post-id))
                          []))]
-    (prn (str "POST-TAGS: " post-tags))
     [:div {:class "controls"}
      (for [tag (db/admin-tags)]
        (if (contains? post-tags (:id tag))
@@ -139,29 +138,20 @@
   (let [tags (filter #(= "tag-" (apply str (take 4 (name (first %))))) p)
         sel_tag_ids (set (map #(Integer/parseInt (apply str (drop 4 (name (first %))))) tags))
         published? (if-not (nil? public) "true" "false")]
-;    (prn (str "Raw tags: " tags))
-;    (prn (str "POSTID: " postid))
-;    (prn (str "Posted Tags are: " sel_tag_ids))
     (if (= postid "new")
       (let [id (:id (db/store-post title tease content "Doug" published?))]
-;        (prn (str "id after insert is: " id))
-;        (prn (str "Class of id is: " (class id)))
         (doseq [tag_id sel_tag_ids]
           (db/tag-post id tag_id)))
       (let [existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
             new_tags (set/difference sel_tag_ids existing_tags)
             removed_tags (set/difference existing_tags sel_tag_ids)]
         ;; Update post (blog) record and invalidate its cache entry
-        ;(prn (str "PUBLISHED value is: " published?))
-;        (prn (str "NEW TAGS are: " new_tags))
         (db/update-post postid title tease content published?)
         (doseq [removed_tag removed_tags]
           (db/untag-post (Integer/parseInt postid) removed_tag))
         (doseq [new_tag new_tags]
           (db/tag-post (Integer/parseInt postid) new_tag))
         (cache/invalidate! (str postid))))
-    #_(let [{keys [postid title tease content public]} (:params request)]
-        )
     (resp/redirect "/admin/posts"))
   )
 
