@@ -2,7 +2,8 @@
   (:require [yuggoth.models.schema :refer :all]
             [yuggoth.config :refer [db]]
             [clojure.java.jdbc :as sql]
-            [clojure.java.jdbc.sql :refer [where]])
+            [clojure.java.jdbc.sql :refer [where]]
+            [clj-time [format :as timef] [coerce :as timec]])
   (:import java.sql.Timestamp java.util.Date))
 
 (defn db-update-or-insert [db table record where-clause]
@@ -41,11 +42,15 @@
 
 
 ;;blog posts
-(defn update-post [id title tease content public]
-  (let [int-id (Integer/parseInt id)] 
+(defn update-post [id title tease content pubtime public]
+  (let [int-id (Integer/parseInt id)
+        timeval (->> pubtime (timef/parse (timef/formatter "yyyy-MM-dd"))
+                     timec/to-timestamp)]
+    #_(sql/query @db ["update blog set title = ?, tease = ?, content = ?, time = to_date(?, 'YYYY-mm-dd'), public = ? where id = ?" title tease content pubtime (Boolean/parseBoolean public) int-id])
+
     (sql/update! @db
       :blog
-      {:id int-id :title title :tease tease :content content
+      {:title title :tease tease :content content :time timeval
        :public (Boolean/parseBoolean public)}
       ["id=?" int-id])))
 
@@ -66,9 +71,12 @@
   (try
     (sql/query @db
       [(str "select id, time, title, author, public" (if full? ", content, tease") 
-            " from blog " (if (not private?) "where public='true'") " order by id desc " 
+            " from blog " (if (not private?) "where  public='true' ")
+            "order by id desc "
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
+
+#_"and to_date(time, 'yyyy/mm/dd') < to_date(current_timestamp, 'yyyy/mm/dd') "
 
 (defn get-post [id]  
   (first (sql/query @db ["select * from blog where id=?" (Integer/parseInt id)])))
@@ -83,15 +91,16 @@
         (Integer/parseInt id)))))
 
 
-(defn store-post [title tease content author public]
-  (first (sql/insert! @db
-                      :blog
-                      {:time (new Timestamp (.getTime (new Date)))
-                       :title title
-                       :tease tease
-                       :content content
-                       :author author
-                       :public (Boolean/parseBoolean public)})))
+(defn store-post [title tease content time public]
+  (let [author (:handle (get-admin))]
+    (first (sql/insert! @db
+                        :blog
+                        {:time (or time (new Timestamp (.getTime (new Date))))
+                         :title title
+                         :tease tease
+                         :content content
+                         :author author
+                         :public (Boolean/parseBoolean public)}))))
 
 (defn post-visible [id public]
   (sql/update! @db
@@ -145,10 +154,14 @@
   (sql/query @db ["select * from tag where id in (select distinct tagid from tag_map) order by name asc"])
   #_(map :name ))
 
-(defn add-tag [tag-name & [db]]
+(defn add-tag [tag_name tag_slug]
   ; TODO insert slug value here also - need regex to strip out non-slug chars
-  (sql/insert! (or db @db)
-    :tag {:name (.toLowerCase tag-name)}))
+  (sql/insert! @db 
+    :tag {:name tag_name :slug tag_slug}))
+
+(defn update-tag [id tag_name tag_slug]
+  (sql/update! @db :tag {:name tag_name :slug tag_slug}
+               ["id = ?" (Integer/parseInt id)]))
 
 (defn delete-tags [tags]
   (doseq [tag tags] 
@@ -164,6 +177,9 @@
 
 (defn tag-by-slug [slug]
   (first (sql/query @db ["select name from tag where slug = ?" slug])))
+
+(defn get-tag [id]
+  (first (sql/query @db ["select * from tag where id = ?" id])))
 
 (defn tag-ids-by-post [postid]
   (mapcat vals (sql/query @db ["select tagid from tag_map where blogid = ?" postid])))

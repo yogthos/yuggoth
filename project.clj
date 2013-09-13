@@ -14,7 +14,8 @@
    [markdown-clj "0.9.25"]
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.3.0-alpha4"]     
-   [postgresql/postgresql "9.1-901.jdbc4"]]
+   [postgresql/postgresql "9.1-901.jdbc4"]
+   [clj-time "0.4.3"]]
   
   :ring
   {:handler yuggoth.handler/war-handler, 

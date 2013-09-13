@@ -40,6 +40,25 @@
          [:td (clojure.string/capitalize (:author post))]
          [:td (link-to (str "/admin/post/edit/" (:id post)) "Edit")"&nbsp;"(link-to (str "/admin/post/delete/" (:id post)) "Delete")]])])))
 
+(defn admin-list-tags
+  "Tagslisting in table with links to delete, edit"
+  []
+  (let [tags (into [] (db/admin-tags))]
+    (layout/admin "Tags" {:link "/admin/tag/new" :text "New Tag"}
+     [:table {:class "table table-striped"}
+      [:thead
+       [:tr
+        [:th "ID"]
+        [:th "Name"]
+        [:th "Slug"]
+        [:th "Actions"]]]
+      (for [tag tags]
+        [:tr
+         [:td (:id tag)]
+         [:td (:name tag)]
+         [:td (:slug tag)]
+         [:td (link-to (str "/admin/tag/edit/" (:id tag)) "Edit")"&nbsp;"(link-to (str "/admin/tag/delete/" (:id tag)) "Delete")]])])))
+
 (defn markdown-help-block
   []
   [:table {:class "table table-bordered"}
@@ -86,12 +105,13 @@
   "Post edit form, used for creating and editing posts."
   [post-id error]
   (let [new? (if (= post-id :new) true false)
-        {:keys [title content tease public]} (if new?
-                                               {:title "" :tease ""
-                                                :content "" :public false}
-                                               (into {} (db/get-post post-id)))
+        {:keys [title content tease public time]} (if new?
+                                                    {:title "" :tease "" :time ""
+                                                     :content "" :public false}
+                                                    (into {} (db/get-post post-id)))
         page-title (if new? "Create Post" "Edit Post")
         tags (if new? (br/tag-list) (br/tag-list post-id))
+        pubtime (if new? time (first (clojure.string/split (str time) #" ")))
         #_all-tags ]
     (layout/admin
       page-title
@@ -102,7 +122,6 @@
          [:div {:class "span8"}
           (form-to {:class "form-horizontal"}
                    [:post "/admin/post/save"]
-                   #_(text-field {:tabindex 1} "title" title)
                    [:div {:class "control-group"}
                     (label {:class "control-label"} "title" "Title")
                     [:div {:class "controls"}
@@ -122,6 +141,11 @@
                     [:div {:class "controls"}
                      (check-box {} "public" public true)]]
                    [:div {:class "control-group"}
+                    (label {:class "control-label"} "time" "Publish Date")
+                    [:div {:class "controls"}
+                     (text-field {:tabindex 5 :class "input-large" :placeholder "yyyy/mm/dd"}
+                                 "pubtime" pubtime)]]
+                   [:div {:class "control-group"}
                     (label {:class "control-label"} "tags" "Tags")
                     (admin-tag-list post-id)]
                    [:div {:class "control-group" :style "clear:both"}
@@ -133,20 +157,52 @@
           (markdown-help-block)]]]]
       )))
 
+(defn admin-edit-tag
+  "Tag edit form, used for creating and editing tags."
+  [tag-id error]
+  (let [new? (if (= tag-id :new) true false)
+        {:keys [name slug]} (if new?
+                              {:name "" :slug ""}
+                              (into {} (db/get-tag (Integer/parseInt tag-id))))
+        page-title (if new? "Create Tag" "Edit Tag")]
+    (layout/admin
+      page-title
+      (when error [:div.error error])
+      [:div {:class "row"}
+       [:div {:class "span12"}
+        [:div {:class "row"}
+         [:div {:class "span8"}
+          (form-to {:class "form-horizontal"}
+                   [:post "/admin/tag/save"]
+                   [:div {:class "control-group"}
+                    (label {:class "control-label"} "name" "Name")
+                    [:div {:class "controls"}
+                     (text-field {:tabindex 1 :class "input-xxlarge"} "name" name)]]
+                   [:div {:class "control-group"}
+                    (label {:class "control-label"} "slug" "Slug")
+                    [:div {:class "controls"}
+                     (text-field {:tabindex 2 :class "input-xxlarge" :rows 5}
+                                "slug" slug)]]
+                   [:div {:class "control-group" :style "clear:both"}
+                    [:div {:class "controls"}
+                     (submit-button {:class "btn"} "Submit")]]
+                   (hidden-field "tagid" tag-id))]]]])))
+
 (defn admin-save-post
-  [postid title tease content public p]
+  [postid title tease content public time p]
   (let [tags (filter #(= "tag-" (apply str (take 4 (name (first %))))) p)
         sel_tag_ids (set (map #(Integer/parseInt (apply str (drop 4 (name (first %))))) tags))
-        published? (if-not (nil? public) "true" "false")]
+        published? (if-not (nil? public) "true" "false")
+        [pubtime _clock] (clojure.string/split time #" ")]
     (if (= postid "new")
-      (let [id (:id (db/store-post title tease content "Doug" published?))]
+      (let [id (:id (db/store-post title tease content pubtime published?))]
         (doseq [tag_id sel_tag_ids]
           (db/tag-post id tag_id)))
       (let [existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
             new_tags (set/difference sel_tag_ids existing_tags)
             removed_tags (set/difference existing_tags sel_tag_ids)]
         ;; Update post (blog) record and invalidate its cache entry
-        (db/update-post postid title tease content published?)
+        (db/update-post postid title tease content pubtime published?)
         (doseq [removed_tag removed_tags]
           (db/untag-post (Integer/parseInt postid) removed_tag))
         (doseq [new_tag new_tags]
@@ -155,17 +211,30 @@
     (resp/redirect "/admin/posts"))
   )
 
+(defn admin-save-tag
+  [tagid name slug]
+  (prn (str "TagID is: " tagid))
+  (if (= tagid "new")
+    (db/add-tag name slug)
+    (db/update-tag tagid name slug))
+  (resp/redirect "/admin/tags"))
+
 (defn admin-clear-cache
   []
   (cache/clear!)
   (resp/redirect "/admin/posts"))
 
 (defroutes admin-routes
+  ; TODO - add route and fn for post delete
   (GET "/admin" [] (resp/redirect "/admin/posts"))
   (GET "/admin/posts" [] (restricted (admin-list-posts)))
   (GET "/admin/post/new" [] (restricted (admin-edit-post :new false)))
   (GET "/admin/post/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
   (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
-  (POST "/admin/post/save" [postid title tease content public :as {p :params}]
-        (restricted (admin-save-post postid title tease content public p)))
-  )
+  ; TODO - add route and fn for tag delete
+  (GET "/admin/tags" [] (restricted (admin-list-tags)))
+  (GET "/admin/tag/new" [] (restricted (admin-edit-tag :new false)))
+  (GET "/admin/tag/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
+  (POST "/admin/post/save" [postid title tease content public pubtime :as {p :params}]
+        (restricted (admin-save-post postid title tease content public pubtime p)))
+  (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug))))
