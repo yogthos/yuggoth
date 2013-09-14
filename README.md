@@ -32,7 +32,7 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net
 
 The blog requires an instance of postgreSQL. On the first run the blog will guide you through setting up
 the db connection properties and create the necessary tables for you. Then you will be presented with the 
-setup wizard wich will allow you to configure the administrator and the blog title. Further configuration 
+setup wizard that will allow you to configure the administrator and the blog title. Further configuration 
 can be done on the profile page.   
 
 ### Building and deploying using Leiningen
