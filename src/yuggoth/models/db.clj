@@ -80,7 +80,7 @@
   (try
     (sql/query @db
       [(str "select id, time, title, author, public" (if full? ", content, tease") 
-            " from blog where page <> 'true'" (if (not private?) " and public='true' ")
+            " from blog where page = 'false'" (if (not private?) " and public='true' ")
             "order by id desc "
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
@@ -94,8 +94,6 @@
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
 
-#_"and to_date(time, 'yyyy/mm/dd') < to_date(current_timestamp, 'yyyy/mm/dd') "
-
 (defn get-post [id]  
   (first (sql/query @db ["select * from blog where id=?" (Integer/parseInt id)])))
 
@@ -107,8 +105,8 @@
     (first
       (sql/query @db 
         [(if next?
-           "select id from blog where id > ? and public='true' order by id asc limit 1"
-           "select id from blog where id < ? and public='true' order by id desc limit 1")] 
+           "select id from blog where id > ? and public='true' and page = 'false' order by id asc limit 1"
+           "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1")] 
         (Integer/parseInt id)))))
 
 
@@ -132,10 +130,10 @@
     ["id=?" (Integer/parseInt id)]))
 
 (defn get-last-post [] 
-  (first (sql/query @db ["select * from blog where id = (select max(id) from blog)"])))
+  (first (sql/query @db ["select * from blog where id = (select max(id) from blog where page = 'false')"])))
 
 (defn get-last-public-post []
-  (first (sql/query @db ["select * from blog where public='true' order by id desc limit 1"])))
+  (first (sql/query @db ["select * from blog where public='true' and page = 'false' order by id desc limit 1"])))
 
 (defn last-post-id []
   (or (:id (first (sql/query @db ["select id from blog order by id desc limit 1"]))) 0))
