@@ -1,6 +1,6 @@
 # Yuggoth
 
-<img src="https://raw.github.com/yogthos/yuggoth/master/logo.jpg" 
+<img src="https://raw.github.com/yogthos/yuggoth/master/logo.png" 
  style="margin-left:50px;"
  hspace="20"
  alt="Yuggoth logo" title="a strange dark orb" align="right" width="200" height="200"/>
