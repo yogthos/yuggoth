@@ -31,7 +31,7 @@
         #_[:li#new-post (link-to "/make-post" (text :new-post))]]
        [:ul.menu-items])     
      [[:li#rss (link-to "/rss" [:div#rss "rss"] #_(image "/img/rss.jpg"))]      
-      [:li#about (link-to "/about" (text :about-title))]      
+      [:li#about (link-to "/p/about" (text :about-title))]      
       [:li#archives (link-to "/archives" (text :archives-title))]
       [:li#home (link-to "/" (text :home-title))]])])
 
@@ -88,7 +88,7 @@
                       :else "#home"))
        [:div.container
         (header)
-        (menu)
+         (menu)
         [:div.contents 
          [:div.post
           [:div.entry-title [:h2 html-title title-elements]]
@@ -136,10 +136,7 @@
             [:li [:a {:href "/admin/pages"} "Pages"]]
             [:li [:a {:href "/admin/tags"} "Tags"]]
             [:li [:a {:href "/admin/comments"} "Comments"]]
-            [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]
-            #_(for [nav nav_links]
-                (nav-item nav url_base))]]]
-                                        ;(page-nav url_base)
+            [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]]]]
          [:div {:id "header"}]
          [:div {:id "content" :class "container offset1 span12"}
           [:row
@@ -149,20 +146,3 @@
                                         ;(if (not (nil? init_script)) [:script init_script])
          ])))
   )
-
-(comment
-       #_(include-js "/js/markdown.js"
-                   "/js/shCore.js"
-                   "/js/brushes/shBrushClojure.js"
-                   "/js/brushes/shBrushBash.js"
-                   "/js/brushes/shBrushCss.js"
-                   "/js/brushes/shBrushJava.js"
-                   "/js/brushes/shBrushJScript.js"
-                   "/js/brushes/shBrushPlain.js"
-                   "/js/brushes/shBrushXml.js")
-       ;;workaround for hiccup not handling URLs without protocol correctly
-       ;[:script {:type "text/javascript", :src "//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"}]
-       #_(include-js "/js/jquery.alerts.js"
-                   "/js/site.js")
-)
-
