@@ -26,7 +26,6 @@
   (util/format-time (:time post) "yyyy MMMM"))
 
 (defn archives-by-date [archives]
-  (prn (str "archives came in as: " archives))
   (->> archives      
     (group-by compare-time)
     (vec)

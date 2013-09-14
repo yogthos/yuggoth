@@ -13,6 +13,16 @@
         (sql/insert! t-con table record)
         result))))
 
+;;admin user
+(defn set-admin [admin]
+  (sql/insert! @db :admin admin))
+
+(defn update-admin [admin]
+  (sql/update! @db :admin admin ["handle=?" (:handle admin)]))
+
+(defn get-admin []  
+  (first (sql/query @db ["select * from admin"])))
+
 ;files
 
 (defn to-byte-array [x]  
@@ -42,15 +52,14 @@
 
 
 ;;blog posts
-(defn update-post [id title tease content pubtime public]
+(defn update-post [id title tease content pubtime public page slug]
   (let [int-id (Integer/parseInt id)
         timeval (->> pubtime (timef/parse (timef/formatter "yyyy-MM-dd"))
                      timec/to-timestamp)]
-    #_(sql/query @db ["update blog set title = ?, tease = ?, content = ?, time = to_date(?, 'YYYY-mm-dd'), public = ? where id = ?" title tease content pubtime (Boolean/parseBoolean public) int-id])
-
     (sql/update! @db
       :blog
       {:title title :tease tease :content content :time timeval
+       :page (Boolean/parseBoolean page) :slug slug
        :public (Boolean/parseBoolean public)}
       ["id=?" int-id])))
 
@@ -58,7 +67,7 @@
   (try
     (sql/query @db
                [(str "select id, time, title, author, public from blog "
-                     "order by id desc "
+                     "where page <> 'true' order by id desc "
                      (if (and (not (nil? limit))
                               (> limit 0)) (str "limit " limit
                                                 (if (and (not (nil? offset))
@@ -71,8 +80,17 @@
   (try
     (sql/query @db
       [(str "select id, time, title, author, public" (if full? ", content, tease") 
-            " from blog " (if (not private?) "where  public='true' ")
+            " from blog where page <> 'true'" (if (not private?) " and public='true' ")
             "order by id desc "
+            (if limit (str "limit " limit)))])
+    (catch Exception ex nil)))
+
+(defn admin-get-pages [& [limit]]    
+  (try
+    (sql/query @db
+      [(str "select id, time, title, author, public, slug"  
+            " from blog where page = 'true' "
+            "order by title asc "
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
 
@@ -80,6 +98,9 @@
 
 (defn get-post [id]  
   (first (sql/query @db ["select * from blog where id=?" (Integer/parseInt id)])))
+
+(defn get-page [slug]  
+  (first (sql/query @db ["select * from blog where slug = ?" slug])))
 
 (defn get-public-post-id [id next?]
   (:id
@@ -91,7 +112,7 @@
         (Integer/parseInt id)))))
 
 
-(defn store-post [title tease content time public]
+(defn store-post [title tease content time public page slug]
   (let [author (:handle (get-admin))]
     (first (sql/insert! @db
                         :blog
@@ -100,6 +121,8 @@
                          :tease tease
                          :content content
                          :author author
+                         :slug slug
+                         :page (Boolean/parseBoolean page)
                          :public (Boolean/parseBoolean public)}))))
 
 (defn post-visible [id public]
@@ -196,13 +219,3 @@
         (doseq [tag blog-tags]
           (if-not (some #{tag} current-tags) (add-tag tag t-con))
           (tag-post id tag t-con)))))
-
-;;admin user
-(defn set-admin [admin]
-  (sql/insert! @db :admin admin))
-
-(defn update-admin [admin]
-  (sql/update! @db :admin admin ["handle=?" (:handle admin)]))
-
-(defn get-admin []  
-  (first (sql/query @db ["select * from admin"])))

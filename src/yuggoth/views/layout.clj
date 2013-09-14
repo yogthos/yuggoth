@@ -71,22 +71,21 @@
        (include-css (util/get-css)
                     "/css/jquery.alerts.css"
                     "/css/shCoreYuggoth.css")
-       [:script {:type "text/javascript"} (str "var context=\"" (:context *request*) "\";")]]      
+       [:script {:type "text/javascript"} (str "var context=\"" (:context *request*) "\";")]]
       [:body              
        (hidden-field "selected" 
                      (cond
-                       (.startsWith html-title (text :archives-title))        
-                       "#archives"
-                       (.startsWith html-title (text :latest-comments-title)) 
-                       "#latest"
-                       (.startsWith html-title (text :login-title))
-                       "#login"
-                       (.startsWith html-title (text :about-title))
-                       "#about"
-                       (.startsWith html-title (text :new-post))
-                       "#new-post"
-                       
-                       :else "#home"))
+                      (.startsWith html-title (text :archives-title))        
+                      "#archives"
+                      (.startsWith html-title (text :latest-comments-title)) 
+                      "#latest"
+                      (.startsWith html-title (text :login-title))
+                      "#login"
+                      (.startsWith html-title (text :about-title))
+                      "#about"
+                      (.startsWith html-title (text :new-post))
+                      "#new-post"
+                      :else "#home"))
        [:div.container
         (header)
         (menu)
@@ -134,6 +133,7 @@
            [:a {:class "brand" :href "/admin"} site-title]
            [:ul {:class "nav"}
             [:li [:a {:href "/admin/posts"} "Posts"]]
+            [:li [:a {:href "/admin/pages"} "Pages"]]
             [:li [:a {:href "/admin/tags"} "Tags"]]
             [:li [:a {:href "/admin/comments"} "Comments"]]
             [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]
