@@ -37,7 +37,7 @@
          [:td (:title post)]
          [:td (:time post)]
          [:td (:public post)]
-         [:td (clojure.string/capitalize (:author post))]
+         [:td (clojure.string/clojure.string/capitalize (:author post))]
          [:td (link-to (str "/admin/post/edit/" (:id post)) "Edit")"&nbsp;"(link-to (str "/admin/post/delete/" (:id post)) "Delete")]])])))
 
 (defn admin-list-pages
@@ -48,19 +48,19 @@
      [:table {:class "table table-striped"}
       [:thead
        [:tr
-        [:th (capitalize (text :id-header))]
-        [:th (capitalize (text :title))]
-        [:th (capitalize (text :slug-header))]
-        [:th (capitalize (text :public-header))]
-        [:th (capitalize (text :author))]
-        [:th (capitalize (text :actions-header))]]]
+        [:th (clojure.string/capitalize (text :id-header))]
+        [:th (clojure.string/capitalize (text :title))]
+        [:th (clojure.string/capitalize (text :slug-header))]
+        [:th (clojure.string/capitalize (text :public-header))]
+        [:th (clojure.string/capitalize (text :author))]
+        [:th (clojure.string/capitalize (text :actions-header))]]]
       (for [page pages]
         [:tr
          [:td (:id page)]
          [:td (:title page)]
          [:td (:slug page)]
          [:td (:public page)]
-         [:td (clojure.string/capitalize (:author page))]
+         [:td (clojure.string/clojure.string/capitalize (:author page))]
          [:td
           (link-to (str "/admin/page/edit/" (:id page)) "Edit")"&nbsp;"
           (link-to (str "/admin/page/delete/" (:id page)) "Delete")]
@@ -74,10 +74,10 @@
      [:table {:class "table table-striped"}
       [:thead
        [:tr
-        [:th (capitalize (text :id-header))]
-        [:th (capitalize (text :name))]
-        [:th (capitalize (text :slug-header))]
-        [:th (capitalize (text :actions-header))]]]
+        [:th (clojure.string/capitalize (text :id-header))]
+        [:th (clojure.string/capitalize (text :name))]
+        [:th (clojure.string/capitalize (text :slug-header))]
+        [:th (clojure.string/capitalize (text :actions-header))]]]
       (for [tag tags]
         [:tr
          [:td (:id tag)]
