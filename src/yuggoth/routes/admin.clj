@@ -21,16 +21,16 @@
   "Posts listing in table with links to delete, edit"
   []
   (let [posts (into [] (db/admin-get-posts))]
-    (layout/admin "Blog Posts" {:link "/admin/post/new" :text "New Post"}
+    (layout/admin "Blog Posts" {:link "/admin/post/new" :text (text :new-post)}
      [:table {:class "table table-striped"}
       [:thead
        [:tr
-        [:th "ID"]
-        [:th "Title"]
-        [:th "Time"]
-        [:th "Published?"]
-        [:th "Author"]
-        [:th "Actions"]]]
+        [:th (capitalize (text :id-header))]
+        [:th (capitalize (text :title))]
+        [:th (capitalize (text :time-header))]
+        [:th (capitalize (text :public-header))]
+        [:th (capitalize (text :author))]
+        [:th (capitalize (text :actions-header))]]]
       (for [post posts]
         [:tr
          [:td (:id post)]
@@ -48,12 +48,12 @@
      [:table {:class "table table-striped"}
       [:thead
        [:tr
-        [:th "ID"]
-        [:th "Title"]
-        [:th "Slug"]
-        [:th "Published?"]
-        [:th "Author"]
-        [:th "Actions"]]]
+        [:th (capitalize (text :id-header))]
+        [:th (capitalize (text :title))]
+        [:th (capitalize (text :slug-header))]
+        [:th (capitalize (text :public-header))]
+        [:th (capitalize (text :author))]
+        [:th (capitalize (text :actions-header))]]]
       (for [page pages]
         [:tr
          [:td (:id page)]
@@ -74,10 +74,10 @@
      [:table {:class "table table-striped"}
       [:thead
        [:tr
-        [:th "ID"]
-        [:th "Name"]
-        [:th "Slug"]
-        [:th "Actions"]]]
+        [:th (capitalize (text :id-header))]
+        [:th (capitalize (text :name))]
+        [:th (capitalize (text :slug-header))]
+        [:th (capitalize (text :actions-header))]]]
       (for [tag tags]
         [:tr
          [:td (:id tag)]
@@ -135,7 +135,7 @@
                                                     {:title "" :tease "" :time ""
                                                      :content "" :public false}
                                                     (into {} (db/get-post post-id)))
-        page-title (if new? "Create Post" "Edit Post")
+        page-title (if new? (text :new-post) (text :edit-post))
         tags (if new? (br/tag-list) (br/tag-list post-id))
         pubtime (if new? time (first (clojure.string/split (str time) #" ")))
         #_all-tags ]
@@ -149,38 +149,38 @@
           (form-to {:class "form-horizontal"}
                    [:post "/admin/post/save"]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "title" "Title")
+                    (label {:class "control-label"} "title" (text :title))
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "title" title)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "tease" "Tease")
+                    (label {:class "control-label"} "tease" (text :tease))
                     [:div {:class "controls"}
                      (text-area {:tabindex 2 :class "input-xxlarge" :rows 5}
                                 "tease" tease)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "content" "Body")
+                    (label {:class "control-label"} "content" (text :content))
                     [:div {:class "controls"}
                      (text-area {:tabindex 3 :class "input-xxlarge" :rows 10}
                                 "content" content)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "public" "Published?")
+                    (label {:class "control-label"} "public" (text :public-header))
                     [:div {:class "controls"}
                      (check-box {} "public" public true)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "time" "Publish Date")
+                    (label {:class "control-label"} "time" (text :publish-date))
                     [:div {:class "controls"}
                      (text-field {:tabindex 5 :class "input-large" :placeholder "yyyy/mm/dd"}
                                  "pubtime" pubtime)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "tags" "Tags")
+                    (label {:class "control-label"} "tags" (text :tags))
                     (admin-tag-list post-id)]
                    [:div {:class "control-group" :style "clear:both"}
                     [:div {:class "controls"}
-                     (submit-button {:class "btn"} "Submit")]]
+                     (submit-button {:class "btn"} (text :submit))]]
                    (hidden-field "postid" post-id)
                    (hidden-field "page" "false")
                    (hidden-field "public" (str public)))]
-         [:div {:class "span4" :align "center"} [:h5"Markdown Help"] [:hr]
+         [:div {:class "span4" :align "center"} [:h5 (text :markdown-help)] [:hr]
           (markdown-help-block)]]]]
       )))
 
@@ -193,7 +193,7 @@
           {:title "" :tease "" :time "" :page true :slug ""
            :content "" :public false}
           (into {} (db/get-post page-id)))
-        page-title (if new? "Create Page" "Edit Page")]
+        page-title (if new? (text :new-page) (text :edit-page))]
     (layout/admin
       page-title
       (when error [:div.error error])
@@ -204,29 +204,29 @@
           (form-to {:class "form-horizontal"}
                    [:post "/admin/post/save"]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "title" "Title")
+                    (label {:class "control-label"} "title" (text :title))
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "title" title)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "slug" "Slug")
+                    (label {:class "control-label"} "slug" (text :slug-header))
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "slug" slug)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "content" "Body")
+                    (label {:class "control-label"} "content" (text :content))
                     [:div {:class "controls"}
                      (text-area {:tabindex 3 :class "input-xxlarge" :rows 10}
                                 "content" content)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "public" "Published?")
+                    (label {:class "control-label"} "public" (text :public-header))
                     [:div {:class "controls"}
                      (check-box {} "public" public true)]]
                    [:div {:class "control-group" :style "clear:both"}
                     [:div {:class "controls"}
-                     (submit-button {:class "btn"} "Submit")]]
+                     (submit-button {:class "btn"} (text :submit))]]
                    (hidden-field "postid" page-id)
                    (hidden-field "page" "true")
                    (hidden-field "public" (str public)))]
-         [:div {:class "span4" :align "center"} [:h5"Markdown Help"] [:hr]
+         [:div {:class "span4" :align "center"} [:h5 (text :markdown-help)] [:hr]
           (markdown-help-block)]]]]
       )))
 
@@ -237,7 +237,7 @@
         {:keys [name slug]} (if new?
                               {:name "" :slug ""}
                               (into {} (db/get-tag (Integer/parseInt tag-id))))
-        page-title (if new? "Create Tag" "Edit Tag")]
+        page-title (if new? (text :new-tag) (text :edit-tag))]
     (layout/admin
       page-title
       (when error [:div.error error])
@@ -248,17 +248,17 @@
           (form-to {:class "form-horizontal"}
                    [:post "/admin/tag/save"]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "name" "Name")
+                    (label {:class "control-label"} "name" (text :name))
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "name" name)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "slug" "Slug")
+                    (label {:class "control-label"} "slug" (text :slug-header))
                     [:div {:class "controls"}
                      (text-field {:tabindex 2 :class "input-xxlarge" :rows 5}
                                 "slug" slug)]]
                    [:div {:class "control-group" :style "clear:both"}
                     [:div {:class "controls"}
-                     (submit-button {:class "btn"} "Submit")]]
+                     (submit-button {:class "btn"} (text :submit))]]
                    (hidden-field "tagid" tag-id))]]]])))
 
 (defn admin-save-post
