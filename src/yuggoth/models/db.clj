@@ -100,14 +100,13 @@
 (defn get-page [slug]  
   (first (sql/query @db ["select * from blog where slug = ?" slug])))
 
-(defn get-public-post-id [id next?]
+(defn get-public-post-id [postid next?]
   (:id
-    (first
-      (sql/query @db 
-        [(if next?
-           "select id from blog where id > ? and public='true' and page = 'false' order by id asc limit 1"
-           "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1")] 
-        (Integer/parseInt id)))))
+   (first
+    (sql/query @db 
+               [(if next?
+                  "select id from blog where id > ? and public='true' and page = 'false' order by id asc limit 1"
+                  "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1") (Integer/parseInt postid)]))))
 
 
 (defn store-post [title tease content time public page slug]
