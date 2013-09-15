@@ -94,7 +94,6 @@
     :quote-example "quoted text"
     :code-help "4 spaces indented code"
 
-    :new-post "New Post"
     :id-header "ID"
     :time-header "Time"
     :public-header "Published?"
@@ -201,7 +200,6 @@
     :quote-example "texto citado"
     :code-help "codigo identado a 4 espacios"
 
-    :new-post "New Post"
     :id-header "ID"
     :time-header "Time"
     :public-header "Published?"
