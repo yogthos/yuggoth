@@ -67,8 +67,8 @@
                :content "width=device-width, initial-scale=1, maximum-scale=1"}]
        [:link {:rel "alternate" :type "application/rss+xml" :title site-title :href "/rss"}]
        [:title site-title]
-       (include-css "/bootstrap/css/bootstrap.css")
-       (include-css "/bootstrap/css/bootstrap-responsive.css")
+       (include-css "/bootstrap/css/bootstrap.min.css")
+       (include-css "/bootstrap/css/bootstrap-responsive.min.css")
        (include-js "/js/jquery.min.js")
        (include-js  "/bootstrap/js/bootstrap.js")]
       [:body              
@@ -124,8 +124,8 @@
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1, maximum-scale=1"}]
          [:title (str site-title " - " title)]
-         (include-css "/bootstrap/css/bootstrap.css")
-         (include-css "/bootstrap/css/bootstrap-responsive.css")
+         (include-css "/bootstrap/css/bootstrap.min.css")
+         (include-css "/bootstrap/css/bootstrap-responsive.min.css")
          (include-js "/js/jquery.min.js")
          (include-js  "/bootstrap/js/bootstrap.js")]
         [:body
