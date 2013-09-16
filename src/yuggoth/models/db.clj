@@ -183,10 +183,13 @@
   (sql/update! @db :tag {:name tag_name :slug tag_slug}
                ["id = ?" (Integer/parseInt id)]))
 
-(defn delete-tags [tags]
-  (doseq [tag tags] 
-    (sql/delete! @db :tag_map (where {:tag tag}))
-    (sql/delete! @db :tag (where {:name tag}))))
+(defn delete-tag [tagid]
+  (let [int_tagid (Integer/parseInt tagid)
+        tagged_posts (count
+                      (sql/query @db
+                                 ["select count(*) from tag_map where tagid = ?" int_tagid]))]
+    (if (> tagged_posts 0) (sql/delete! @db :tag_map (where {:tagid int_tagid})))
+    (sql/delete! @db :tag (where {:id int_tagid}))))
 
 (defn posts-by-tag [tag-name]
   (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
