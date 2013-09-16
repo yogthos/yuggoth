@@ -41,14 +41,15 @@
     (text :archives-title)
     (archives-by-date (db/get-posts false false (boolean (session/get :admin))))))
 
-(defn show-tag [tagname] 
-  (layout/common
-    tagname    
-    (archives-by-date (db/posts-by-tag tagname))))
+(defn show-tag [slug]
+  (let [tagname (:name (db/tag-by-slug slug))]
+    (layout/common
+     tagname    
+     (archives-by-date (db/posts-by-tag-slug slug)))))
 
 (defroutes archive-routes
   (GET "/archives"     []        (archives))
-  (GET "/tag/:tagname" [tagname] (show-tag tagname))
+  (GET "/tag/:tagslug" [tagslug] (show-tag tagslug))
   (POST "/archives" [post-id visible]
         (db/post-visible post-id (not (Boolean/parseBoolean visible)))
         (resp/redirect "/archives")))

@@ -10,15 +10,19 @@
     [:data "bytea"]))
 
 ;;blog table
+; DONE - Add columns for page? and slug to support "static" pages
 (defn create-blog-table []
   (sql/create-table
     :blog
     [:id "SERIAL"]
     [:time :timestamp]
     [:title "varchar(100)"]
+    [:tease "TEXT"]
     [:content "TEXT"]
-    [:author "varchar(100)"]    
-    [:public :boolean]))
+    [:author "varchar(100)"]
+    [:slug "varchar(100)"]
+    [:public :boolean]
+    [:page :boolean]))
 
 ;;comment table 
 (defn create-comments-table []
@@ -28,19 +32,24 @@
     [:blogid :int]
     [:time :timestamp]    
     [:content "TEXT"]
+    [:approved :boolean]
     [:author "varchar(100)"]))
 
 ;;tag table
 (defn create-tag-table []
-  (sql/create-table
-    :tag
-    [:name "varchar(50)"]))
+  (do
+    (sql/create-table
+     :tag
+     [:id "SERIAL"]
+     [:name "varchar(50)"]
+     [:slug "varchar(50)"])
+    #_(create-index :tag_slug :tag [:slug] :unique)))
 
 (defn create-tag-map-table []
   (sql/create-table
     :tag_map
     [:blogid :int]
-    [:tag "varchar(50)"]))
+    [:tagid :int]))
 
 ;;admin table
 (defn create-admin-table []
