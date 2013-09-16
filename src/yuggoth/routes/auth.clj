@@ -8,27 +8,32 @@
             [noir.util.cache :as cache]
             [noir.session :as session]
             [noir.response :as resp]
-            [yuggoth.models.db :as db]))
+            [yuggoth.models.db :as db]
+            [clojure.string :as s]))
 
 (defn create-admin-form [{:keys [title handle pass pass1 email]}]
   (form-to [:post "/create-admin"]
-           (text-field {:placeholder (text :blog-title)} "title" title)             
-           (util/make-form "handle" (text :name) handle 
-                           "pass"  (text :password) pass
-                           "pass1" (text :confirm-password) pass1
-                           "email" (text :email) email)
-           [:span.submit {:tabindex 5} (text :create)]))
+           #_(text-field {:placeholder (text :blog-title)} "title" title)             
+           (util/make-form "title" (s/capitalize (text :blog-title)) title
+                           "handle" (s/capitalize (text :admin-user-name)) handle 
+                           "pass"  (s/capitalize (text :password)) pass
+                           "pass1" (s/capitalize (text :confirm-password)) pass1
+                           "email" (s/capitalize (text :email)) email)
+           (submit-button {:class "btn"} (s/capitalize (text :create)))))
 
 (defn login 
-  ([params]  
-    (layout/common
-      "Login"      
+  ([params]
+     (layout/common
+      (if (db/get-admin)
+        (s/capitalize (text :login-title))
+        (s/capitalize (text :blog-settings)))
       [:div.error (:error params)]
       (if (db/get-admin)
-        (form-to [:post "/login"]           
-                 (text-field {:placeholder (text :user) :tabindex 1} "handle")
-                 (password-field {:placeholder (text :password) :tabindex 2} "pass")
-               [:span.submit {:tabindex 3} (text :login)])
+        (form-to 
+         [:post "/login"]           
+         (text-field {:placeholder (s/capitalize (text :user)) :tabindex 1} "handle")
+         (password-field {:placeholder (s/capitalize (text :password)) :tabindex 2} "pass")
+                 [:span.submit {:tabindex 3} (text :login)])
         (create-admin-form params))))
   
   ([handle pass]     
