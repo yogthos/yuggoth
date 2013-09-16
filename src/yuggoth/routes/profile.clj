@@ -25,14 +25,6 @@
     "Profile"
     [:h2.info info]
     
-    (form-to [:post "/update-tags"]
-             (label "tags" "select tags to delete ") 
-             (mapcat (fn [tag]
-                       [(hidden-field (str "tag-" tag))
-                        [:span.tagoff tag]])
-                     (db/tags))             
-             (submit-button "update tags"))
-    
     (let [admin (session/get :admin)]            
       (form-to [:post "/profile"]
                (util/make-form "title"  (text :blog-title)       (or title (:title admin))
@@ -74,12 +66,7 @@
         (text :profile-updated)
         (catch Exception ex (.getMessage ex))))))
 
-(defn update-tags [tags]
-  (db/delete-tags (map second tags))
-  (resp/redirect "/profile"))
-
 (defroutes profile-routes
   (GET "/about"        []               (about))
   (GET "/profile"      {params :params} (restricted (profile params)))
-  (POST "/profile"     {params :params} (restricted (update-profile params)))  
-  (POST "/update-tags" {tags :params}   (restricted (update-tags tags))))
+  (POST "/profile"     {params :params} (restricted (update-profile params))))

@@ -2,7 +2,8 @@
   (:require [yuggoth.models.schema :refer :all]
             [yuggoth.config :refer [db]]
             [clojure.java.jdbc :as sql]
-            [clojure.java.jdbc.sql :refer [where]])
+            [clojure.java.jdbc.sql :refer [where]]
+            [clj-time [format :as timef] [coerce :as timec]])
   (:import java.sql.Timestamp java.util.Date))
 
 (defn db-update-or-insert [db table record where-clause]
@@ -11,6 +12,16 @@
       (if (zero? (first result))
         (sql/insert! t-con table record)
         result))))
+
+;;admin user
+(defn set-admin [admin]
+  (sql/insert! @db :admin admin))
+
+(defn update-admin [admin]
+  (sql/update! @db :admin admin ["handle=?" (:handle admin)]))
+
+(defn get-admin []  
+  (first (sql/query @db ["select * from admin"])))
 
 ;files
 
@@ -41,43 +52,75 @@
 
 
 ;;blog posts
-
-(defn update-post [id title content public]
-  (let [int-id (Integer/parseInt id)] 
+(defn update-post [id title tease content pubtime public page slug]
+  (let [int-id (Integer/parseInt id)
+        timeval (->> pubtime (timef/parse (timef/formatter "yyyy-MM-dd"))
+                     timec/to-timestamp)]
     (sql/update! @db
       :blog
-      {:id int-id :title title :content content :public (Boolean/parseBoolean public)}
+      {:title title :tease tease :content content :time timeval
+       :page (Boolean/parseBoolean page) :slug slug
+       :public (Boolean/parseBoolean public)}
       ["id=?" int-id])))
+
+(defn admin-get-posts [& [limit offset]]
+  (try
+    (sql/query @db
+               [(str "select id, time, title, author, public from blog "
+                     "where page <> 'true' order by id desc "
+                     (if (and (not (nil? limit))
+                              (> limit 0)) (str "limit " limit
+                                                (if (and (not (nil? offset))
+                                                         (> offset 0))
+                                                  (str " offset " offset)))))])
+    (catch Exception ex nil)))
+                     
 
 (defn get-posts [& [limit full? private?]]    
   (try
     (sql/query @db
-      [(str "select id, time, title, public" (if full? ", content") 
-            " from blog " (if (not private?) "where public='true'") " order by id desc " 
+      [(str "select id, time, title, author, public" (if full? ", content, tease") 
+            " from blog where page = 'false'" (if (not private?) " and public='true' ")
+            "order by id desc "
+            (if limit (str "limit " limit)))])
+    (catch Exception ex nil)))
+
+(defn admin-get-pages [& [limit]]    
+  (try
+    (sql/query @db
+      [(str "select id, time, title, author, public, slug"  
+            " from blog where page = 'true' "
+            "order by title asc "
             (if limit (str "limit " limit)))])
     (catch Exception ex nil)))
 
 (defn get-post [id]  
   (first (sql/query @db ["select * from blog where id=?" (Integer/parseInt id)])))
 
-(defn get-public-post-id [id next?]
+(defn get-page [slug]  
+  (first (sql/query @db ["select * from blog where slug = ?" slug])))
+
+(defn get-public-post-id [postid next?]
   (:id
-    (first
-      (sql/query @db 
-        [(if next?
-           "select id from blog where id > ? and public='true' order by id asc limit 1"
-           "select id from blog where id < ? and public='true' order by id desc limit 1")] 
-        (Integer/parseInt id)))))
+   (first
+    (sql/query @db 
+               [(if next?
+                  "select id from blog where id > ? and public='true' and page = 'false' order by id asc limit 1"
+                  "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1") (Integer/parseInt postid)]))))
 
 
-(defn store-post [title content author public]
-  (sql/insert! @db
-    :blog
-    {:time (new Timestamp (.getTime (new Date)))
-     :title title
-     :content content
-     :author author
-     :public (Boolean/parseBoolean public)}))
+(defn store-post [title tease content time public page slug]
+  (let [author (:handle (get-admin))]
+    (first (sql/insert! @db
+                        :blog
+                        {:time (or time (new Timestamp (.getTime (new Date))))
+                         :title title
+                         :tease tease
+                         :content content
+                         :author author
+                         :slug slug
+                         :page (Boolean/parseBoolean page)
+                         :public (Boolean/parseBoolean public)}))))
 
 (defn post-visible [id public]
   (sql/update! @db
@@ -86,10 +129,10 @@
     ["id=?" (Integer/parseInt id)]))
 
 (defn get-last-post [] 
-  (first (sql/query @db ["select * from blog where id = (select max(id) from blog)"])))
+  (first (sql/query @db ["select * from blog where id = (select max(id) from blog where page = 'false')"])))
 
 (defn get-last-public-post []
-  (first (sql/query @db ["select * from blog where public='true' order by id desc limit 1"])))
+  (first (sql/query @db ["select * from blog where public='true' and page = 'false' order by id desc limit 1"])))
 
 (defn last-post-id []
   (or (:id (first (sql/query @db ["select id from blog order by id desc limit 1"]))) 0))
@@ -113,29 +156,60 @@
   (sql/delete! @db :comment (where {:id (Integer/parseInt id)})))
 
 ;;tags
-(defn tag-post [blogid tag & [db]]
-  (sql/insert! (or db @db)
+(defn tag-post [blogid tagid]
+  (sql/insert! @db 
     :tag_map
-    {:blogid blogid :tag tag}))
+    {:blogid blogid :tagid tagid}))
+
+(defn untag-post [blogid tagid]
+  (sql/delete! @db 
+    :tag_map
+    (where {:blogid blogid :tagid tagid})))
+
+(defn admin-tags []
+  (sql/query @db ["select * from tag order by name asc"])
+  #_(map :name ))
 
 (defn tags []
-  (map :name (sql/query @db ["select * from tag"])))
+  (sql/query @db ["select * from tag where id in (select distinct tagid from tag_map) order by name asc"])
+  #_(map :name ))
 
-(defn add-tag [tag-name & [db]]
-  (sql/insert! (or db @db)
-    :tag {:name (.toLowerCase tag-name)}))
+(defn add-tag [tag_name tag_slug]
+  ; TODO insert slug value here also - need regex to strip out non-slug chars
+  (sql/insert! @db 
+    :tag {:name tag_name :slug tag_slug}))
 
-(defn delete-tags [tags]
-  (doseq [tag tags] 
-    (sql/delete! @db :tag_map (where {:tag tag}))
-    (sql/delete! @db :tag (where {:name tag}))))
+(defn update-tag [id tag_name tag_slug]
+  (sql/update! @db :tag {:name tag_name :slug tag_slug}
+               ["id = ?" (Integer/parseInt id)]))
+
+(defn delete-tag [tagid]
+  (let [int_tagid (Integer/parseInt tagid)
+        tagged_posts (count
+                      (sql/query @db
+                                 ["select count(*) from tag_map where tagid = ?" int_tagid]))]
+    (if (> tagged_posts 0) (sql/delete! @db :tag_map (where {:tagid int_tagid})))
+    (sql/delete! @db :tag (where {:id int_tagid}))))
 
 (defn posts-by-tag [tag-name]
   (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?" 
                   tag-name]))
 
+(defn posts-by-tag-slug [slug]
+  (sql/query @db ["select blog.id id, time, title, public from blog, tag_map, tag where blog.id = blogid and tagid = tag.id and tag.slug=?" slug]))
+
+(defn tag-by-slug [slug]
+  (first (sql/query @db ["select name from tag where slug = ?" slug])))
+
+(defn get-tag [id]
+  (first (sql/query @db ["select * from tag where id = ?" id])))
+
+(defn tag-ids-by-post [postid]
+  (mapcat vals (sql/query @db ["select tagid from tag_map where blogid = ?" postid])))
+
 (defn tags-by-post [postid]
-  (mapcat vals (sql/query @db ["select tag from tag_map where blogid=?" postid])))
+  (sql/query @db ["select id, name, slug from tag t, tag_map tm where t.id = tm.tagid and blogid=?" postid])
+  #_(mapcat vals ))
 
 (defn update-tags [blogid blog-tags]    
   (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)
@@ -145,13 +219,3 @@
         (doseq [tag blog-tags]
           (if-not (some #{tag} current-tags) (add-tag tag t-con))
           (tag-post id tag t-con)))))
-
-;;admin user
-(defn set-admin [admin]
-  (sql/insert! @db :admin admin))
-
-(defn update-admin [admin]
-  (sql/update! @db :admin admin ["handle=?" (:handle admin)]))
-
-(defn get-admin []  
-  (first (sql/query @db ["select * from admin"])))

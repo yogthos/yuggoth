@@ -17,32 +17,23 @@
 (defn tag-list []
   [:p.taglist
    (for [tag (db/tags)]
-     [:div.tag (link-to (str "/tag/" tag) [:span.tagon tag])])])
+     [:div.tag (link-to (str "/tag/" (:slug tag)) [:span.tagon (:name tag)])])])
 
 (defn menu []
   [:div.menu 
    (into
-     (if (session/get :admin) 
-       [:ul.menu-items          
-        [:li (link-to "/logout" (text :logout))]
-        [:li (link-to "/profile" (text :profile))]
-        [:li (link-to "/upload" (text :upload))]
-        [:li#latest (link-to "/latest-comments" (text :latest-comments-title))]
-        [:li#new-post (link-to "/make-post" (text :new-post))]]
-       [:ul.menu-items])     
-     [[:li#rss (link-to "/rss" [:div#rss "rss"] #_(image "/img/rss.jpg"))]      
-      [:li#about (link-to "/about" (text :about-title))]      
+     [:ul.nav
+      [:li#home (link-to "/" (text :home-title))]
       [:li#archives (link-to "/archives" (text :archives-title))]
-      [:li#home (link-to "/" (text :home-title))]])])
+      [:li#about (link-to "/p/about" (text :about-title))]
+      [:li#rss (link-to "/rss" [:div#rss "RSS"] #_(image "/img/rss.jpg"))]]
+     (if (session/get :admin) 
+       [[:li (link-to "/admin" "Admin")]
+        [:li (link-to "/logout" (text :logout))]]))])
 
 (defn sidebar [title]
-  (if (or (= (text :new-post) title) (= (text :edit-post) title))    
-    [:div.sidebar-preview
-     [:h2 [:span.render-preview (text :preview-title)]]
-     [:div#post-preview]]
-    
-    [:div.sidebar
-     [:h2 (text :recent-posts-title)]     
+  [:span
+     [:h3 (text :recent-posts-title)]     
      (conj
        [:ul
         (for [{:keys [id time title]} (reverse (sort-by :time (db/get-posts 5)))]
@@ -51,51 +42,60 @@
                     title
                     [:div.date (util/format-time time)])])]
        [:li (link-to "/archives" (text :more))])
-     (tag-list)]))
+     (tag-list)])
 
 (defn footer []
-  [:div.footer
-   [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR)) 
-    (:handle (db/get-admin)) 
-    (when (not (session/get :admin)) [:span " (" (link-to "/login" (text :login)) ")"]) 
-    (text :powered-by)
-    (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
+  (let [adm (db/get-admin)]
+    [:div.footer
+     [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " ") 
+      (if-not (and (nil? adm)
+                   (nil? (:handle adm)))
+        (clojure.string/capitalize (:handle (db/get-admin))))
+      (when-not (session/get :admin) [:span " (" (link-to "/login" (text :login)) ")"]) 
+      (text :powered-by)
+      (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]]))
 
 (defn common [title & content]  
   (let [html-title (if (string? title) title (:title title))
-        title-elements (when (map? title) (:elements title))]            
+        title-elements (when (map? title) (:elements title))
+        site-title (:title (db/get-admin))]
     (html5
       [:head
-       [:link {:rel "alternate" :type "application/rss+xml" :title (:title (db/get-admin)) :href "/rss"}]       
-       [:title html-title]
-       (include-css (util/get-css)
-                    "/css/jquery.alerts.css"
-                    "/css/shCoreYuggoth.css")
-       [:script {:type "text/javascript"} (str "var context=\"" (:context *request*) "\";")]]      
+       [:meta {:charset "utf-8"}]
+       [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1"}]
+       [:meta {:name "viewport"
+               :content "width=device-width, initial-scale=1, maximum-scale=1"}]
+       [:link {:rel "alternate" :type "application/rss+xml" :title site-title :href "/rss"}]
+       [:title site-title]
+       (include-css "/bootstrap/css/bootstrap.min.css")
+       (include-css "/bootstrap/css/bootstrap-responsive.min.css")
+       (include-js "/js/jquery.min.js")
+       (include-js  "/bootstrap/js/bootstrap.js")]
       [:body              
        (hidden-field "selected" 
                      (cond
-                       (.startsWith html-title (text :archives-title))        
-                       "#archives"
-                       (.startsWith html-title (text :latest-comments-title)) 
-                       "#latest"
-                       (.startsWith html-title (text :login-title))
-                       "#login"
-                       (.startsWith html-title (text :about-title))
-                       "#about"
-                       (.startsWith html-title (text :new-post))
-                       "#new-post"
-                       
-                       :else "#home"))
-       [:div.container
-        (header)
-        (menu)
-        [:div.contents 
-         [:div.post
-          [:div.entry-title [:h2 html-title title-elements]]
-          [:div.entry-content content]]
-         (sidebar html-title)]          
-        (footer)]
+                      (.startsWith html-title (text :archives-title))        
+                      "#archives"
+                      (.startsWith html-title (text :latest-comments-title)) 
+                      "#latest"
+                      (.startsWith html-title (text :login-title))
+                      "#login"
+                      (.startsWith html-title (text :about-title))
+                      "#about"
+                      (.startsWith html-title (text :new-post))
+                      "#new-post"
+                      :else "#home"))
+       [:div {:class "navbar offset1 span12"}
+        [:div.navbar-inner
+         [:a.brand {:href "/"} site-title]
+         (menu)]
+        [:div#content {:class "container span12"}
+         [:div.row-fluid
+          [:div.span9
+           [:div {:class title} [:h3 html-title title-elements]]
+           content]
+          [:div.span3 (sidebar html-title)]]
+         [:div {:style "text-align: center;"} (footer)]]]
        
        (include-js "/js/markdown.js"
                    "/js/shCore.js"
@@ -110,3 +110,40 @@
        [:script {:type "text/javascript", :src "//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"}]
        (include-js "/js/jquery.alerts.js"
                    "/js/site.js")])))
+
+(defn admin
+  ([title content] (admin title nil content))
+  ([title link content]  
+     (let [html-title (if (string? title) title (:title title))
+           title-elements (when (map? title) (:elements title))
+           site-title (:title (db/get-admin))]
+       (html5
+        [:head
+         [:meta {:charset "utf-8"}]
+         [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1"}]
+         [:meta {:name "viewport"
+                 :content "width=device-width, initial-scale=1, maximum-scale=1"}]
+         [:title (str site-title " - " title)]
+         (include-css "/bootstrap/css/bootstrap.min.css")
+         (include-css "/bootstrap/css/bootstrap-responsive.min.css")
+         (include-js "/js/jquery.min.js")
+         (include-js  "/bootstrap/js/bootstrap.js")]
+        [:body
+         [:div {:class "navbar offset1 span12"}
+          [:div {:class "navbar-inner"}
+           [:a {:class "brand" :href "/admin"} site-title]
+           [:ul {:class "nav"}
+            [:li [:a {:href "/admin/posts"} "Posts"]]
+            [:li [:a {:href "/admin/pages"} "Pages"]]
+            [:li [:a {:href "/admin/tags"} "Tags"]]
+            [:li [:a {:href "/admin/comments"} "Comments"]]
+            [:li [:a {:href "/admin/cache/clear"} "Clear Cache"]]]]]
+         [:div {:id "header"}]
+         [:div {:id "content" :class "container offset1 span12"}
+          [:row
+           [:legend html-title]
+           (if-not (nil? link) [:div {:align "right"} (link-to (:link link) (:text link))])]
+          content]
+                                        ;(if (not (nil? init_script)) [:script init_script])
+         ])))
+  )
