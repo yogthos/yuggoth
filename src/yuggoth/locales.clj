@@ -106,6 +106,8 @@
     :edit-page "Edit Page"
     :new-tag "Create Tag"
     :edit-tag "Edit Tag"
+    :blog-settings "Blog Settings"
+    :admin-user-name "Admin User Name"
     }
    :es 
    {:about-title "Sobre Nos"
@@ -212,5 +214,7 @@
     :edit-page "Edit Page"
     :new-tag "Create Tag"
     :edit-tag "Edit Tag"
+    :blog-settings "Blog Settings"
+    :admin-user-name "Admin User Name"
     }})
 

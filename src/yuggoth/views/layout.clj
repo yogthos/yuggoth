@@ -45,12 +45,15 @@
      (tag-list)])
 
 (defn footer []
-  [:div.footer
-   [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " ") 
-    (clojure.string/capitalize (:handle (db/get-admin))) 
-    (when-not (session/get :admin) [:span " (" (link-to "/login" (text :login)) ")"]) 
-    (text :powered-by)
-    (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
+  (let [adm (db/get-admin)]
+    [:div.footer
+     [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " ") 
+      (if-not (and (nil? adm)
+                   (nil? (:handle adm)))
+        (clojure.string/capitalize (:handle (db/get-admin))))
+      (when-not (session/get :admin) [:span " (" (link-to "/login" (text :login)) ")"]) 
+      (text :powered-by)
+      (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]]))
 
 (defn common [title & content]  
   (let [html-title (if (string? title) title (:title title))
