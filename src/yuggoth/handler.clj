@@ -2,6 +2,8 @@
   (:use yuggoth.routes.auth
         yuggoth.routes.archives
         yuggoth.routes.blog
+        yuggoth.routes.page
+        yuggoth.routes.admin
         yuggoth.routes.comments
         yuggoth.routes.upload
         yuggoth.routes.profile
@@ -66,7 +68,9 @@
             upload-routes
             profile-routes
             rss-routes
-            blog-routes                 
+            blog-routes
+            page-routes
+            admin-routes
             app-routes] 
            :middleware [wrap-exceptions
                         wrap-ssl-if-selected]
