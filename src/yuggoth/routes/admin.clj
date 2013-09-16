@@ -7,6 +7,7 @@
         hiccup.util 
         yuggoth.config)
   (:require [clojure.set :as set]
+            [clojure.string :as s]
             [markdown.core :as markdown] 
             [yuggoth.views.layout :as layout]
             [yuggoth.util :as util]
@@ -20,6 +21,7 @@
 (defn admin-list-posts
   "Posts listing in table with links to delete, edit"
   []
+  ; TODO - implement delete operation on posts
   (let [posts (into [] (db/admin-get-posts))]
     (layout/admin "Blog Posts" {:link "/admin/post/new" :text (text :new-post)}
      [:table {:class "table table-striped"}
@@ -38,11 +40,12 @@
          [:td (:time post)]
          [:td (:public post)]
          [:td (clojure.string/capitalize (:author post))]
-         [:td (link-to (str "/admin/post/edit/" (:id post)) "Edit")"&nbsp;"(link-to (str "/admin/post/delete/" (:id post)) "Delete")]])])))
+         [:td (link-to (str "/admin/post/edit/" (:id post)) "Edit")"&nbsp;"#_(link-to (str "/admin/post/delete/" (:id post)) "Delete")]])])))
 
 (defn admin-list-pages
   "Pages listing in table with links to delete, edit"
   []
+  ; TODO - Implement delete operation on pages
   (let [pages (into [] (db/admin-get-pages))]
     (layout/admin "Pages" {:link "/admin/page/new" :text "New Page"}
      [:table {:class "table table-striped"}
@@ -63,8 +66,15 @@
          [:td (clojure.string/capitalize (:author page))]
          [:td
           (link-to (str "/admin/page/edit/" (:id page)) "Edit")"&nbsp;"
-          (link-to (str "/admin/page/delete/" (:id page)) "Delete")]
+          #_(link-to (str "/admin/page/delete/" (:id page)) "Delete")]
          ])])))
+
+(defn- tag-delete-form
+  [tagid]
+  (form-to [:post "/admin/tag/delete"]
+           (hidden-field "tagid" tagid)
+           (submit-button {:class "btn btn-mini"} (s/capitalize (text :delete))))
+  )
 
 (defn admin-list-tags
   "Tagslisting in table with links to delete, edit"
@@ -77,13 +87,16 @@
         [:th (clojure.string/capitalize (text :id-header))]
         [:th (clojure.string/capitalize (text :name))]
         [:th (clojure.string/capitalize (text :slug-header))]
-        [:th (clojure.string/capitalize (text :actions-header))]]]
+        [:th {:colspan 2} (clojure.string/capitalize (text :actions-header))]]]
       (for [tag tags]
-        [:tr
+        [:tr 
          [:td (:id tag)]
          [:td (:name tag)]
          [:td (:slug tag)]
-         [:td (link-to (str "/admin/tag/edit/" (:id tag)) "Edit")"&nbsp;"(link-to (str "/admin/tag/delete/" (:id tag)) "Delete")]])])))
+         [:td {:width "40px"}
+          (link-to {:class "btn btn-mini"}
+                   (str "/admin/tag/edit/" (:id tag)) (s/capitalize (text :edit)))]
+         [:td (tag-delete-form (:id tag))]])])))
 
 (defn markdown-help-block
   []
@@ -248,11 +261,11 @@
           (form-to {:class "form-horizontal"}
                    [:post "/admin/tag/save"]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "name" (text :name))
+                    (label {:class "control-label"} "name" (s/capitalize (text :name)))
                     [:div {:class "controls"}
                      (text-field {:tabindex 1 :class "input-xxlarge"} "name" name)]]
                    [:div {:class "control-group"}
-                    (label {:class "control-label"} "slug" (text :slug-header))
+                    (label {:class "control-label"} "slug" (s/capitalize (text :slug-header)))
                     [:div {:class "controls"}
                      (text-field {:tabindex 2 :class "input-xxlarge" :rows 5}
                                 "slug" slug)]]
@@ -292,6 +305,11 @@
     (db/update-tag tagid name slug))
   (resp/redirect "/admin/tags"))
 
+(defn admin-delete-tag
+  [tagid]
+  (db/delete-tag tagid)
+  (resp/redirect "/admin/tags"))
+
 (defn admin-clear-cache
   []
   (cache/clear!)
@@ -314,4 +332,5 @@
   (POST "/admin/post/save" [postid title tease content public pubtime
                             page slug :as {p :params}]
         (restricted (admin-save-post postid title tease content public pubtime page slug p)))
-  (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug))))
+  (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug)))
+  (POST "/admin/tag/delete" [tagid] (restricted (admin-delete-tag tagid))))
