@@ -1,15 +1,29 @@
 (ns yuggoth.views.layout
-  (:use yuggoth.config   
+  (:use yuggoth.config
         noir.request
-        hiccup.element 
-        hiccup.form 
-        hiccup.util                        
+        hiccup.element
+        hiccup.form
+        hiccup.util
         [hiccup.page :only [include-css include-js html5]])
   (:require [yuggoth.util :as util]
             [noir.validation :as vali]
             [yuggoth.models.db :as db]
-            [noir.session :as session])
-  (:import java.util.Calendar))
+            [noir.session :as session]
+            [selmer.parser :as parser]
+            [ring.util.response :refer [response]])
+  (:import java.util.Calendar compojure.response.Renderable))
+
+(def template-path "yuggoth/views/templates/")
+
+(deftype RenderableTemplate [template params]
+  Renderable
+  (render [this request]
+    (->> (assoc params :servlet-context (:context request))
+         (parser/render-file (str template-path template))
+         response)))
+
+(defn render [template & [params]]
+  (RenderableTemplate. template params))
 
 (defn header []
   [:div.header [:h1 [:div.site-title (:title (db/get-admin))]]])

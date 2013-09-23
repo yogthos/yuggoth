@@ -7,17 +7,18 @@
         yuggoth.routes.comments
         yuggoth.routes.upload
         yuggoth.routes.profile
-        yuggoth.routes.rss        
-        compojure.core)  
+        yuggoth.routes.rss
+        compojure.core)
   (:require [yuggoth.config :as config]
             [yuggoth.views.layout :as layout]
             [noir.util.middleware :as middleware]
+            [selmer.parser :as parser]
             [noir.response :as resp]
             [noir.session :as session]
             [noir.util.cache :as cache]
             [compojure.route :as route]))
 
-(defroutes app-routes    
+(defroutes app-routes
   (route/resources "/")
   (route/not-found "Not Found"))
 
@@ -27,6 +28,11 @@
    an app server such as Tomcat
    put any initialization code here"
   []
+  ;;add custom tags
+  (parser/add-tag! :label
+  (fn [[label-id] _]
+    (config/text (keyword label-id))))
+  
   (config/init)
   (cache/set-size! 5)
   (println "yuggoth started successfully..."))

@@ -3,7 +3,7 @@
   (:require [yuggoth.locales :as locales]
             [yuggoth.models.schema :as schema]
             [yuggoth.util :as util] 
-            [yuggoth.views.layout :as layout]                       
+            [yuggoth.views.layout :as layout]
             [noir.util.crypt :as crypt]
             [noir.util.cache :as cache]
             [noir.session :as session]
@@ -11,96 +11,79 @@
             [yuggoth.models.db :as db]
             [clojure.string :as s]))
 
-(defn create-admin-form [{:keys [title handle pass pass1 email]}]
-  (form-to [:post "/create-admin"]
-           #_(text-field {:placeholder (text :blog-title)} "title" title)             
-           (util/make-form "title" (s/capitalize (text :blog-title)) title
-                           "handle" (s/capitalize (text :admin-user-name)) handle 
-                           "pass"  (s/capitalize (text :password)) pass
-                           "pass1" (s/capitalize (text :confirm-password)) pass1
-                           "email" (s/capitalize (text :email)) email)
-           (submit-button {:class "btn"} (s/capitalize (text :create)))))
+(defn initialized? []
+  (:initialized @blog-config))
 
-(defn login 
+(defn initialized-with-admin? []
+  (and (:initialized @blog-config) (db/get-admin)))
+
+(defn create-admin-page [admin]
+  (layout/render "create-admin.html" admin))
+
+(defn login
   ([params]
-     (layout/common
-      (if (db/get-admin)
-        (s/capitalize (text :login-title))
-        (s/capitalize (text :blog-settings)))
-      [:div.error (:error params)]
-      (if (db/get-admin)
-        (form-to 
-         [:post "/login"]           
-         (text-field {:placeholder (s/capitalize (text :user)) :tabindex 1} "handle")
-         (password-field {:placeholder (s/capitalize (text :password)) :tabindex 2} "pass")
-                 [:span.submit {:tabindex 3} (text :login)])
-        (create-admin-form params))))
-  
-  ([handle pass]     
-    (if-let [admin (db/get-admin)]       
-      (if (and (= handle (:handle admin)) 
-               (crypt/compare pass (:pass admin))) 
+    (if (initialized-with-admin?)
+      (layout/render "login.html")
+      (resp/redirect "/setup-blog")))
+
+  ([handle pass]
+    (if-let [admin (db/get-admin)]
+      (if (and (= handle (:handle admin))
+               (crypt/compare pass (:pass admin)))
         (do (cache/invalidate! :home)
-            (session/put! :admin admin))))  
+            (session/put! :admin admin))))
     (resp/redirect "/")))
 
-(defn check-admin-fields [admin]
+(defn check-admin-fields [{:keys [title handle pass pass1] :as params}]
   (cond
-    (not= (:pass admin) (:pass1 admin)) (text :pass-mismatch)
-    (empty? (:handle admin)) (text :admin-required)
-    (empty? (:title admin)) (text :blog-title-required)
+    (not= pass pass1) (text :pass-mismatch)
+    (empty? handle) (text :admin-required)
+    (empty? title) (text :blog-title-required)
     :else nil))
 
-(defn create-admin [admin]   
-  (if (db/get-admin) 
+(defn create-admin [admin]
+  (if (db/get-admin)
     (resp/redirect "/")
-    (if-let [error (check-admin-fields admin)] 
-      (login (assoc admin :error error))
-      (do        
-        (-> admin (dissoc :pass1) (update-in [:pass] crypt/encrypt) (db/set-admin))        
+    (if-let [error (check-admin-fields admin)]
+      (create-admin-page (assoc admin :error error))
+      (do
+        (-> admin (dissoc :pass1) (update-in [:pass] crypt/encrypt) (db/set-admin))
         (resp/redirect "/login")))))
 
-(defn setup-blog [{:keys [host port schema user pass ssl ssl-port error]}]
-  (if (:initialized @blog-config)
+(defn setup-blog-page [params]
+  (cond
+    (initialized-with-admin?)
     (resp/redirect "/")
-    (html
-      [:body 
-       [:h2 "Initial Configuration"]
-       (if error [:h2.error error])
-       (form-to [:post "/setup-blog"]
-                (util/make-form "host" (text :host) host
-                                "port" (text :port) (or port 5432)
-                                "schema" (text :schema) schema
-                                "user"   (text :user) user
-                                "pass"   (text :password) pass                              
-                                "ssl-port" (text :ssl-port) (or ssl-port 443))
-                "locale " (drop-down "locale" (map name (keys locales/dict)) "en")
-                [:br]
-                (label "ssl" (text :ssl?)) (check-box "ssl" false)
-                [:br]
-                (submit-button (text :initialize)))])))
+    (initialized?)
+    (resp/redirect "/create-admin")
+    :else
+    (layout/render "blog-config.html"
+                   (-> params
+                       (update-in [:port] #(or % 5432))
+                       (update-in [:ssl-port] #(or % 443))))))
 
-(defn handle-setup-blog [config]  
+(defn handle-setup-blog [config]
   (if (:initialized @blog-config)
     (resp/redirect "/")
     (try 
       (save (-> config
-                      (assoc :initialized true)
-                      (update-in [:locale] keyword)
-                      (update-in [:port] #(Integer/parseInt %))
-                      (update-in [:ssl] #(Boolean/parseBoolean %))
-                      (update-in [:ssl-port] #(Integer/parseInt %))))
-      (schema/reset-blog @db)      
-      (resp/redirect "/login")
+                (assoc :initialized true)
+                (update-in [:locale] keyword)
+                (update-in [:port] #(Integer/parseInt %))
+                (update-in [:ssl] #(Boolean/parseBoolean %))
+                (update-in [:ssl-port] #(Integer/parseInt %))))
+      (schema/reset-blog @db)
+      (resp/redirect "/create-admin")
       (catch Exception ex
-        (setup-blog (assoc config :error (.getMessage ex)))))))
+        (setup-blog-page (assoc config :error (.getMessage ex)))))))
 
-(defroutes auth-routes  
-  (POST "/create-admin" {admin :params}  (create-admin admin))
-  (GET "/setup-blog"    {params :params} (setup-blog params))
-  (POST "/setup-blog"   {config :params} (handle-setup-blog config))
+(defroutes auth-routes
+  (GET "/create-admin"  {params :params}  (create-admin-page params))
+  (POST "/create-admin" {params :params}  (create-admin params))
+  (GET "/setup-blog"    {params :params} (setup-blog-page params))
+  (POST "/setup-blog"   {params :params} (handle-setup-blog params))
   (GET "/login"         {params :params} (login params))
-  (POST "/login"        [handle pass]    (login handle pass))  
+  (POST "/login"        [handle pass]    (login handle pass))
   (GET "/logout" []
        (session/clear!)
        (cache/invalidate! :home)
