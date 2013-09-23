@@ -276,6 +276,10 @@ tr.padded td {
 	padding-bottom: 10px;
 }
 
+.padded-table td {
+	padding-right: 10px;
+}
+
 textarea#comment {
 	background-color: #EEEEEE; 
 	width: 600px;

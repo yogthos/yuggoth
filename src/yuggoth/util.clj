@@ -1,6 +1,7 @@
 (ns yuggoth.util
-  (:use hiccup.form hiccup.util clavatar.core [clojure.java.io :only [as-url]])
+  (:use hiccup.form hiccup.util)
   (:require [noir.response :as resp]
+            [clojure.java.io :refer [as-url]]
             [noir.session :as session]
             [yuggoth.models.db :as db]
             [noir.io :as io]
@@ -48,12 +49,6 @@
   (->> 
     (io/slurp-resource "md" filename)      
     (md/md-to-html-string)))
-
-(defn gravatar-url [email]
-  (let [url (gravatar email :default :404)] 
-    (try (javax.imageio.ImageIO/read (as-url url))
-      url
-      (catch Exception ex nil))))
 
 (defn gen-captcha-text []
   (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))
