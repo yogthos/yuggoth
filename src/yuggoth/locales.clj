@@ -22,7 +22,7 @@
     :host "host"
     :port "port"
     :schema "schema"
-    :ssl-port "ssl port"
+    :ssl-port "SSL port"
     :ssl? "enable SSL"
     :initialize "initialize"
     
