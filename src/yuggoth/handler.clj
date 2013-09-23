@@ -30,8 +30,13 @@
   []
   ;;add custom tags
   (parser/add-tag! :label
-  (fn [[label-id] _]
-    (config/text (keyword label-id))))
+    (fn [[label-id] _]
+      (config/text (keyword label-id))))
+  
+  (parser/add-tag! :clabel
+    (fn [[label-id] _]
+      (clojure.string/capitalize
+        (config/text (keyword label-id)))))
   
   (config/init)
   (cache/set-size! 5)
