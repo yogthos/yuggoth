@@ -28,6 +28,11 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net
 * toggle post visibility
 * localization
 
+**Important**: 
+
+The blog is currently under conversion to Selemer and the master branch is likely not working.
+The latest stable tag is available [here](https://github.com/yogthos/yuggoth/tree/0.5.0-stable).
+
 ## Usage
 
 The blog requires an instance of postgreSQL. On the first run the blog will guide you through setting up
