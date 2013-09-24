@@ -14,7 +14,7 @@
     :blog-title "Blog title"
     :preview-title "Preview (click to redraw)"
     :recent-posts-title "Recent posts"
-    
+    :rss "RSS"
     :pass-mismatch "entered passwords do not match"
     :admin-required "administrator name is required"
     :blog-title-required "blog title is required"
@@ -122,6 +122,7 @@
     :blog-title "Título del Blog"
     :preview-title "Vista previa (click para actualizar)"
     :recent-posts-title "Entradas recientes"
+    :rss "RSS"
     
     :pass-mismatch "las contraseñas ingresadas no son iguales"
     :admin-required "se requiere el nombre del administrador"
