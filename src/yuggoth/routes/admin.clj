@@ -294,7 +294,7 @@
         (doseq [new_tag new_tags]
           (db/tag-post (Integer/parseInt postid) new_tag))
         (cache/invalidate! (str postid))))
-    (resp/redirect "/admin/posts"))
+    (resp/redirect "/admin/post/list"))
   )
 
 (defn admin-save-tag
@@ -303,34 +303,40 @@
   (if (= tagid "new")
     (db/add-tag name slug)
     (db/update-tag tagid name slug))
-  (resp/redirect "/admin/tags"))
+  (resp/redirect "/admin/tag/list"))
 
 (defn admin-delete-tag
   [tagid]
   (db/delete-tag tagid)
-  (resp/redirect "/admin/tags"))
+  (resp/redirect "/admin/tag/list"))
 
 (defn admin-clear-cache
   []
   (cache/clear!)
-  (resp/redirect "/admin/posts"))
+  (resp/redirect "/admin/post/list"))
 
 (defroutes admin-routes
   ; TODO - add route and fn for post delete
-  (GET "/admin" [] (resp/redirect "/admin/posts"))
-  (GET "/admin/posts" [] (restricted (admin-list-posts)))
-  (GET "/admin/post/new" [] (restricted (admin-edit-post :new false)))
-  (GET "/admin/post/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
-  (GET "/admin/pages" [] (restricted (admin-list-pages)))
-  (GET "/admin/page/new" [] (restricted (admin-edit-page :new false)))
-  (GET "/admin/page/edit/:pageid" [pageid] (restricted (admin-edit-page pageid false)))
+  (GET "/admin" [] (resp/redirect "/admin/post/list"))
   (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
-  ; TODO - add route and fn for tag delete
-  (GET "/admin/tags" [] (restricted (admin-list-tags)))
-  (GET "/admin/tag/new" [] (restricted (admin-edit-tag :new false)))
-  (GET "/admin/tag/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
-  (POST "/admin/post/save" [postid title tease content public pubtime
+  
+  (context "/admin/post"
+           (GET "/list" [] (restricted (admin-list-posts)))
+           (GET "/new" [] (restricted (admin-edit-post :new false)))
+           (GET "/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
+           (POST "/save" [postid title tease content public pubtime
                             page slug :as {p :params}]
-        (restricted (admin-save-post postid title tease content public pubtime page slug p)))
-  (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug)))
-  (POST "/admin/tag/delete" [tagid] (restricted (admin-delete-tag tagid))))
+        (restricted (admin-save-post postid title tease content public pubtime page slug p))))
+  (context "/admin/page"
+           (GET "/list" [] (restricted (admin-list-pages)))
+           (GET "/new" [] (restricted (admin-edit-page :new false)))
+           (GET "/edit/:pageid" [pageid] (restricted (admin-edit-page pageid false))))  
+
+  ; TODO - add route and fn for tag delete
+
+  (context "/admin/tag"
+           (GET "/list" [] (restricted (admin-list-tags)))
+           (GET "/new" [] (restricted (admin-edit-tag :new false)))
+           (GET "/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
+           (POST "/save" [tagid name slug] (restricted (admin-save-tag tagid name slug)))
+           (POST "/delete" [tagid] (restricted (admin-delete-tag tagid)))))
