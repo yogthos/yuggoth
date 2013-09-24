@@ -1,0 +1,40 @@
+{% extends "yuggoth/views/templates/base.html" %}
+{% block content %}
+<input id="selected" name="selected" type="hidden"
+	value="{{selected-page}}">
+<div class="container">
+	<div class="header">
+		<h1>
+			<div class="site-title">{{site-title}}</div>
+		</h1>
+	</div>
+	<div class="menu">
+		<ul class="menu-items">
+		   {% if admin %}
+			<li><a href="{{servlet-context}}/logout">{% label logout %}</a></li>
+			<li><a href="{{servlet-context}}/profile">{% label profile %}</a></li>
+			<li><a href="{{servlet-context}}/upload">{% label upload %}</a></li>
+			<li id="latest"><a href="{{servlet-context}}/latest-comments">{% label latest-comments-title %}</a></li>
+			<li id="new-post"><a href="{{servlet-context}}/make-post">{% label new-post %}</a></li>
+			{% endif %}
+			<li id="rss"><a href="{{servlet-context}}/rss"><div id="rss">{% label rss %}</div></a></li>
+			<li id="about"><a href="{{servlet-context}}/about">{% label about-title %}</a></li>
+			<li id="archives"><a href="{{servlet-context}}/archives">{% label archives-title %}</a></li>
+			<li id="home" class="selected"><a href="{{servlet-context}}/">{% label home-title %}</a></li>
+		</ul>
+	</div>
+	<div class="contents">
+	{% block page-content %}
+	{% endblock %}
+	</div>
+	<div class="footer">
+		<p>
+			{{footer}}
+			{% if not admin %}
+			<span> (<a href="{{servlet-context}}/login">{% label login %}</a>)</span>
+			{% endif %}
+			{% label powered-by %} <a href="http://github.com/yogthos/yuggoth">Yuggoth</a>
+		</p>
+	</div>
+</div>
+{% endblock %}

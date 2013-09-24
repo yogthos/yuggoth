@@ -43,8 +43,7 @@
 (defn list-files []
   (map :name (sql/query @db ["select name from file"])))
 
-(defn delete-file [name]  
-  (println name)
+(defn delete-file [name]
   (sql/delete! @db :file (where {:name name})))
 
 (defn get-file [name]

@@ -214,6 +214,9 @@ span {
 	padding: 20px;
 }
 
+#post-nav {
+	margin-bottom: 10px;
+}
 
 .entry-title {
     color: #555;

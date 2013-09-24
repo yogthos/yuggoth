@@ -1,0 +1,76 @@
+{% extends "yuggoth/views/templates/base-blog.html" %}
+{% block page-content %}
+<div class="post">
+	<div class="entry-title">
+		<h2>
+			{{post.title}}
+			{% if admin %}
+				{% if post.id %}
+				<div>
+					<div>
+						<form action="{{servlet-context}}/toggle-post" method="POST">
+							<input id="post-id" name="post-id" type="hidden" value="50">
+							<input id="public" name="public" type="hidden" value="true">
+							<span class="submit">hide</span>
+						</form>
+					</div>
+					<div>
+						<form action="{{servlet-context}}/update-post" method="POST">
+							<input id="post-id" name="post-id" type="hidden" value="50">
+							<span class="submit">edit</span>
+						</form>
+					</div>
+				</div>
+				{% endif %}
+			{% endif %}
+		</h2>
+	</div>
+	<div class="entry-content">
+	<p id="post-time">{{post.time|date:"dd MMM, yyyy"}}</p>
+	{{post.content|safe}}
+	<div id="post-nav">
+	{% if post.has-last %}
+		<div class="leftmost">
+	    	<a href="{{servlet-context}}/blog-previous/{{post.id}}">{% label previous %}</a>
+		</div>
+	{% endif %}
+	{% if post.has-next %}
+		<div class="rightmost">
+			<a href="{{servlet-context}}/blog-next/{{post.id}}">{% label next %}</a>
+		</div>
+	{% endif %}
+	</div>
+	{% if post.id %}
+	<div>
+		{% label tags %} &nbsp;
+		{% for tag in post.tags %}
+		<span class="tagon" id="tag-{{tag.id}}">{{tag.name}}</span>
+		{% endfor %}
+	</div>
+	
+	<div class="comments">
+	<hr/>
+	{% for comment in post.comments %}
+		<div class="comment">
+			<h4>{{comment.time|date:"dd MMM, yyyy"}} - {{comment.author}}</h4>
+			<div id="comment-content">
+			<p>{{comment.content|safe}}</p>
+			{% if admin %}
+			<form action="{{servlet-context}}/delete-comment" method="POST">
+				<input id="id" name="id" type="hidden" value="{{comment.id}}"/>
+				<input id="blogid" name="blogid" type="hidden" value="{{post.id}}"/>
+				<input class="delete" type="submit" value="{% label delete %}"/>
+			</form>
+			{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+	</div>
+		{% include "yuggoth/views/templates/comment-form.html" %}
+	{% endif %}
+	</div>
+</div>
+{% include "yuggoth/views/templates/recent-posts.html" %}
+{% endblock %}
+
+
