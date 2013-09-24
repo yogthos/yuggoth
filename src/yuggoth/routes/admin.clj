@@ -1,5 +1,5 @@
 (ns yuggoth.routes.admin
-  (:use compojure.core                 
+  (:use compojure.core
         noir.util.route
         hiccup.core
         hiccup.form 
@@ -320,21 +320,21 @@
   (GET "/admin" [] (resp/redirect "/admin/post/list"))
   (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
   
-  (context "/admin/post"
+  (context "/admin/post" []
            (GET "/list" [] (restricted (admin-list-posts)))
            (GET "/new" [] (restricted (admin-edit-post :new false)))
            (GET "/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
            (POST "/save" [postid title tease content public pubtime
                             page slug :as {p :params}]
-        (restricted (admin-save-post postid title tease content public pubtime page slug p))))
-  (context "/admin/page"
+                 (restricted (admin-save-post postid title tease content public pubtime page slug p))))
+  (context "/admin/page" []
            (GET "/list" [] (restricted (admin-list-pages)))
            (GET "/new" [] (restricted (admin-edit-page :new false)))
            (GET "/edit/:pageid" [pageid] (restricted (admin-edit-page pageid false))))  
 
   ; TODO - add route and fn for tag delete
 
-  (context "/admin/tag"
+  (context "/admin/tag" []
            (GET "/list" [] (restricted (admin-list-tags)))
            (GET "/new" [] (restricted (admin-edit-tag :new false)))
            (GET "/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
