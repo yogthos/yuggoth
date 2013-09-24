@@ -108,7 +108,7 @@
                   "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1") (Integer/parseInt postid)]))))
 
 
-(defn store-post [title tease content time public page slug]
+(defn store-post [title tease content pubtime public page slug]
   (let [author (:handle (get-admin))
         timeval (->> pubtime (timef/parse (timef/formatter "yyyy/MM/dd"))
                      timec/to-timestamp)]
