@@ -80,7 +80,7 @@
     :update-tags "update tags"
     
     :italics-help "*italics*"
-    :italics-example "italics"   
+    :italics-example "italics"
     :bold-help "**bold**"
     :bold-example "bold"
     :strikethrough-help "~~foo~~"

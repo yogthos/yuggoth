@@ -25,6 +25,52 @@
 (defn render [template & [params]]
   (RenderableTemplate. template params))
 
+(defn format-post [{:keys [id time title] :as post}]
+  (assoc post
+         :date (util/format-time time)
+         :url (util/format-title-url id title)))
+
+(defn posts-list []
+  (->> (db/get-posts 5)
+       (sort-by :time)
+       (reverse)
+       (map format-post)))
+
+(defn footer-text []
+  (let [adm (db/get-admin)]
+    (str
+      "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " "
+      (if-not (and (nil? adm) (nil? (:handle adm)))
+        (clojure.string/capitalize (:handle adm))))))
+
+(defn render-blog-page [title template & [params]]
+  (let [html-title (if (string? title) title (:title title))
+        title-elements (when (map? title) (:elements title))
+        site-title (:title (db/get-admin))]
+    (render template
+            (assoc params
+                   :admin (session/get :admin)
+                   :title html-title
+                   :site-title site-title
+                   :posts (posts-list)
+                   :tags (db/tags)
+                   :footer (footer-text)
+                   :selected-page
+                   (cond
+                     (.startsWith html-title (text :archives-title))
+                     "#archives"
+                     (.startsWith html-title (text :latest-comments-title))
+                     "#latest"
+                     (.startsWith html-title (text :login-title))
+                     "#login"
+                     (.startsWith html-title (text :about-title))
+                     "#about"
+                     (.startsWith html-title (text :new-post))
+                     "#new-post"
+                     :else "#home")))))
+
+
+;; TODO remove
 (defn header []
   [:div.header [:h1 [:div.site-title (:title (db/get-admin))]]])
 
@@ -64,7 +110,7 @@
      [:p (str "Copyright (C) 2012-" (.get (Calendar/getInstance) Calendar/YEAR) " ") 
       (if-not (and (nil? adm)
                    (nil? (:handle adm)))
-        (clojure.string/capitalize (:handle (db/get-admin))))
+        (clojure.string/capitalize (:handle adm)))
       (when-not (session/get :admin) [:span " (" (link-to "/login" (text :login)) ")"]) 
       (text :powered-by)
       (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]]))
