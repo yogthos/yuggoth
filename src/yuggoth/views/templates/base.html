@@ -5,16 +5,16 @@
 		<meta charset="utf-8">
 		<link href="{{servlet-context}}/rss" rel="alternate" type="application/rss+xml">
 		<title>{{title}}</title>
-		<link href="{{servlet-context}}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		<link href="{{servlet-context}}/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
-		<link href="{{servlet-context}}/css/jquery.alerts.css" rel="stylesheet" type="text/css" />
-		<link href="{{servlet-context}}/css/shCoreYuggoth.css" rel="stylesheet" type="text/css" />
-		<link href="{{servlet-context}}/css/screen.css" rel="stylesheet" type="text/css" />
+		{% style "/css/bootstrap.min.css" %}
+		{% style "/css/bootstrap-responsive.min.css" %}
+		{% style "/css/jquery.alerts.css" %}
+		{% style "/css/shCoreYuggoth.css" %}
+		{% style "/css/screen.css" %}
 		<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"/>
-		<script src="{{servlet-context}}/css/jquery.alerts.js" type="text/javascript"></script>
-		<script src="{{servlet-context}}/css/bootstrap.js" type="text/javascript"></script>
-		<script src="js/markdown.js" type="text/javascript"></script>
-		<script src="js/site.js" type="text/javascript"></script>
+		{% script "/js/jquery.alerts.js" %}
+		{% script "/js/bootstrap.js" %}
+		{% script "/js/markdown.js" %}
+		{% script "/js/site.js" %}
 	</head>
 	<body>
 	{% block content %}
