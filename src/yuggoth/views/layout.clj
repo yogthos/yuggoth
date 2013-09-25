@@ -18,7 +18,6 @@
 (deftype RenderableTemplate [template params]
   Renderable
   (render [this request]
-    (println request)
     (->> (assoc params :servlet-context (:context request))
          (parser/render-file (str template-path template))
          response)))
