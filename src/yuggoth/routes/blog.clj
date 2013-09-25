@@ -1,5 +1,5 @@
 (ns yuggoth.routes.blog
-  (:use compojure.core                 
+  (:use compojure.core
         noir.util.route
         hiccup.core
         hiccup.form
