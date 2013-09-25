@@ -23,7 +23,7 @@
          response)))
 
 (defn render [template & [params]]
-  (RenderableTemplate. template params))
+  (RenderableTemplate. template (assoc params :admin (session/get :admin))))
 
 (defn format-post [{:keys [id time title] :as post}]
   (assoc post
@@ -49,7 +49,6 @@
         site-title (:title (db/get-admin))]
     (render template
             (assoc params
-                   :admin (session/get :admin)
                    :title html-title
                    :site-title site-title
                    :posts (posts-list)

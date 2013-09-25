@@ -57,7 +57,7 @@
     :other "other"
     :new-post "Create Post"
     :edit-post "Edit Post"
-    :content "Body"    
+    :content "Body"
     :post "post"
     :title "Title"
     :title-required "post title is required"
@@ -108,6 +108,8 @@
     :edit-tag "Edit Tag"
     :blog-settings "Blog Settings"
     :admin-user-name "Admin User Name"
+    :example "example"
+    :syntax "syntax"
     }
    :es 
    {:about-title "Acerca de"
