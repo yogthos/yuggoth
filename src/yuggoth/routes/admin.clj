@@ -112,7 +112,8 @@
     "create-post.html"
     {:error error
      :post (if (= post-id :new)
-             {:title ""
+             {:id "new"
+              :title ""
               :tease ""
               :time (java.util.Date.)
               :content ""

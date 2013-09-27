@@ -1,0 +1,15 @@
+{% extends "yuggoth/views/templates/base-blog.html" %}
+{% block page-content %}
+<h2>{% clabel latest-comments-title %}</h2>
+<table>
+	<tbody>
+		{% for comment in comments %}
+		<tr class="padded">
+			<td>
+				<a href="{{servlet-context}}/blog/{{comment.blogid}}">{{comment.content}} - {{comment.author}}</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
