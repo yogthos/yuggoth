@@ -5,13 +5,13 @@
 
   :dependencies
   [[org.clojure/clojure "1.5.1"]
-   [lib-noir "0.6.9"]
+   [lib-noir "0.7.1"]
    [compojure "1.1.5"]
    [ring-server "0.3.0"]
    [clj-rss "0.1.3"]
-   [selmer "0.4.2"]
+   [selmer "0.4.3"]
    [com.taoensso/timbre "2.6.1"]
-   [markdown-clj "0.9.32"]
+   [markdown-clj "0.9.33"]
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.3.0-alpha4"]
    [postgresql/postgresql "9.1-901.jdbc4"]
