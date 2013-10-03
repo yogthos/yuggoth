@@ -201,27 +201,27 @@
                    (hidden-field "tagid" tag-id))]]]])))
 
 (defn admin-save-post
-  [postid title tease content public time page slug p]
+  [{:keys [postid title page tease content publish time page slug] :as p}]
   (let [tags             (filter #(= "tag-" (apply str (take 4 (name (first %))))) p)
         sel_tag_ids      (set (map #(Integer/parseInt (apply str (drop 4 (name (first %))))) tags))
-        published?       (if-not (nil? public) "true" "false")
-        [pubtime _clock] (if time (clojure.string/split time #" ") "")]
+        publish?         (= "publish" publish)
+        page?            (= "true" page)]
     (if (= postid "new")
-      (let [id (:id (db/store-post title tease content pubtime published? page slug))]
+      (let [id (:id (db/store-post title tease content publish? page slug))]
         (doseq [tag_id sel_tag_ids]
           (db/tag-post id tag_id)))
-      (let [existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
+      (let [postid (Integer/parseInt postid)
+            existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
             new_tags      (set/difference sel_tag_ids existing_tags)
             removed_tags  (set/difference existing_tags sel_tag_ids)]
         ;; Update post (blog) record and invalidate its cache entry
-        (db/update-post postid title tease content pubtime published? page slug)
+        (db/update-post postid title tease content publish? page slug)
         (doseq [removed_tag removed_tags]
-          (db/untag-post (Integer/parseInt postid) removed_tag))
+          (db/untag-post postid removed_tag))
         (doseq [new_tag new_tags]
-          (db/tag-post (Integer/parseInt postid) new_tag))
-        (cache/invalidate! (str postid))))
-    (resp/redirect "/admin/posts"))
-  )
+          (db/tag-post postid new_tag))
+        (cache/invalidate! postid)))
+    (resp/redirect "/admin/posts")))
 
 (defn admin-save-tag
   [tagid name slug]
@@ -257,9 +257,7 @@
   (GET "/admin/tags" [] (restricted (admin-list-tags)))
   (GET "/admin/tag/new" [] (restricted (admin-edit-tag :new false)))
   (GET "/admin/tag/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
-  (POST "/admin/post/save" [postid title tease content public pubtime
-                            page slug :as {p :params}]
-        (restricted (admin-save-post postid title tease content public pubtime page slug p)))
+  (POST "/admin/post/save" {params :params} (restricted (admin-save-post params)))
   (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug)))
   (POST "/admin/tag/delete" [tagid] (restricted (admin-delete-tag tagid))))
 

@@ -1,5 +1,5 @@
 {% extends "yuggoth/views/templates/base-blog.html" %}
-{% block page-content %}
+{% block main-content %}
 <div class="post">
 	<div class="entry-title">
 		<h2>
@@ -70,7 +70,8 @@
 	{% endif %}
 	</div>
 </div>
+{% endblock %}
+{% block sidebar-content %}
 {% include "yuggoth/views/templates/recent-posts.html" %}
 {% endblock %}
-
 
