@@ -51,16 +51,17 @@
 
 
 ;;blog posts
-(defn update-post [id title tease content pubtime public page slug]
-  (let [int-id (Integer/parseInt id)
-        timeval (->> pubtime (timef/parse (timef/formatter "yyyy/MM/dd"))
-                     timec/to-timestamp)]
-    (sql/update! @db
-      :blog
-      {:title title :tease tease :content content :time timeval
-       :page (Boolean/parseBoolean page) :slug slug
-       :public (Boolean/parseBoolean public)}
-      ["id=?" int-id])))
+(defn update-post [id title tease content publish? page? slug]
+  (sql/update!
+    @db
+    :blog
+    {:title title
+     :tease tease
+     :content content
+     :page page?
+     :slug slug
+     :public publish?}
+    ["id=?" id]))
 
 (defn admin-get-posts [& [limit offset]]
   (try
@@ -108,20 +109,18 @@
                   "select id from blog where id < ? and public='true' and page = 'false' order by id desc limit 1") (Integer/parseInt postid)]))))
 
 
-(defn store-post [title tease content pubtime public page slug]
-  (let [author (:handle (get-admin))
-        timeval (->> pubtime (timef/parse (timef/formatter "yyyy/MM/dd"))
-                     timec/to-timestamp)]
-    (first (sql/insert! @db
-                        :blog
-                        {:time (or timeval (new Timestamp (.getTime (new Date))))
-                         :title title
-                         :tease tease
-                         :content content
-                         :author author
-                         :slug slug
-                         :page (Boolean/parseBoolean page)
-                         :public (Boolean/parseBoolean public)}))))
+(defn store-post [title tease content publish? page slug]
+  (first (sql/insert!
+           @db
+           :blog
+           {:time (new Timestamp (.getTime (new Date)))
+            :title title
+            :tease tease
+            :content content
+            :author (:handle (get-admin))
+            :slug slug
+            :page (Boolean/parseBoolean page)
+            :public publish?})))
 
 (defn post-visible [id public]
   (sql/update! @db

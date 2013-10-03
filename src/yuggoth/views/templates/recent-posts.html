@@ -1,19 +1,17 @@
-<div class="sidebar">
-	<h2>{% label recent-posts-title %}</h2>
-	<ul>
-		{% for post in posts %}
-		<li>
-			<a href="{{servlet-context}}/blog/{{post.url}}">
-			{{post.title}} <div class="date">{{post.date}}</div>
-			</a>
-		</li>
-	</ul>
-	{% endfor %}
-	<p class="taglist">
-		{% for tag in tags %}
-		<a href="{{servlet-context}}/tag/{{tag.slug}}">
-		<span class="tagon">{{tag.name}}</span>
+<h2>{% label recent-posts-title %}</h2>
+<ul>
+	{% for post in posts %}
+	<li>
+		<a href="{{servlet-context}}/blog/{{post.url}}">
+		{{post.title}} <div class="date">{{post.date}}</div>
 		</a>
-		{% endfor %}
-	</p>
-</div>
+	</li>
+</ul>
+{% endfor %}
+<p class="taglist">
+	{% for tag in tags %}
+	<a href="{{servlet-context}}/tag/{{tag.slug}}">
+	<span class="tagon">{{tag.name}}</span>
+	</a>
+	{% endfor %}
+</p>

@@ -28,6 +28,7 @@
    an app server such as Tomcat
    put any initialization code here"
   []
+  (parser/cache-off!)
   ;;add custom tags
   (parser/add-tag! :label
     (fn [[label-id] _]
