@@ -1,0 +1,32 @@
+{% extends "yuggoth/views/templates/base-blog.html" %}
+{% block main-content %}
+<div class="post">
+	<div class="entry-title">
+		<h2>{% clabel upload-title %}</h2>
+	</div>
+	<div class="entry-content">
+		<h2 class="info"></h2>
+		<div>
+			<h3>{% clabel available-files %}</h3>
+			<ul>
+				{% for file in files %}
+				<li class="file-link"><a href="/files/{{file.name}}">{{file.name}}</a><span>
+				</span>
+				<div class="file">
+						<form action="/admin/delete-file/{{file.name}}" method="POST">
+							<input class="delete" type="submit" value="{% label delete %}">
+						</form>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<br>
+		<form action="/admin/upload" enctype="multipart/form-data" method="POST">
+			<label for="file">{% clabel file-to-upload %}</label>
+			<input id="file" name="file" type="file"><br>
+			<span class="submit">{% label upload %}</span>
+		</form>
+	</div>
+</div>
+{% endblock %}

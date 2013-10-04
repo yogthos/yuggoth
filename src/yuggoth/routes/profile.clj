@@ -14,11 +14,12 @@
             [noir.response :as resp]))
 
 (defn about []
-  (let [{:keys [about style handle email]} (db/get-admin)]   
-    (layout/common
-      (str "About " handle)            
-      (markdown/md-to-html-string (str about))
-      [:p [:b email]])))
+  (let [{:keys [about handle email]} (db/get-admin)]
+    (layout/render-blog-page
+      (str "About " handle)
+      "about.html"
+      {:about (markdown/md-to-html-string (str about))
+       :email email})))
 
 (defn profile [{:keys [title handle style email about pass pass1 pass2 info]}]
   (layout/common

@@ -1,0 +1,23 @@
+{% extends "yuggoth/views/templates/base-blog.html" %}
+{% block main-content %}
+<div class="post">
+	<div class="entry-title">
+		<h2>{{title}}</h2>
+	</div>
+	<div class="entry-content">	
+	{% for period in archives %}
+			<div>
+				{{period.0}}
+				<hr>
+				<ul>
+				{% for post in period.1 %}
+					<li class="archive">
+					<a class="archive" href="/blog/{{post.id}}">{{post.date|date:"dd MMM"}} - {{post.title}}</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+	{% endfor %}
+	</div>
+</div>
+{% endblock %}

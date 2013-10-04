@@ -18,7 +18,9 @@
 (deftype RenderableTemplate [template params]
   Renderable
   (render [this request]
-    (->> (assoc params :servlet-context (:context request))
+    (->> (assoc params
+                (keyword (clojure.string/replace template #".html" "-selected")) "active"
+                :servlet-context (:context request))
          (parser/render-file (str template-path template))
          response)))
 
@@ -44,29 +46,13 @@
         (clojure.string/capitalize (:handle adm))))))
 
 (defn render-blog-page [title template & [params]]
-  (let [html-title (if (string? title) title (:title title))
-        title-elements (when (map? title) (:elements title))
-        site-title (:title (db/get-admin))]
-    (render template
-            (assoc params
-                   :title html-title
-                   :site-title site-title
-                   :posts (posts-list)
-                   :tags (db/tags)
-                   :footer (footer-text)
-                   :selected-page
-                   (cond
-                     (.startsWith html-title (text :archives-title))
-                     "#archives"
-                     (.startsWith html-title (text :latest-comments-title))
-                     "#latest"
-                     (.startsWith html-title (text :login-title))
-                     "#login"
-                     (.startsWith html-title (text :about-title))
-                     "#about"
-                     (.startsWith html-title (text :new-post))
-                     "#new-post"
-                     :else "#home")))))
+  (render template
+          (assoc params
+                 :site-title (:title (db/get-admin))
+                 :title      title
+                 :posts      (posts-list)
+                 :tags       (db/tags)
+                 :footer     (footer-text))))
 
 
 ;; TODO remove
