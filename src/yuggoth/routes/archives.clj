@@ -16,8 +16,6 @@
     (sort-by #(util/parse-time (first %) "yyyy MMMM"))
     (reverse)))
 
-(archives-by-date (db/get-posts false false true))
-
 (defn archives []
   (layout/render-blog-page
     (text :archives-title)
