@@ -1,11 +1,10 @@
 (ns yuggoth.handler
-  (:use yuggoth.routes.auth
+  (:use yuggoth.routes.admin
+        yuggoth.routes.auth
         yuggoth.routes.archives
         yuggoth.routes.blog
         yuggoth.routes.page
-        yuggoth.routes.admin
         yuggoth.routes.comments
-        yuggoth.routes.upload
         yuggoth.routes.profile
         yuggoth.routes.rss
         compojure.core)
@@ -77,7 +76,6 @@
            [auth-routes
             archive-routes
             comments-routes
-            upload-routes
             profile-routes
             rss-routes
             blog-routes

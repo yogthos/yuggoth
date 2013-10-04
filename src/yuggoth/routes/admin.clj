@@ -3,17 +3,17 @@
         noir.util.route
         hiccup.core
         hiccup.form 
-        hiccup.element 
+        hiccup.element
         hiccup.util 
         yuggoth.config)
   (:require [clojure.set :as set]
             [clojure.string :as s]
             [markdown.core :as markdown] 
+            [noir.session :as session]
+            [noir.response :as resp]
+            [noir.util.cache :as cache]
             [yuggoth.views.layout :as layout]
             [yuggoth.util :as util]
-            [noir.session :as session]
-            [noir.response :as resp]   
-            [noir.util.cache :as cache]
             [yuggoth.models.db :as db]
             [yuggoth.routes.blog :as br]
             [yuggoth.routes.comments :as comments]))
@@ -241,23 +241,46 @@
   (cache/clear!)
   (resp/redirect "/admin/posts"))
 
+(defn upload-page [& [info]]
+  (layout/render "upload.html" {:info info}))
+
+(defn handle-upload [file]
+  (resp/redirect
+    (str "/admin/upload/"
+         (try
+           (db/store-file file)
+           (text :file-uploaded)
+           (catch Exception ex
+             (.printStackTrace ex)
+             (str (text :error-uploading) (.getMessage ex)))))))
 
 ;;turns out servlet-context gets hijacked by the context macro
-(defroutes admin-routes
+(def-restricted-routes admin-routes
   ; TODO - add route and fn for post delete
   (GET "/admin" [] (resp/redirect "/admin/posts"))
-  (GET "/admin/posts" [] (restricted (admin-list-posts)))
-  (GET "/admin/post/new" [] (restricted (admin-edit-post :new false)))
-  (GET "/admin/post/edit/:postid" [postid] (restricted (admin-edit-post postid false)))
-  (GET "/admin/pages" [] (restricted (admin-list-pages)))
-  (GET "/admin/page/new" [] (restricted (admin-edit-page :new false)))
-  (GET "/admin/page/edit/:pageid" [pageid] (restricted (admin-edit-page pageid false)))
-  (GET "/admin/cache/clear" [] (restricted (admin-clear-cache)))
+  (GET "/admin/posts" [] (admin-list-posts))
+  (GET "/admin/post/new" [] (admin-edit-post :new false))
+  (GET "/admin/post/edit/:postid" [postid] (admin-edit-post postid false))
+  (GET "/admin/pages" [] (admin-list-pages))
+  (GET "/admin/page/new" [] (admin-edit-page :new false))
+  (GET "/admin/page/edit/:pageid" [pageid] (admin-edit-page pageid false))
+  (GET "/admin/cache/clear" [] (admin-clear-cache))
   ; TODO - add route and fn for tag delete
-  (GET "/admin/tags" [] (restricted (admin-list-tags)))
-  (GET "/admin/tag/new" [] (restricted (admin-edit-tag :new false)))
-  (GET "/admin/tag/edit/:tagid" [tagid] (restricted (admin-edit-tag tagid false)))
-  (POST "/admin/post/save" {params :params} (restricted (admin-save-post params)))
-  (POST "/admin/tag/save" [tagid name slug] (restricted (admin-save-tag tagid name slug)))
-  (POST "/admin/tag/delete" [tagid] (restricted (admin-delete-tag tagid))))
+  (GET "/admin/tags" [] (admin-list-tags))
+  (GET "/admin/tag/new" [] (admin-edit-tag :new false))
+  (GET "/admin/tag/edit/:tagid" [tagid] (admin-edit-tag tagid false))
+  (POST "/admin/post/save" {params :params} (admin-save-post params))
+  (POST "/admin/tag/save" [tagid name slug] (admin-save-tag tagid name slug))
+  (POST "/admin/tag/delete" [tagid] (admin-delete-tag tagid))
+  (GET "/admin/upload"       [] (upload-page))
+  (GET "/admin/upload/:info" [info] (restricted (upload-page info)))
+  (POST "/admin/upload"      [file] (restricted (handle-upload file)))    
+  (GET "/files/:name"  [name]
+       (if-let [{:keys [name type data]} (db/get-file name)]
+         (resp/content-type type (new java.io.ByteArrayInputStream data))
+         (resp/status 404 "")))
+  (POST "/admin/delete-file/:name" [params]
+        (restricted
+          (do (db/delete-file (:name params))
+              (resp/redirect "/upload")))))
 

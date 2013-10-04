@@ -5,7 +5,7 @@
 		<div class="site-title">{{site-title}}</div>
          <div class="nav navbar-nav">
          	 <ul class="nav navbar-nav">
-         	 	<li class="{{home-selected}}">
+         	 	<li class="{{post-selected}}">
          	 		<a href="{{servlet-context}}/">{% label home-title %}</a>
          	 	</li>
          	 	<li class="{{archives-selected}}">
@@ -21,13 +21,13 @@
          	 {% if admin %}
          	 <ul class="nav navbar-nav navbar-right">
          	 	<li class="{{rss-selected}}">
-         	 		<a href="{{servlet-context}}/make-post">{% label new-post %}</a>
+         	 		<a href="{{servlet-context}}/admin/posts/new">{% label new-post %}</a>
          	 	</li>
-         	 	<li class="{{rss-selected}}">
+         	 	<li class="{{latest-comments-selected}}">
          	 		<a href="{{servlet-context}}/latest-comments">{% label latest-comments-title %}</a>
          	 	</li>
          	 	<li class="{{upload-selected}}">
-         	 		<a href="{{servlet-context}}/upload">{% label upload %}</a>
+         	 		<a href="{{servlet-context}}/admin/upload">{% label upload %}</a>
          	 	</li>
          	 	<li class="{{profile-selected}}">
          	 		<a href="{{servlet-context}}/profile">{% label profile %}</a>

@@ -1,0 +1,11 @@
+{% extends "yuggoth/views/templates/base-blog.html" %}
+{% block main-content %}
+<div class="post">
+	<div class="entry-title">
+		<h2>{{title}}</h2>
+	</div>
+	<div class="entry-content">	
+	{{about|safe}}
+	</div>
+</div>
+{% endblock %}
