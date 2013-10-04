@@ -108,7 +108,8 @@
 (defn admin-edit-post
   "Post edit form, used for creating and editing posts."
   [post-id error]
-  (layout/render
+  (layout/render-blog-page
+    (text (if (= post-id :new) :new-post :edit-post))
     "create-post.html"
     {:error error
      :post (if (= post-id :new)
@@ -206,22 +207,25 @@
         sel_tag_ids      (set (map #(Integer/parseInt (apply str (drop 4 (name (first %))))) tags))
         publish?         (= "publish" publish)
         page?            (= "true" page)]
-    (if (= postid "new")
-      (let [id (:id (db/store-post title tease content publish? page slug))]
-        (doseq [tag_id sel_tag_ids]
-          (db/tag-post id tag_id)))
-      (let [postid (Integer/parseInt postid)
-            existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
-            new_tags      (set/difference sel_tag_ids existing_tags)
-            removed_tags  (set/difference existing_tags sel_tag_ids)]
-        ;; Update post (blog) record and invalidate its cache entry
-        (db/update-post postid title tease content publish? page slug)
-        (doseq [removed_tag removed_tags]
-          (db/untag-post postid removed_tag))
-        (doseq [new_tag new_tags]
-          (db/tag-post postid new_tag))
-        (cache/invalidate! postid)))
-    (resp/redirect "/admin/posts")))
+    (try
+      (if (= postid "new")
+        (let [id (:id (db/store-post title tease content publish? page slug))]
+          (doseq [tag_id sel_tag_ids]
+            (db/tag-post id tag_id)))
+        (let [postid (Integer/parseInt postid)
+              existing_tags (set (db/tag-ids-by-post (Integer/parseInt postid)))
+              new_tags      (set/difference sel_tag_ids existing_tags)
+              removed_tags  (set/difference existing_tags sel_tag_ids)]
+          ;; Update post (blog) record and invalidate its cache entry
+          (db/update-post postid title tease content publish? page slug)
+          (doseq [removed_tag removed_tags]
+            (db/untag-post postid removed_tag))
+          (doseq [new_tag new_tags]
+            (db/tag-post postid new_tag))
+          (cache/invalidate! postid)))
+      (resp/redirect "/admin/posts")
+      (catch Exception ex
+        (admin-edit-post postid (.getMessage ex))))))
 
 (defn admin-save-tag
   [tagid name slug]

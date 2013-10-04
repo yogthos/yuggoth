@@ -1,6 +1,5 @@
 {% extends "yuggoth/views/templates/base-blog.html" %}
-{% block page-content %}
-<div class="container offset1 span12" id="content">
+{% block main-content %}
 	{% if error %}<div class="error">{{error}}</div>{% endif %}
 	<row>
 	<legend>
@@ -45,7 +44,6 @@
 							<div class="controls">
 								<input class="input-large" id="pubtime" name="pubtime" placeholder="yyyy/mm/dd" tabindex="5" type="text"
 								value="{{post.time|date:"dd MMM, yyyy"}}"/>
-								
 							</div>
 						</div>
 						<div class="control-group">
@@ -68,14 +66,12 @@
 						<input id="public" name="public" type="hidden" value="{{post.public}}"/>
 					</form>
 				</div>
-				<div align="center" class="span4">
-					<h5>{% label markdown-help %}</h5>
-					<hr>
-					{% include "yuggoth/views/templates/md-help.html" %}
-				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
+{% endblock %}
+{% block sidebar-content %}
+<h5>{% label markdown-help %}</h5>
+<hr>
+{% include "yuggoth/views/templates/md-help.html" %}
 {% endblock %}
