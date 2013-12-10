@@ -1,7 +1,6 @@
 (ns yuggoth.util
-  (:use hiccup.form hiccup.util)
+  (:use hiccup.form hiccup.util clavatar.core [clojure.java.io :only [as-url]])
   (:require [noir.response :as resp]
-            [clojure.java.io :refer [as-url]]
             [noir.session :as session]
             [yuggoth.models.db :as db]
             [noir.io :as io]
@@ -12,17 +11,17 @@
   (if title
     (let [sb (new StringBuffer)]
       (doseq [c (.toLowerCase title)]
-        (if (or (= (int c) 32) (and (> (int c) 96) (< (int c) 123))) 
-          (.append sb c)))      
+        (if (or (= (int c) 32) (and (> (int c) 96) (< (int c) 123)))
+          (.append sb c)))
       (str id "-" (url-encode (.toString sb))))))
 
 (defn make-form [& fields]
-  (reduce-kv 
+  (reduce-kv
     (fn [table i [id name value]]
       (conj table
-            [:tr 
-             [:td (label id name)] 
-             [:td ((if (.startsWith id "pass") password-field text-field) 
+            [:tr
+             [:td (label id name)]
+             [:td ((if (.startsWith id "pass") password-field text-field)
                     {:tabindex (inc i)} id value)]]))
     [:table]
     (vec (partition 3 fields))))
@@ -35,9 +34,9 @@
     (.format (new java.text.SimpleDateFormat fmt) time)))
 
 (defn parse-time [time-str time-format]
-  (.parse 
-    (new java.text.SimpleDateFormat 
-         (or time-format "yyyy-MM-dd HH:mm:ss.SSS")) 
+  (.parse
+    (new java.text.SimpleDateFormat
+         (or time-format "yyyy-MM-dd HH:mm:ss.SSS"))
     time-str))
 
 (defn get-css []
@@ -46,9 +45,15 @@
 (defn md->html
   "reads a markdown file from public/md and returns an HTML string"
   [filename]
-  (->> 
-    (io/slurp-resource "md" filename)      
+  (->>
+    (io/slurp-resource "md" filename)
     (md/md-to-html-string)))
+
+(defn gravatar-url [email]
+  (let [url (gravatar email :default :404)]
+    (try (javax.imageio.ImageIO/read (as-url url))
+      url
+      (catch Exception ex nil))))
 
 (defn gen-captcha-text []
   (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))

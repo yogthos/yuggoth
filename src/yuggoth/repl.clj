@@ -1,4 +1,4 @@
-(ns yuggoth.repl    
+(ns yuggoth.repl
   (:use yuggoth.handler
         ring.server.standalone
         [ring.middleware file-info file]))
@@ -6,7 +6,7 @@
 (defonce server (atom nil))
 
 (defn get-handler []
-  ;; #'app expands to (var app) so that when we reload our code, 
+  ;; #'app expands to (var app) so that when we reload our code,
   ;; the server is forced to re-resolve the symbol in the var
   ;; rather than having its own copy. When the root binding
   ;; changes, the server picks it up without having to restart.
@@ -21,8 +21,8 @@
   [& [port]]
   (let [port (if port (Integer/parseInt port) 8080)]
     (reset! server
-            (serve (get-handler) 
-                   {:port port 
+            (serve (get-handler)
+                   {:port port
                     :init init
                     :auto-reload? true
                     :join true

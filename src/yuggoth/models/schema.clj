@@ -1,4 +1,4 @@
-(ns yuggoth.models.schema  
+(ns yuggoth.models.schema
   (:require [clojure.java.jdbc :as sql]))
 
 ;;file table
@@ -10,51 +10,42 @@
     [:data "bytea"]))
 
 ;;blog table
-; DONE - Add columns for page? and slug to support "static" pages
 (defn create-blog-table []
   (sql/create-table
     :blog
     [:id "SERIAL"]
     [:time :timestamp]
     [:title "varchar(100)"]
-    [:tease "TEXT"]
     [:content "TEXT"]
     [:author "varchar(100)"]
-    [:slug "varchar(100)"]
-    [:public :boolean]
-    [:page :boolean]))
+    [:public :boolean]))
 
-;;comment table 
+;;comment table
 (defn create-comments-table []
   (sql/create-table
     :comment
     [:id "SERIAL"]
     [:blogid :int]
-    [:time :timestamp]    
+    [:time :timestamp]
     [:content "TEXT"]
-    [:approved :boolean]
     [:author "varchar(100)"]))
 
 ;;tag table
 (defn create-tag-table []
-  (do
-    (sql/create-table
-     :tag
-     [:id "SERIAL"]
-     [:name "varchar(50)"]
-     [:slug "varchar(50)"])
-    #_(create-index :tag_slug :tag [:slug] :unique)))
+  (sql/create-table
+    :tag
+    [:name "varchar(50)"]))
 
 (defn create-tag-map-table []
   (sql/create-table
     :tag_map
     [:blogid :int]
-    [:tagid :int]))
+    [:tag "varchar(50)"]))
 
 ;;admin table
 (defn create-admin-table []
   (sql/create-table
-    :admin   
+    :admin
     [:title "varchar(100)"]
     [:style "varchar(50)"]
     [:about "TEXT"]
@@ -70,8 +61,8 @@ eg: (drop-table :users)"
    (sql/drop-table table)
    (catch Exception _)))
 
-(defn reset-blog [db]  
-  (sql/with-connection 
+(defn reset-blog [db]
+  (sql/with-connection
     db
     (drop-table :admin)
     (drop-table :blog)
@@ -85,5 +76,5 @@ eg: (drop-table :users)"
       (create-comments-table)
       (create-file-table)
       (create-tag-table)
-      (create-tag-map-table))    
+      (create-tag-map-table))
     nil))

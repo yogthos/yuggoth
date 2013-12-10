@@ -1,4 +1,13 @@
-$(document).ready(function(){	    
+
+$(document).ready(function(){
+
+	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+ 		$(".sidebar").hide();
+ 		$(".contents").width("auto");
+ 		$(".post").width("auto");
+ 		$(".entry-content").width("auto");
+	}
+		    
 	SyntaxHighlighter.config.tagName = "code";
 	SyntaxHighlighter.defaults.gutter = false;   
 	SyntaxHighlighter.all();
