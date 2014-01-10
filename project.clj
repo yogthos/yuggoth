@@ -27,4 +27,5 @@
    :dev 
    {:dependencies [[ring-mock "0.1.3"] [ring/ring-devel "1.1.8"]]}}
    
-  :plugins [[lein-ring "0.8.3"]])
+  :plugins [[lein-ring "0.8.3"]]
+  :min-lein-version "2.0.0")
