@@ -2,7 +2,6 @@
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
-  :min-lein-version "2.0.0"
 
   :dependencies
   [[org.clojure/clojure "1.5.1"]
@@ -16,7 +15,7 @@
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.3.0-alpha4"]
    [postgresql/postgresql "9.1-901.jdbc4"]
-   [environ "0.4.0"]]
+   [environ "0.4.0"]]]
 
   :ring
   {:handler yuggoth.handler/war-handler,
@@ -29,4 +28,5 @@
    :dev
    {:dependencies [[ring-mock "0.1.3"] [ring/ring-devel "1.1.8"]]}}
 
-  :plugins [[lein-ring "0.8.3"]])
+  :plugins [[lein-ring "0.8.3"]]
+  :min-lein-version "2.0.0")
