@@ -17,8 +17,6 @@
       url)))
 
 (defn reset [config]
-  (println (:host config))
-  (println (:schema config))
   (reset! db
           {:datasource
            (doto (new PGPoolingDataSource)
