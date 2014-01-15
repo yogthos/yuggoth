@@ -1,5 +1,5 @@
 (ns yuggoth.config
-  (:use clojure.java.io yuggoth.models.schema yuggoth.locales)
+  (:use clojure.java.io yuggoth.models.schema yuggoth.locales environ.core)
   (:import java.io.File
            java.sql.DriverManager
            org.postgresql.ds.PGPoolingDataSource))
@@ -17,21 +17,36 @@
       url)))
 
 (defn reset [config]
+  (println (:host config))
+  (println (:schema config))
   (reset! db
           {:datasource
            (doto (new PGPoolingDataSource)
              (.setServerName   (:host config) )
              (.setDatabaseName (:schema config))
-             (.setPortNumber   (:port config))
+             (.setPortNumber   (:port config ))
              (.setUser         (:user config))
              (.setPassword     (:pass config)))})
   (reset! blog-config (select-keys config [:ssl :ssl-port :initialized :locale])))
 
 (defn init []
-  (with-open
-    [r (java.io.PushbackReader. (reader (load-config-file)))]
-    (if-let [config (read r nil nil)]
-      (reset config)))
+  (if-let [host (env :yug-host)]
+    (reset (hash-map :host host,
+                     :schema (env :yug-schema)
+                     :port (Integer/valueOf (env :yug-port))
+                     :user (env :yug-user)
+                     :pass (env :yug-password)
+                     :ssl (Boolean/valueOf (env :yug-ssl))
+                     :ssl-port (Integer/valueOf (env :yug-ssl-port))
+                     :initialized (Boolean/valueOf (env :yug-initialized))
+                     :locale (keyword (env :yug-locale))
+                     ))
+    (with-open
+        [r (java.io.PushbackReader. (reader (load-config-file)))]
+      (if-let [config (read r nil nil)]
+        (reset config)))
+    )
+
   (println "intialized"))
 
 (defn save [config]
