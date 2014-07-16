@@ -39,7 +39,6 @@ body {
 }
 
 .menu {
-    color: #eee;
     clear: both;
     padding-top: 11px;
     padding-bottom: 10px;
@@ -62,6 +61,7 @@ body {
 }
 
 .menu a {
+    color: #222;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
     font-size: 18px;
     margin: 0 10px;
@@ -191,7 +191,7 @@ span {
     width: 650px;
     padding-bottom: 10px;
     text-align:left;
-
+    color: #222;
     margin: 10px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -204,7 +204,6 @@ span {
 
 
 .entry-title {
-    color: #555;
     font-family: 'Oswald', Helvetica, Arial, sans-serif;
     line-height: 10px;
     text-align: left;
