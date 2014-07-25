@@ -3,7 +3,7 @@
 
 ;;file table
 (defn create-file-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :file
     [:type "varchar(50)"]
     [:name "varchar(50)"]
@@ -11,7 +11,7 @@
 
 ;;blog table
 (defn create-blog-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :blog
     [:id "SERIAL"]
     [:time :timestamp]
@@ -22,7 +22,7 @@
 
 ;;comment table
 (defn create-comments-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :comment
     [:id "SERIAL"]
     [:blogid :int]
@@ -32,19 +32,19 @@
 
 ;;tag table
 (defn create-tag-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :tag
     [:name "varchar(50)"]))
 
 (defn create-tag-map-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :tag_map
     [:blogid :int]
     [:tag "varchar(50)"]))
 
 ;;admin table
 (defn create-admin-table []
-  (sql/create-table
+  (sql/create-table-ddl
     :admin
     [:title "varchar(100)"]
     [:style "varchar(50)"]
@@ -58,23 +58,22 @@
 eg: (drop-table :users)"
   [table]
   (try
-   (sql/drop-table table)
+   (sql/drop-table-ddl table)
    (catch Exception _)))
 
 (defn reset-blog [db]
-  (sql/with-connection
-    db
-    (drop-table :admin)
-    (drop-table :blog)
-    (drop-table :comment)
-    (drop-table :file)
-    (drop-table :tag)
-    (drop-table :tag_map)
-    (sql/transaction
+  (sql/with-db-transaction [t-conn db]
+    (sql/db-do-commands
+      t-conn
+      (drop-table :admin)
+      (drop-table :blog)
+      (drop-table :comment)
+      (drop-table :file)
+      (drop-table :tag)
+      (drop-table :tag_map)
       (create-admin-table)
       (create-blog-table)
       (create-comments-table)
       (create-file-table)
       (create-tag-table)
-      (create-tag-map-table))
-    nil))
+      (create-tag-map-table))))

@@ -72,4 +72,3 @@
                         wrap-ssl-if-selected]
            :access-rules [admin-page]))
 
-(def war-handler (middleware/war-handler app))

@@ -1,12 +1,11 @@
 (ns yuggoth.models.db
   (:require [yuggoth.models.schema :refer :all]
             [yuggoth.config :refer [db]]
-            [clojure.java.jdbc :as sql]
-            [clojure.java.jdbc.sql :refer [where]])
+            [clojure.java.jdbc :as sql])
   (:import java.sql.Timestamp java.util.Date))
 
 (defn db-update-or-insert [db table record where-clause]
-  (sql/db-transaction [t-con db]
+  (sql/with-db-transaction [t-con db]
     (let [result (sql/update! t-con table record where-clause)]
       (if (zero? (first result))
         (sql/insert! t-con table record)
@@ -34,7 +33,7 @@
 
 (defn delete-file [name]
   (println name)
-  (sql/delete! @db :file (where {:name name})))
+  (sql/delete! @db :file ["name=?" name]))
 
 (defn get-file [name]
   (first (sql/query @db ["select * from file where name=?" name])))
@@ -70,13 +69,14 @@
          (Integer/parseInt id)]))))
 
 (defn store-post [title content author public]
-  (sql/insert! @db
+  (first
+   (sql/insert! @db
     :blog
-    {:time (new Timestamp (.getTime (new Date)))
+    {:time (-> (Date.) (.getTime) (Timestamp.))
      :title title
      :content content
      :author author
-     :public (Boolean/parseBoolean public)}))
+     :public (Boolean/parseBoolean public)})))
 
 (defn post-visible [id public]
   (sql/update! @db
@@ -109,10 +109,11 @@
   (sql/query @db ["select * from comment order by time desc limit ?" n]))
 
 (defn delete-comment [id]
-  (sql/delete! @db :comment (where {:id (Integer/parseInt id)})))
+  (sql/delete! @db :comment ["id=?" (Integer/parseInt id)]))
 
 ;;tags
 (defn tag-post [blogid tag & [db]]
+  (println "tagging" blogid tag)
   (sql/insert! (or db @db)
     :tag_map
     {:blogid blogid :tag tag}))
@@ -126,8 +127,8 @@
 
 (defn delete-tags [tags]
   (doseq [tag tags]
-    (sql/delete! @db :tag_map (where {:tag tag}))
-    (sql/delete! @db :tag (where {:name tag}))))
+    (sql/delete! @db :tag_map ["tag=?" tag])
+    (sql/delete! @db :tag ["name=?" tag])))
 
 (defn posts-by-tag [tag-name]
   (sql/query @db ["select id, time, title, public from blog, tag_map where id=blogid and tag_map.tag=?"
@@ -139,8 +140,8 @@
 (defn update-tags [blogid blog-tags]
   (let [id (if (string? blogid) (Integer/parseInt blogid) blogid)
         current-tags (tags)]
-    (sql/db-transaction [t-con @db]
-      (sql/delete! t-con :tag_map (where {:blogid id}))
+    (sql/with-db-transaction [t-con @db]
+      (sql/delete! t-con :tag_map ["blogid=?" id])
         (doseq [tag blog-tags]
           (if-not (some #{tag} current-tags) (add-tag tag t-con))
           (tag-post id tag t-con)))))

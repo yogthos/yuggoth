@@ -61,6 +61,11 @@
     (text :powered-by)
     (link-to "http://github.com/yogthos/yuggoth" "Yuggoth")]])
 
+(defn servlet-context [request]
+  (when-let [context (:servlet-context request)]
+    (try (.getContextPath context)
+         (catch IllegalArgumentException e context))))
+
 (defn common [title & content]
   (let [html-title (if (string? title) title (:title title))
         title-elements (when (map? title) (:elements title))]
@@ -71,7 +76,7 @@
        (include-css (util/get-css)
                     "/css/jquery.alerts.css"
                     "/css/shCoreYuggoth.css")
-       [:script {:type "text/javascript"} (str "var context=\"" (:context *request*) "\";")]]
+       [:script {:type "text/javascript"} (str "var context=\"" (servlet-context *request*) "\";")]]
       [:body
        (hidden-field "selected"
                      (cond
