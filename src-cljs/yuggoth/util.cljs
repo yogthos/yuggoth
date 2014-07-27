@@ -37,13 +37,15 @@
       (str id "-" (js/encodeURI (.toString sb))))))
 
 (defn format-time [time & [fmt]]
-  #_(when time
-    (-> (or fmt "dd MMM, yyyy")
+  (when time
+    (.toTimeString time)
+    #_(-> (or fmt "dd MMM, yyyy")
         (time-format/formatter)
         (time-format/unparse time))))
 
 (defn parse-time [time-str & [time-format]]
-  (when time-str
+  time-str
+  #_(when time-str
     (-> (or time-format "yyyy-MM-dd HH:mm:ss.SSS")
         (time-format/formatter)
         (time-format/parse time-str))))

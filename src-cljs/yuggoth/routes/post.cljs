@@ -1,5 +1,6 @@
 (ns yuggoth.routes.post
   (:require [ajax.core :refer [GET POST]]
+            [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
             [yuggoth.util
              :refer [text]]))

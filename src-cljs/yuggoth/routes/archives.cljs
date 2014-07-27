@@ -1,5 +1,6 @@
 (ns yuggoth.routes.archives
   (:require [ajax.core :refer [GET POST]]
+            [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
             [yuggoth.util
              :refer [text
@@ -9,29 +10,31 @@
 
 (defn post-visibility [id public]
   (let [state (atom (if public (text :hide) (text :show)))]
-    [:span.submit
-      {:onClick #(POST "/archives"
-                       {:params {:post-id id
-                                 :visible public}
-                        :handler (fn [_] (swap! state not))})}
-          @state]))
+    (fn []
+      [:span.submit
+        {:onClick #(POST "/archives"
+                         {:params {:post-id id
+                                   :visible public}
+                          :handler (fn [_] (swap! state not))})}
+            @state])))
 
 (defn make-list [date items]
   [:div
    date
    [:hr]
    [:ul
-    (for [{:keys [id time title public]} (reverse (sort-by :time items))]
-      [:li.archive
-       [:a {:class "archive" :href (str "/blog/" (format-title-url id title))}
-        (str (format-time time "MMMM dd") " - " title)]
-       (if (session/get :admin)
-         [post-visibility id public])])]])
+    (doall
+     (for [{:keys [id time title public]} (reverse (sort-by :time items))]
+       [:li.archive
+        [:a {:class "archive" :href (str "/blog/" (format-title-url id title))}
+         (str (format-time time "MMMM dd") " - " title)]
+        (if (session/get :admin)
+          [post-visibility id public])]))]])
 
 (defn compare-time [post]
   (format-time (:time post) "yyyy MMMM"))
 
-(defn archives-by-date [archives]
+(defn archives-by-date []
   (->> (session/get :archives)
     (group-by compare-time)
     (vec)
@@ -43,10 +46,7 @@
       [:div])))
 
 (defn archives-page []
-  (println (session/get :archives))
-  (println (->> (session/get :archives)
-               (map :time)
-               (map #(format-time % "yyyy MMMM"))))
   [:div.post
     [:div.entry-title [:h2 (session/get :entry-title)]]
-    [:div.entry-content ]])
+    [:div.entry-content
+     [archives-by-date]]])
