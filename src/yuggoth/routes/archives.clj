@@ -47,7 +47,7 @@
     (archives-by-date (db/posts-by-tag tagname))))
 
 (defroutes archive-routes
-  (GET "/archives"     []        (archives))
+  (GET "/archives-old"     []        (archives))
   (GET "/tag/:tagname" [tagname] (show-tag tagname))
   (POST "/archives" [post-id visible]
         (db/post-visible post-id (not (Boolean/parseBoolean visible)))

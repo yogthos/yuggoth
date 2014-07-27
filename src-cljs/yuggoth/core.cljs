@@ -1,25 +1,26 @@
 (ns yuggoth.core
   (:import goog.History)
   (:require [goog.events :as events]
+            [clojure.string :as string]
             [goog.history.EventType :as EventType]
             [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]
             [secretary.core :as secretary
              :include-macros true :refer [defroute]]
             [yuggoth.routes.home :refer [home-page]]
+            [yuggoth.routes.about :refer [about-page]]
             [yuggoth.routes.post :refer [edit-post-page]]
             [yuggoth.routes.archives :refer [archives-page]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [println
-                     link
+             :refer [link
                      nav-link
                      text
                      hook-browser-navigation!
                      format-title-url
                      format-time]]))
 
-
+(enable-console-print!)
 (def current-page (atom home-page))
 
 (defn set-page! [page]
@@ -39,6 +40,9 @@
    (for [tag (session/get :tags)]
      [:div.tag (link (str "/tag/" tag) [:span.tagon tag])])])
 
+(defn fetch-archives []
+  (GET "/archives" {:handler #(session/put! :archives %)}))
+
 (defn menu []
   [:div.menu
    (into
@@ -52,7 +56,7 @@
        [:ul.menu-items])
      [[:li#rss [:a {:href "/rss"} [:div#rss "rss"]]]
        [nav-link "#/about" :about-title "about"]
-       [nav-link "#/archives" :archives-title "archives"]
+       [nav-link "#/archives" :archives-title "archives" fetch-archives]
        [nav-link "#/" :home-title "home"]])])
 
 (defn sidebar []
@@ -87,7 +91,13 @@
   (hook-browser-navigation!)
   (session/clear!)
   (session/init!)
-  (set-page! home-page)
+  (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
+    (set-page! (or (get {"/archives" archives-page
+                         "/about" about-page}
+                        uri)
+                   home-page)))
+
+  (fetch-archives)
   (GET "/locale" {:handler #(session/put! :locale %)})
   (GET "/posts/5" {:handler #(session/put! :posts %)})
   (GET "/tags" {:handler #(session/put! :tags %)})

@@ -10,9 +10,6 @@
             [cljs-time.coerce :as time-coerce]
             [cljs-time.format :as time-format]))
 
-(defn println [& args]
-  (.log js/console (apply str (interpose " " args))))
-
 (defn error-handler [response]
   (session/reset! {:error response}))
 
@@ -54,5 +51,5 @@
 (defn link [path & body]
   [:a {:href path} body])
 
-(defn nav-link [path label & [id]]
-  [:li {:id id} (link path (text label))])
+(defn nav-link [path label & [id on-click]]
+  [:li {:id id :on-click on-click} (link path (text label))])

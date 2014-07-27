@@ -11,14 +11,14 @@
   (when (session/get :admin)
     [:div
      [:div [:span.submit
-            {:onClick #(do
+            {:on-click #(do
                          (js/alert "toggle")
                          #_(POST "/toggle-post" {:params {:post-id post-id
                                                  :public visible}}))}
             (if visible (text :hide) (text :show))]]
 
      [:div [:span.submit
-            {:onClick #(do
+            {:on-click #(do
                          (js/alet "edit")
                          #_(POST "/update-post" {:params {:post-id post-id}}))}
             (text :edit)]]]))
