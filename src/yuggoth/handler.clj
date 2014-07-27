@@ -7,7 +7,8 @@
         yuggoth.routes.profile
         yuggoth.routes.rss
         compojure.core)
-  (:require [yuggoth.config :as config]
+  (:require [yuggoth.routes.services :refer [service-routes]]
+            [yuggoth.config :as config]
             [yuggoth.views.layout :as layout]
             [noir.util.middleware :as middleware]
             [noir.response :as resp]
@@ -67,6 +68,7 @@
             profile-routes
             rss-routes
             blog-routes
+            service-routes
             app-routes]
            :middleware [wrap-exceptions
                         wrap-ssl-if-selected]

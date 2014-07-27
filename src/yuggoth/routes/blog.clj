@@ -118,16 +118,15 @@
       (resp/redirect (if post-id (str "/blog/" (util/format-title-url post-id title)) "/")))
     (make-post content (assoc post :error (text :title-required)))))
 
-(defn home-page []
+#_(defn home-page []
   (if (:initialized @blog-config)
     (if-let [post (db/get-last-public-post)]
       (entry post)
       (layout/common (text :welcome-title) (text :nothing-here)))
     (resp/redirect "/setup-blog")))
 
-(defn about-page []
-  (layout/common
-   "this is the story of yuggoth... work in progress"))
+(defn home-page []
+  (layout/render "app.html"))
 
 (defn toggle-post [post-id public]
   (db/post-visible post-id (not (Boolean/parseBoolean public)))

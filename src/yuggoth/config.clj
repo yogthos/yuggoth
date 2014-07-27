@@ -4,11 +4,14 @@
            java.sql.DriverManager
            org.postgresql.ds.PGPoolingDataSource))
 
-(def blog-config (atom nil))
-(def db (atom nil))
+(defonce blog-config (atom nil))
+(defonce db (atom nil))
+
+(defn locale []
+  (-> (get @blog-config :locale :en) dict))
 
 (defn text [tag]
-  (get (get dict (get @blog-config :locale :en)) tag "<no translation available>"))
+  (-> (locale) (get tag "<no translation available>")))
 
 (defn load-config-file []
   (let [url (resource "blog.properties")]

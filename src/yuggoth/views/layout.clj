@@ -1,16 +1,42 @@
 (ns yuggoth.views.layout
-  (:use yuggoth.config
-        noir.request
+  (:use noir.request
         hiccup.element
         hiccup.form
         hiccup.util
         [hiccup.page :only [include-css include-js html5]])
-  (:require [yuggoth.util :as util]
+  (:require [yuggoth.config :refer :all]
+            [yuggoth.util :as util]
             [noir.validation :as vali]
             [yuggoth.models.db :as db]
-            [noir.session :as session])
+            [noir.session :as session]
+            [selmer.parser :as parser]
+            [ring.util.response :refer [content-type response]]
+            [compojure.response :refer [Renderable]]
+            [environ.core :refer [env]])
   (:import java.util.Calendar))
 
+
+(def template-path "templates/")
+
+(deftype RenderableTemplate [template params]
+  Renderable
+  (render [this request]
+    (content-type
+      (->> (assoc params
+                  :title "TODO" ;(if (string? title) title (:title title))
+                  :dev (env :dev)
+                  :site-title (:title (db/get-admin))
+                  :servlet-context
+                  (if-let [context (:servlet-context request)]
+                    (.getContextPath context)))
+        (parser/render-file (str template-path template))
+        response)
+      "text/html; charset=utf-8")))
+
+(defn render [template & [params]]
+  (RenderableTemplate. template params))
+
+;;;old
 (defn header []
   [:div.header [:h1 [:div.site-title (:title (db/get-admin))]]])
 
