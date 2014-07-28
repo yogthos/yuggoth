@@ -56,8 +56,14 @@
                    [ring/ring-devel "1.3.0"]]
     :env {:dev true}}}
 
+  :minify-assets
+{:assets
+  {"resources/public/css/site.min.css" "resources/public/css"}}
+
   :plugins [[lein-ring "0.8.3"]
             [lein-environ "0.5.0"]
             [lein-cljsbuild "1.0.3"]
-            [lein-ancient "0.5.0"]]
+            [lein-ancient "0.5.0"]
+            [lein-asset-minifier "0.1.5"]
+            [lein-cooper "0.0.1"]]
   :min-lein-version "2.0.0")

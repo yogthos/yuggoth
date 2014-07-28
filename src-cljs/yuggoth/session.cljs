@@ -9,6 +9,7 @@
 
 (defn- sync! []
   (when (:_dirty @state)
+    (println "syncing ditry state")
     (clojure.core/swap! state dissoc :_dirty)
     (cookies/set! :state @state))
   (js/setTimeout sync! 1000))

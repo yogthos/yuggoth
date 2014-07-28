@@ -29,8 +29,11 @@
 ;;routes
 (defroute "/" [] (set-page! home-page))
 (defroute "/archives" [] (set-page! archives-page))
-;(defroute "/blog-previous/" [] )
-;(defroute "/blog-next/")
+(defroute "/last" [] #_(GET "/last-post" {:params {:id (session/get-in [:post :id])}
+                                         :handler #(session/put! :post %)})
+  (println (str @session/state) #_(session/get-in [:post :id])))
+(defroute "/next" [] (GET "/next-post" {:params {:id (session/get-in [:post :id])}
+                                         :handler #(session/put! :post %)}))
 
 (defn header []
   [:div.header [:h1 [:div.site-title js/siteTitle]]])
@@ -89,7 +92,8 @@
 (defn init []
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
-  (session/clear!)
+  ;;TODO: don't clear sessions by default
+  ;;(session/clear!)
   (session/init!)
   (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
     (set-page! (or (get {"/archives" archives-page
@@ -99,6 +103,7 @@
 
   (fetch-archives)
   (GET "/locale" {:handler #(session/put! :locale %)})
+  (GET "/latest-post" {:handler #(session/put! :post %)})
   (GET "/posts/5" {:handler #(session/put! :posts %)})
   (GET "/tags" {:handler #(session/put! :tags %)})
 
