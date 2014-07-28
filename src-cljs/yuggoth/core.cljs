@@ -7,10 +7,10 @@
             [ajax.core :refer [GET POST]]
             [secretary.core :as secretary
              :include-macros true :refer [defroute]]
-            [yuggoth.routes.home :refer [home-page]]
-            [yuggoth.routes.about :refer [about-page]]
-            [yuggoth.routes.post :refer [edit-post-page]]
-            [yuggoth.routes.archives :refer [archives-page]]
+            [yuggoth.pages.home :refer [home-page]]
+            [yuggoth.pages.about :refer [about-page]]
+            [yuggoth.pages.post :refer [edit-post-page]]
+            [yuggoth.pages.archives :refer [archives-page]]
             [yuggoth.session :as session]
             [yuggoth.util
              :refer [link

@@ -1,4 +1,4 @@
-(ns yuggoth.routes.archives
+(ns yuggoth.pages.archives
   (:require [ajax.core :refer [GET POST]]
             [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]

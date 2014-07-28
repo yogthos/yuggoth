@@ -1,4 +1,4 @@
-(ns yuggoth.routes.home
+(ns yuggoth.pages.home
   (:require [ajax.core :refer [GET POST]]
             [secretary.core :as secretary
              :include-macros true]
