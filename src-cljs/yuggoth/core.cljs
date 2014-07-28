@@ -89,21 +89,25 @@
      [@current-page]
      [sidebar]]])
 
+(defn parse-post-id [url]
+  (let [[x y] (clojure.string/split url #":\d+")]
+    (re-find #"\d+" (or y x))))
+
 (defn init []
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
-  ;;TODO: don't clear sessions by default
-  ;;(session/clear!)
   (session/init!)
   (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
     (set-page! (or (get {"/archives" archives-page
                          "/about" about-page}
                         uri)
                    home-page)))
-
   (fetch-archives)
   (GET "/locale" {:handler #(session/put! :locale %)})
-  (GET "/latest-post" {:handler #(session/put! :post %)})
+  (if-let [blog-id (parse-post-id (.-URL js/document))]
+    (GET "/blog-post" {:params {:id blog-id}
+                       :handler #(session/put! :post %)})
+    (GET "/latest-post" {:handler #(session/put! :post %)}))
   (GET "/posts/5" {:handler #(session/put! :posts %)})
   (GET "/tags" {:handler #(session/put! :tags %)})
 
