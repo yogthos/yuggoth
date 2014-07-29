@@ -53,5 +53,5 @@
      [:div.entry-title [:h2 title ]]
      [:div.entry-content
       {:dangerouslySetInnerHTML
-           {:__html (md->html (str content))}}]
+           {:__html (js/marked (str content))}}]
      [post-nav]]))

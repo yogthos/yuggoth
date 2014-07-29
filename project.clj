@@ -20,7 +20,6 @@
    [reagent "0.4.2"]
    [secretary "1.2.0"]
    [cljs-ajax "0.2.6"]
-   [markdown-clj "0.9.47"]
    [com.andrewmcveigh/cljs-time "0.1.5"]]
 
   :ring
