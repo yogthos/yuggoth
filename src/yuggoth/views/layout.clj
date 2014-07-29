@@ -76,7 +76,7 @@
        (include-css (util/get-css)
                     "/css/jquery.alerts.css"
                     "/css/shCoreYuggoth.css")
-       [:script {:type "text/javascript"} (str "var context=\"" (:servlet-context *request*) "\";")]]
+       [:script {:type "text/javascript"} (str "var context=\"" (servlet-context *request*) "\";")]]
       [:body
        (hidden-field "selected"
                      (cond
