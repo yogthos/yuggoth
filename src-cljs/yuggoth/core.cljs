@@ -18,7 +18,9 @@
                      text
                      hook-browser-navigation!
                      format-title-url
-                     format-time]]))
+                     format-time
+                     fetch-post
+                     set-current-post]]))
 
 (enable-console-print!)
 (def current-page (atom home-page))
@@ -73,11 +75,9 @@
        [:h2 (text :recent-posts-title)]
        (conj
          [:ul
-          (for [{:keys [id time title]} (reverse (sort-by :time (session/get :posts)))]
-            [:li
-             (link (str "#/blog/" (format-title-url id title))
-                   title
-                   [:div.date (format-time time)])])]
+          (for [{:keys [id time title]} (reverse (sort-by :time (session/get :recent-posts)))]
+            [:li [:a {:on-click (fetch-post id set-current-post)}
+                  title [:div.date (format-time time)]]])]
           [nav-link "#/archives" (text :more)])
        (tag-list)])))
 
@@ -96,7 +96,7 @@
 (defn init []
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
-  (session/init!)
+  ;(session/init!)
   (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
     (set-page! (or (get {"/archives" archives-page
                          "/about" about-page}
@@ -104,12 +104,12 @@
                    home-page)))
   (fetch-archives)
   (GET "/locale" {:handler #(session/put! :locale %)})
-  (if-let [blog-id (parse-post-id (.-URL js/document))]
-    (GET "/blog-post" {:params {:id blog-id}
-                       :handler #(session/put! :post %)})
-    (GET "/latest-post" {:handler #(session/put! :post %)}))
-  (GET "/posts/5" {:handler #(session/put! :posts %)})
+  (GET "/posts/5" {:handler #(session/put! :recent-posts %)})
   (GET "/tags" {:handler #(session/put! :tags %)})
+  (if-let [blog-id (parse-post-id (.-URL js/document))]
+    ((fetch-post blog-id #(session/put! :post %)))
+    (GET "/latest-post" {:handler #(session/put! :post %)}))
+
 
   (reagent/render-component
     [page]

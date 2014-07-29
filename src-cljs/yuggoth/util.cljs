@@ -55,3 +55,13 @@
 
 (defn nav-link [path label & [id on-click]]
   [:li {:id id :on-click on-click} (link path (text label))])
+
+(defn set-current-post [post]
+  (session/put! :post post)
+  (set! (.-href window.location) (str "/#/blog/" (:id post))))
+
+(defn fetch-post [id handler]
+  (fn []
+    (GET "/blog-post"
+         {:params {:id id}
+          :handler handler})))

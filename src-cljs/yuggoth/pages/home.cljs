@@ -7,11 +7,9 @@
             [markdown.core :refer [md->html]]
             [yuggoth.util
              :refer [text
-                     link]]))
+                     link
+                     set-current-post]]))
 
-(defn set-current-post [post]
-  (session/put! :post post)
-  (set! (.-href window.location) (str "/#/blog/" (:id post))))
 
 (defn fetch-post [next?]
   (GET "/blog-post"
