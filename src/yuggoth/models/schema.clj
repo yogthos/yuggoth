@@ -61,16 +61,18 @@ eg: (drop-table :users)"
    (sql/drop-table-ddl table)
    (catch Exception _)))
 
-(defn reset-blog [db]
+(defn reset-blog [db]  
   (sql/with-db-transaction [t-conn db]
+    (try
+        (drop-table :admin)
+        (drop-table :blog)
+        (drop-table :comment)
+        (drop-table :file)
+        (drop-table :tag)
+        (drop-table :tag_map)
+        (catch java.sql.BatchUpdateException _))
     (sql/db-do-commands
-      t-conn
-      (drop-table :admin)
-      (drop-table :blog)
-      (drop-table :comment)
-      (drop-table :file)
-      (drop-table :tag)
-      (drop-table :tag_map)
+      t-conn      
       (create-admin-table)
       (create-blog-table)
       (create-comments-table)
