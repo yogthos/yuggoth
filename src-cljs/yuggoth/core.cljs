@@ -114,8 +114,7 @@
     (set-page! (get {"/archives" archives-page
                      "/about" about-page
                      "/make-post" make-post-page
-                     "/upload" upload-page
-                     "/" home-page}
+                     "/upload" upload-page}
                     uri
                     home-page)))
   ;;fetch the post based on the URL
