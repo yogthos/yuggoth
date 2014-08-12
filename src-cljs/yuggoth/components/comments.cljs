@@ -38,7 +38,7 @@
 (defn comment-form []
   (let [blogid       (session/get-in [:post :id])
         comment-text (atom nil)
-        author       (atom nil)
+        author       (atom "anonymous")
         show-help?   (atom false)]
     (fn []
       [:div.comment-form

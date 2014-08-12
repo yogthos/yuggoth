@@ -37,7 +37,10 @@
       empty-post)))
 
 (defn get-posts [count]
-  (map format-time (db/get-posts count)))
+  (->> (db/get-posts count)
+       (sort-by :time)
+       (reverse)
+       (map format-time)))
 
 (defn toggle-post! [{:keys [id public]}]
   (db/toggle-post! id (not public)))

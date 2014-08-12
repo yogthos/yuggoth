@@ -9,9 +9,6 @@
   (:import net.sf.jlue.util.Captcha
            java.util.TimeZone))
 
-(def tz (TimeZone/getDefault))                              ; TODO: consider using UTC for all?
-(def iso8601 "yyyy-MM-dd'T'HH:mm:ssZZ")
-
 (defn format-time
   "formats the time using SimpleDateFormat, the default format is
    \"dd MMM, yyyy\" and a custom one can be passed in as the second argument"

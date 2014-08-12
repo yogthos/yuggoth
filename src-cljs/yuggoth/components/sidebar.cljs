@@ -28,7 +28,7 @@
         [:div.sidebar
          [:h2 (text :recent-posts-title)]
          [:ul
-            (for [{:keys [id time title]} (reverse (sort-by :time (session/get :recent-posts)))]
+            (for [{:keys [id time title]} (session/get :recent-posts)]
               ^{:key id}
               [:li [:a {:on-click (fetch-post id
                                      #(do

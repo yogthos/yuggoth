@@ -46,7 +46,7 @@
 
 (defn file-item [name]
   [:tr
-   [:td.file-link [:a {:href (str "/files/" name)} name]]
+   [:td.file-link [:a {:href (str js/context "/files/" name)} name]]
    [:td.file [delete-component name]]])
 
 (defn files-list []

@@ -77,7 +77,7 @@
         [nav-link "#/latest-comments" :latest-comments-title]
         [nav-link "#/make-post" :new-post]]
        [:ul.menu-items])
-    [[:li#rss [:a {:href "/rss"} [:div#rss "rss"]]]
+    [[:li#rss [:a {:href (str js/context "/rss")} [:div#rss "rss"]]]
     [nav-link "#/about" :about-title]
     [nav-link "#/archives" :archives-title]
     [nav-link "#/" :home-title]])])

@@ -42,20 +42,12 @@
          (js/encodeURI)
          (str id "-"))))
 
-(defn link [& [x y & xs :as body]]
-  (if (map? x)
-    [:a (merge {:href y} x) xs]
-    [:a {:href x} (rest body)]))
 
 (defn set-post-url [{:keys [id]}]
-  (set! (.-href window.location) (str "/#/blog/" id)))
-
-(defn nav-link [path label & [on-click]]
-  [:li {:on-click on-click} (link path (text label))])
-
+  (set! (.-href window.location) (str js/context "/#/blog/" id)))
 
 (defn set-location! [url]
-  (set! (.-href js/location) url))
+  (set! (.-href js/location) (str js/context url)))
 
 (defn set-page! [page]
   (session/put! :current-page page))
@@ -111,3 +103,10 @@
             :value @target}
            opts)])
 
+(defn link [& [x y & xs :as body]]
+  (if (map? x)
+    [:a (merge {:href (str js/context y)} x) xs]
+    [:a {:href (str js/context x)} (rest body)]))
+
+(defn nav-link [path label & [on-click]]
+  [:li {:on-click on-click} (link path (text label))])

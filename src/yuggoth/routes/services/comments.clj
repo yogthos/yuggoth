@@ -14,7 +14,7 @@
 
 (defn make-comment! [blogid captcha content author]
   (let [admin  (session/get :admin)
-        author (or (:handle admin) author)]
+        author (or (:handle admin) author "anonymous")]
     (if (valid-comment? admin author captcha content)
       (db/add-comment! blogid
                        (escape-html content)
