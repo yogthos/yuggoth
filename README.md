@@ -17,7 +17,6 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net
 
 ## Features
 
-* content caching
 * RSS feed
 * tags
 * markdown in posts and comments with preview
