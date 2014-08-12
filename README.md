@@ -45,7 +45,7 @@ to run as standalone
 ```bash
 lein cljsbuild once release
 lein ring uberjar
-java -jar yuggoth-0.5.0-SNAPSHOT-standalone.jar
+java -jar target/yuggoth-1.0-standalone.jar
 ```
 
 setting the `$PORT` environment variable allows changing the port which the standalone instance runs on
