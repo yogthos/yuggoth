@@ -20,21 +20,21 @@
 (defn toggle-public! []
   (POST "/toggle-post"
         {:params
-         {:post
-          (select-keys
-            (session/get :post)
-            [:id :public])}
+          {:post
+            (select-keys
+              (session/get :post)
+              [:id :public])}
          :handler
-         (fn [[result]]
-          (when (pos? result)
-            (set-recent!)
-            (session/update-in! [:post :public] not)))}))
+          (fn [[result]]
+            (when (pos? result)
+              (set-recent!)
+              (session/update-in! [:post :public] not)))}))
 
 (defn fetch-post [next?]
   (GET "/blog-post"
        {:params {:id (session/get-in [:post (if next? :next :last)])}
-                 :handler #(do (set-current-post! %)
-                               (set-post-url %))}))
+        :handler #(do (set-current-post! %)
+                      (set-post-url %))}))
 
 (defn tags []
   [:div (map (fn [tag]
@@ -43,15 +43,15 @@
 
 (defn admin-forms []
   [:div.post-admin-menu
-    [:div.leftmost
-     [:span.button
-       {:on-click #(toggle-public!)}
-       (if (session/get-in [:post :public])
-         (text :hide) (text :show))]]
-    [:div.leftmost
-     [:span.button
-       {:on-click #(set-location! "#/edit-post")}
-       (text :edit)]]])
+   [:div.leftmost
+    [:span.button
+     {:on-click #(toggle-public!)}
+     (if (session/get-in [:post :public])
+       (text :hide) (text :show))]]
+   [:div.leftmost
+    [:span.button
+     {:on-click #(set-location! "#/edit-post")}
+     (text :edit)]]])
 
 (defn post-nav []
   [:div.postnav
@@ -62,6 +62,13 @@
      [:span.button.rightmost {:on-click #(fetch-post true)}
       (str (text :next) "⪧")])])
 
+(defn loading-spinner []
+  [:div.spinner
+   [:div.rect1]
+   [:div.rect2]
+   [:div.rect3]
+   [:div.rect4]
+   [:div.rect5]])
 
 (defn home-page []
   (let [{:keys [id content time title author]}
@@ -79,6 +86,6 @@
          [tags]
          [post-nav]
          [:br]
-        [comments]]]
-       [:div (text :loading)])
+         [comments]]]
+       [loading-spinner])
      [sidebar]]))

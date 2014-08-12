@@ -28,7 +28,7 @@
                      set-page!
                      set-admin-page!]]))
 
-(enable-console-print!)
+;(enable-console-print!)
 
 (defn fetch-archives! [& [tag]]
   (GET (if tag (str "/tag/" tag) "/archives")
