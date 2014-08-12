@@ -36,6 +36,12 @@ can be done on the profile page.
 
 ### Building and deploying using Leiningen
 
+to compile CSS assets
+
+```bash
+lein minify-assets
+```
+
 to run in development mode
 ```bash
 lein cljsbuild auto dev
