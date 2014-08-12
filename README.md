@@ -55,9 +55,6 @@ to make a deployable WAR
 lein ring uberwar
 ```
 
-see [markdown-clj](https://github.com/yogthos/markdown-clj) for supported syntax in posts, any valid HTML will work as well
-
-
 ## License
 
 Distributed under the Eclipse Public License, the same as Clojure.
