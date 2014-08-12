@@ -2,6 +2,7 @@
   <head>
     <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <link href="/rss" rel="alternate" title="{{site-title}}" type="application/rss+xml">
+      <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/default.min.css">
       {% style "/css/site.min.css" %}
   </head>
 
@@ -11,7 +12,7 @@
           </div>
 
           {% script "/vendor/js/marked.min.js" %}
-          {% script "/vendor/js/highlight.pack.js" %}
+          <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script>
           <script type="text/javascript">
               var admin = {{admin}};
               var context = "{{servlet-context}}";
