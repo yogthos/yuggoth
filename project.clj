@@ -52,6 +52,7 @@
 
   :profiles
   {:uberjar {:aot :all}
+   :uberwar {:dependencies [[commons-fileupload "1.3"]]}
    :production
    {:ring
     {:open-browser? false, :stacktraces? false, :auto-reload? false}}
