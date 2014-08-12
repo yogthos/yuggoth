@@ -67,7 +67,7 @@
   [:div.menu
    (into
     (if (session/get :admin)
-       [:ul.menu-items
+      [:ul.menu-items
         [:li {:on-click
               #(GET "/logout" {:handler logout!})}
          [:a (text :logout)]]
@@ -76,10 +76,10 @@
         [nav-link "#/latest-comments" :latest-comments-title]
         [nav-link "#/make-post" :new-post]]
        [:ul.menu-items])
-    [[:li#rss [:a {:href (str js/context "/rss")} [:div#rss "rss"]]]
-    [nav-link "#/about" :about-title]
-    [nav-link "#/archives" :archives-title]
-    [nav-link "#/" :home-title]])])
+      [[:li#rss [:a {:href (str js/context "/rss")} [:span#rss "rss"]]]
+       [nav-link "#/about" :about-title]
+       [nav-link "#/archives" :archives-title]
+       [nav-link "#/" :home-title]])])
 
 (defn page []
   [:div.container
