@@ -38,11 +38,13 @@ can be done on the profile page.
 ### Building and deploying using Leiningen
 
 ```bash
+lein cljsbuild auto dev
 lein ring server
 ```
 
 to run as standalone
 ```bash
+lein cljsbuild once release
 lein ring uberjar
 java -jar yuggoth-0.5.0-SNAPSHOT-standalone.jar
 ```
