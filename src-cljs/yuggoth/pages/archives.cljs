@@ -1,52 +1,63 @@
 (ns yuggoth.pages.archives
-  (:require [ajax.core :refer [GET POST]]
-            [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
+            [yuggoth.pages.home :refer [home-page]]
             [yuggoth.util
-             :refer [text
+             :refer [GET
+                     POST
+                     text
                      format-title-url
-                     format-time
-                     parse-time]]))
+                     fetch-post
+                     set-page!
+                     set-title!
+                     set-current-post!
+                     set-location!]]))
 
 (defn post-visibility [id public]
-  (let [state (atom (if public (text :hide) (text :show)))]
+  (let [state (atom public)]
     (fn []
       [:span.submit
-        {:onClick #(POST "/archives"
-                         {:params {:post-id id
-                                   :visible public}
-                          :handler (fn [_] (swap! state not))})}
-            @state])))
+        {:on-click
+         #(POST "/toggle-post"
+                {:params {:post
+                          {:id id
+                           :public public}}
+                 :handler (fn [[result]]
+                            (when (pos? result)
+                              (swap! state not)))})}
+            ({true (text :hide)
+              false (text :show)}
+             @state)])))
 
 (defn make-list [date items]
   [:div
    date
    [:hr]
    [:ul
-    (doall
-     (for [{:keys [id time title public]} (reverse (sort-by :time items))]
+    (for [{:keys [id time title public]} (reverse (sort-by :time items))]
+       ^{:key id}
        [:li.archive
-        [:a {:class "archive" :href (str "/blog/" (format-title-url id title))}
-         (str (format-time time "MMMM dd") " - " title)]
+        [:a {:class "archive"
+             :on-click
+             (fetch-post id
+               #(do
+                  (set-current-post! %)
+                  (set-page! home-page)
+                  (set-location! (str "/#/blog/" (:id %)))))}
+         (str time " - " title)]
         (if (session/get :admin)
-          [post-visibility id public])]))]])
-
-(defn compare-time [post]
-  (format-time (:time post) "yyyy MMMM"))
-
-(defn archives-by-date []
-  (->> (session/get :archives)
-    (group-by compare-time)
-    (vec)
-    (sort-by #(parse-time (first %) "yyyy MMMM"))
-    (reverse)
-    (reduce
-      (fn [groups [date items]]
-        (conj groups (make-list date items)))
-      [:div])))
+          [post-visibility id public])])]])
 
 (defn archives-page []
-  [:div.post
-    [:div.entry-title [:h2 (session/get :entry-title)]]
+  (set-title! (text :archives-title))
+  [:div.conents
+   [:div.archives
+    [:div.entry-title
+     [:h2 (str (text :archives-title)
+               (when-let [tag (session/get :archives-tag)]
+                  (str " - " tag)))]]
     [:div.entry-content
-     [archives-by-date]]])
+     (reduce
+      (fn [groups [date items]]
+        (conj groups (make-list date items)))
+      [:div] (session/get :archives))]]])

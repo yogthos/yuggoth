@@ -1,30 +1,16 @@
 (ns yuggoth.util
-  (:use hiccup.form hiccup.util clavatar.core [clojure.java.io :only [as-url]])
-  (:require [noir.response :as resp]
+  (:require [clojure.java.io :refer [as-url]]
+            [noir.response :as resp]
             [noir.session :as session]
-            [yuggoth.models.db :as db]
+            [clojure.string :as string]
+            [markdown.core :as md]
             [noir.io :as io]
-            [markdown.core :as md])
-  (:import net.sf.jlue.util.Captcha))
+            [yuggoth.db.core :as db])
+  (:import net.sf.jlue.util.Captcha
+           java.util.TimeZone))
 
-(defn format-title-url [id title]
-  (if title
-    (let [sb (new StringBuffer)]
-      (doseq [c (.toLowerCase title)]
-        (if (or (= (int c) 32) (and (> (int c) 96) (< (int c) 123)))
-          (.append sb c)))
-      (str id "-" (url-encode (.toString sb))))))
-
-(defn make-form [& fields]
-  (reduce-kv
-    (fn [table i [id name value]]
-      (conj table
-            [:tr
-             [:td (label id name)]
-             [:td ((if (.startsWith id "pass") password-field text-field)
-                    {:tabindex (inc i)} id value)]]))
-    [:table]
-    (vec (partition 3 fields))))
+(def tz (TimeZone/getDefault))                              ; TODO: consider using UTC for all?
+(def iso8601 "yyyy-MM-dd'T'HH:mm:ssZZ")
 
 (defn format-time
   "formats the time using SimpleDateFormat, the default format is
@@ -48,12 +34,6 @@
   (->>
     (io/slurp-resource "md" filename)
     (md/md-to-html-string)))
-
-(defn gravatar-url [email]
-  (let [url (gravatar email :default :404)]
-    (try (javax.imageio.ImageIO/read (as-url url))
-      url
-      (catch Exception ex nil))))
 
 (defn gen-captcha-text []
   (->> #(rand-int 26) (repeatedly 6) (map (partial + 97)) (map char) (apply str)))

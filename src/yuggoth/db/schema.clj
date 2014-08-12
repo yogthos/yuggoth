@@ -1,4 +1,4 @@
-(ns yuggoth.models.schema
+(ns yuggoth.db.schema
   (:require [clojure.java.jdbc :as sql]))
 
 ;;file table
@@ -61,7 +61,7 @@ eg: (drop-table :users)"
    (sql/drop-table-ddl table)
    (catch Exception _)))
 
-(defn reset-blog [db]  
+(defn reset-blog [db]
   (sql/with-db-transaction [t-conn db]
     (try
         (drop-table :admin)
@@ -72,10 +72,11 @@ eg: (drop-table :users)"
         (drop-table :tag_map)
         (catch java.sql.BatchUpdateException _))
     (sql/db-do-commands
-      t-conn      
+      t-conn
       (create-admin-table)
       (create-blog-table)
       (create-comments-table)
       (create-file-table)
       (create-tag-table)
       (create-tag-map-table))))
+

@@ -1,0 +1,79 @@
+<div class="contents">
+    <div class="post">
+        <div class="entry-title">
+            <h2>Initial Configuration</h2>
+        </div>
+        {% if error %}
+        <div class="error">
+            <p>{{error}}</p>
+        </div>
+        {% endif %}
+        <form action="{{servlet-context}}/blog-setup" method="POST">
+            <h3>DB Configuration</h3>
+            <table>
+                <tr>
+                    <td><label for="host">host</label></td>
+                    <td><input id="host" name="host" tabindex="1" type="text" value="{{config.host}}" /></td>
+                </tr>
+                <tr>
+                    <td><label for="port">port</label></td>
+                    <td><input id="port" name="port" tabindex="2" type="text" value={% if config.port %} "{{config.port}}" {% else %} "5432" {% endif %}/></td>
+                </tr>
+                <tr>
+                    <td><label for="schema">schema</label></td>
+                    <td><input id="schema" name="schema" tabindex="3" type="text" value="{{config.schema}}"/></td>
+                </tr>
+                <tr>
+                    <td><label for="user">schema user</label></td>
+                    <td><input id="user" name="user" tabindex="4" type="text" value="{{config.user}}"/></td>
+                </tr>
+                <tr>
+                    <td><label for="pass">password</label></td>
+                    <td><input id="pass" name="pass" tabindex="5" type="password" /></td>
+                </tr>
+            </table>
+            <h3>Blog Configuration</h3>
+            <table>
+                <tr>
+                    <td><label for="title">Blog title</label></td>
+                    <td><input id="title" name="title" tabindex="6" type="text" value="{{config.title}}"/></td>
+                </tr>
+                <tr>
+                    <td><label for="admin">administrator</label></td>
+                    <td><input id="admin" name="admin" tabindex="7" type="text" value="{{config.admin}}"/></td>
+                </tr>
+                <tr>
+                    <td><label for="admin-pass">password</label></td>
+                    <td><input id="admin-pass" name="admin-pass" tabindex="8" type="password" /></td>
+                </tr>
+                <tr>
+                    <td><label for="admin-pass-repeat">repeat password</label></td>
+                    <td><input id="admin-pass-repeat" name="admin-pass-repeat" tabindex="9" type="password" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ssl-port">ssl port</label></td>
+                    <td><input id="ssl-port" name="ssl-port" tabindex="10" type="text" value={% if config.ssl-port %} "{{config.ssl-port}}" {% else %} "443" {% endif %} /></td>
+                </tr>
+                <tr>
+                    <td>locale</td>
+                    <td>
+                     <select id="locale" name="locale">
+                     {% for locale in locales %}
+                        <option {% ifequal "en" locale %}selected="selected"{% endifequal %}>{{locale}}</option>
+                     {% endfor %}
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ssl">enable SSL</label></td>
+                    <td><input id="ssl" name="ssl" type="checkbox" tabindex="11" value={% if config.ssl %} "{{config.ssl}}" {% else %} "true" {% endif %} /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" tabindex="12" value="initialize" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

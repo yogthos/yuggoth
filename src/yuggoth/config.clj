@@ -1,11 +1,15 @@
 (ns yuggoth.config
-  (:use clojure.java.io yuggoth.models.schema yuggoth.locales environ.core)
+  (:use clojure.java.io
+        yuggoth.db.schema
+        yuggoth.locales
+        environ.core)
   (:import java.io.File
            java.sql.DriverManager
            org.postgresql.ds.PGPoolingDataSource))
 
 (defonce blog-config (atom nil))
 (defonce db (atom nil))
+(defonce configured? (atom nil))
 
 (defn locale []
   (-> (get @blog-config :locale :en) dict))
@@ -19,7 +23,7 @@
       (doto (new File "blog.properties") (.createNewFile))
       url)))
 
-(defn reset [config]
+(defn reset-config! [config]
   (reset! db
           {:datasource
            (doto (new PGPoolingDataSource)
@@ -30,29 +34,28 @@
              (.setPassword     (:pass config)))})
   (reset! blog-config (select-keys config [:ssl :ssl-port :initialized :locale])))
 
-(defn init []
+(defn init! []
   (if-let [host (env :yug-host)]
-    (reset (hash-map :host host,
-                     :schema (env :yug-schema)
-                     :port (Integer/valueOf (env :yug-port))
-                     :user (env :yug-user)
-                     :pass (env :yug-password)
-                     :ssl (Boolean/valueOf (env :yug-ssl))
-                     :ssl-port (Integer/valueOf (env :yug-ssl-port))
-                     :initialized (Boolean/valueOf (env :yug-initialized))
-                     :locale (keyword (env :yug-locale))
-                     ))
+    (reset-config!
+     (hash-map :host host
+               :schema (env :yug-schema)
+               :port (Integer/valueOf (env :yug-port))
+               :user (env :yug-user)
+               :pass (env :yug-password)
+               :ssl (Boolean/valueOf (env :yug-ssl))
+               :ssl-port (Integer/valueOf (env :yug-ssl-port))
+               :initialized (Boolean/valueOf (env :yug-initialized))
+               :locale (keyword (env :yug-locale))))
     (with-open
         [r (java.io.PushbackReader. (reader (load-config-file)))]
       (if-let [config (read r nil nil)]
-        (reset config)))
-    )
+        (reset-config! config))))
+  (println "initialized"))
 
-  (println "intialized"))
-
-(defn save [config]
+(defn save! [config]
   (with-open [con (DriverManager/getConnection
                     (str "jdbc:postgresql://" (:host config) "/" (:schema config)) (:user config) (:pass config))])
   (with-open [w (clojure.java.io/writer (load-config-file))]
     (.write w (str config))
-    (reset config)))
+    (reset-config! config)))
+

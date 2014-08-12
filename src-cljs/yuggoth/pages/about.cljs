@@ -1,13 +1,17 @@
 (ns yuggoth.pages.about
-  (:require [ajax.core :refer [GET POST]]
-            [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [text]]))
-
-
+             :refer [GET
+                     POST
+                     text
+                     markdown
+                     set-title!]]))
 
 (defn about-page []
-  [:div.post
-    [:div.entry-title [:h2 (session/get :entry-title)]]
-    [:div.entry-content "TODO: about"]])
+  (set-title! (text :about))
+  (let [{:keys [about style handle email]} (session/get :profile)]
+    [:div.archives
+     [:div.entry-title [:h2 (str (text :about-title) " " handle)]]
+     [:div.entry-content (markdown about)]
+     [:p [:b email]]]))

@@ -1,22 +1,22 @@
 (ns yuggoth.handler
-  (:use yuggoth.routes.auth
-        yuggoth.routes.archives
-        yuggoth.routes.blog
-        yuggoth.routes.comments
-        yuggoth.routes.upload
-        yuggoth.routes.profile
-        yuggoth.routes.rss
-        compojure.core)
-  (:require [yuggoth.routes.services :refer [service-routes]]
+  (:require [yuggoth.routes.blog :refer [blog-routes]]
+            [yuggoth.routes.services.core :refer [service-routes]]
+            [yuggoth.routes.rss :refer [rss-routes]]
+            [yuggoth.routes.setup :refer [setup-routes]]
+            [yuggoth.session-manager :as session-manager]
             [yuggoth.config :as config]
-            [yuggoth.views.layout :as layout]
-            [noir.util.middleware :as middleware]
-            [noir.response :as resp]
+            [yuggoth.db.core :as db]
+            [yuggoth.middleware :refer [load-middleware]]
+            [compojure.core :refer [defroutes]]
+            [compojure.route :as route]
+            [noir.util.middleware :refer [app-handler]]
             [noir.session :as session]
             [noir.util.cache :as cache]
-            [compojure.route :as route]))
+            [selmer.parser :as parser]
+            [environ.core :refer [env]]
+            [cronj.core :as cronj]))
 
-(defroutes app-routes
+(defroutes base-routes
   (route/resources "/")
   (route/not-found "Not Found"))
 
@@ -26,51 +26,32 @@
    an app server such as Tomcat
    put any initialization code here"
   []
-  (config/init)
+  (config/init!)
+  (reset! config/configured?
+          (boolean (db/get-admin)))
   (cache/set-size! 5)
+  (if (env :dev) (parser/cache-off!))
+  (cronj/start! session-manager/cleanup-job)
   (println "yuggoth started successfully..."))
+
+(defn destroy
+  "destroy will be called when your application
+   shuts down, put any clean up code here"
+  []
+  (println "myapp is shutting down...")
+  (cronj/shutdown! session-manager/cleanup-job)
+  (println "shutdown complete!"))
 
 (defn admin-page [req]
   (session/get :admin))
 
-(defn wrap-ssl-if-selected [app]
-  (if (:ssl @config/blog-config)
-    (fn [req]
-      (if (or (not-any? #(= (:uri req) (str (:context req) %)) ["/login"])
-              (= :https (:scheme req))
-              (= "https" ((:headers req) "x-forwarded-proto")))
-        (app req)
-        (let [host  (-> req
-                        (:headers)
-                        (get "host")
-                        (clojure.string/split #":")
-                        (first))
-              ssl-port (:ssl-port @config/blog-config)]
-          (resp/redirect (str "https://" host ":" ssl-port (:uri req)) :permanent))))
-    app))
-
-(defn wrap-exceptions [app]
-  (fn [request]
-    (try
-      (app request)
-      (catch Exception ex
-        (.printStackTrace ex)
-        {:status 500
-         :headers {"Content-Type" "text/html"}
-         :body (layout/common (config/text :welcome-title)
-                              (config/text :nothing-here))}))))
-
-(def app (middleware/app-handler
-           [auth-routes
-            archive-routes
-            comments-routes
-            upload-routes
-            profile-routes
-            rss-routes
-            blog-routes
-            service-routes
-            app-routes]
-           :middleware [wrap-exceptions
-                        wrap-ssl-if-selected]
-           :access-rules [admin-page]))
+(def app (app-handler
+          [rss-routes
+           blog-routes
+           service-routes
+           setup-routes
+           base-routes]
+           :middleware (load-middleware)
+           :access-rules [admin-page]
+           :formats [:edn]))
 

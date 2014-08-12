@@ -1,55 +1,84 @@
 (ns yuggoth.pages.home
-  (:require [ajax.core :refer [GET POST]]
-            [secretary.core :as secretary
+  (:require [secretary.core :as secretary
              :include-macros true]
             [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
-            [markdown.core :refer [md->html]]
+            [yuggoth.components.sidebar :refer [sidebar]]
+            [yuggoth.components.comments :refer [comments]]
             [yuggoth.util
-             :refer [text
+             :refer [GET
+                     POST
+                     text
+                     markdown
                      link
-                     set-current-post]]))
+                     set-title!
+                     set-recent!
+                     set-current-post!
+                     set-location!
+                     set-post-url]]))
 
+(defn toggle-public! []
+  (POST "/toggle-post"
+        {:params
+         {:post
+          (select-keys
+            (session/get :post)
+            [:id :public])}
+         :handler
+         (fn [[result]]
+          (when (pos? result)
+            (set-recent!)
+            (session/update-in! [:post :public] not)))}))
 
 (defn fetch-post [next?]
   (GET "/blog-post"
-       {:params {:id ((if next? inc dec) (session/get-in [:post :id]))}
-                 :handler set-current-post}))
+       {:params {:id (session/get-in [:post (if next? :next :last)])}
+                 :handler #(do (set-current-post! %)
+                               (set-post-url %))}))
 
-(defn toggle-post [content post-id public]
-  )
+(defn tags []
+  [:div (map (fn [tag]
+               [link {:class "tag"} (str "#/tag/" tag) [:span.tagon tag]])
+             (session/get-in [:post :tags]))])
 
-(defn admin-forms [post-id visible]
-  (when (session/get :admin)
-    [:div
-     [:div [:span.submit
-            {:on-click #(do
-                         (js/alert "toggle")
-                         #_(POST "/toggle-post" {:params {:post-id post-id
-                                                 :public visible}}))}
-            (if visible (text :hide) (text :show))]]
-
-     [:div [:span.submit
-            {:on-click #(do
-                         (js/alet "edit")
-                         #_(POST "/update-post" {:params {:post-id post-id}}))}
-            (text :edit)]]]))
+(defn admin-forms []
+  [:div.post-admin-menu
+    [:div.leftmost
+     [:span.button
+       {:on-click #(toggle-public!)}
+       (if (session/get-in [:post :public])
+         (text :hide) (text :show))]]
+    [:div.leftmost
+     [:span.button
+       {:on-click #(set-location! "#/edit-post")}
+       (text :edit)]]])
 
 (defn post-nav []
-  [:div
-   [:div.leftmost.comment-preview
-    [:a.tagon {:on-click #(fetch-post false)}
-      (text :previous)]]
-   [:div.rightmost.comment-preview
-    [:a.tagon {:on-click #(fetch-post true)}
-      (text :next)]]])
+  [:div.postnav
+   (when (session/get-in [:post :last])
+     [:span.button.leftmost {:on-click #(fetch-post false)}
+      (str "⪦" (text :previous))])
+   (when (session/get-in [:post :next])
+     [:span.button.rightmost {:on-click #(fetch-post true)}
+      (str (text :next) "⪧")])])
+
 
 (defn home-page []
-  (let [{:keys [content time public title author id]}
+  (let [{:keys [id content time title author]}
         (session/get :post)]
-    [:div.post
-     [:div.entry-title [:h2 title ]]
-     [:div.entry-content
-      {:dangerouslySetInnerHTML
-           {:__html (js/marked (str content))}}]
-     [post-nav]]))
+    (set-title! title)
+    [:div.contents
+     (if id
+       [:div.post
+        [:div.entry-title [:h2 title ] [:span time]]
+        (when (and (session/get :admin)
+                   (pos? (session/get-in [:post :id])))
+          [admin-forms])
+        [:div.entry-content
+         [:div (markdown content)]
+         [tags]
+         [post-nav]
+         [:br]
+        [comments]]]
+       [:div (text :loading)])
+     [sidebar]]))

@@ -4,118 +4,131 @@
             [clojure.string :as string]
             [goog.history.EventType :as EventType]
             [reagent.core :as reagent :refer [atom]]
-            [ajax.core :refer [GET POST]]
             [secretary.core :as secretary
              :include-macros true :refer [defroute]]
             [yuggoth.pages.home :refer [home-page]]
+            [yuggoth.pages.upload :refer [upload-page]]
+            [yuggoth.pages.latest-comments :refer [latest-comments-page]]
+            [yuggoth.pages.profile :refer [profile-page]]
             [yuggoth.pages.about :refer [about-page]]
-            [yuggoth.pages.post :refer [edit-post-page]]
+            [yuggoth.pages.post :refer [edit-post-page make-post-page]]
             [yuggoth.pages.archives :refer [archives-page]]
+            [yuggoth.components.login :refer [login-form]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [link
+             :refer [GET
+                     POST
+                     link
                      nav-link
                      text
+                     set-location!
                      hook-browser-navigation!
                      format-title-url
-                     format-time
                      fetch-post
-                     set-current-post]]))
+                     set-current-post!
+                     set-page!
+                     set-admin-page!]]))
 
-(enable-console-print!)
-(def current-page (atom home-page))
+;(enable-console-print!)
 
-(defn set-page! [page]
-  (reset! current-page page))
+(defn fetch-archives! [& [tag]]
+  (GET (if tag (str "/tag/" tag) "/archives")
+       {:handler #(do (session/put! :archives %)
+                      (session/put! :archives-tag tag)
+                      (set-page! archives-page))}))
 
 ;;routes
 (defroute "/" [] (set-page! home-page))
-(defroute "/archives" [] (set-page! archives-page))
-(defroute "/last" [] #_(GET "/last-post" {:params {:id (session/get-in [:post :id])}
-                                         :handler #(session/put! :post %)})
-  (println (str @session/state) #_(session/get-in [:post :id])))
-(defroute "/next" [] (GET "/next-post" {:params {:id (session/get-in [:post :id])}
-                                         :handler #(session/put! :post %)}))
+(defroute "/about" [] (set-page! about-page))
+(defroute "/archives" [] (fetch-archives!))
+(defroute "/latest-comments" [] (set-page! latest-comments-page))
+(defroute "/upload" [] (set-admin-page! upload-page))
+(defroute "/profile" [] (set-admin-page! profile-page))
+(defroute "/make-post" [] (set-admin-page! make-post-page))
+(defroute "/edit-post" [] (set-admin-page! edit-post-page))
+(defroute "/tag/:tag" [tag] (fetch-archives! tag))
+(defroute "/login" [] (session/put! :login true))
 
 (defn header []
   [:div.header [:h1 [:div.site-title js/siteTitle]]])
 
-(defn tag-list []
-  [:p.taglist
-   (for [tag (session/get :tags)]
-     [:div.tag (link (str "/tag/" tag) [:span.tagon tag])])])
+(defn footer []
+  [:div.footer
+   [:p (str "Copyright © 2012-" (.getFullYear (js/Date.)) " ")
+    (session/get-in [:profile :handle])
+    (when-not (session/get :admin) [:span " (" [:a {:on-click #(secretary/dispatch! "#/login")} #_{:href "#/login"} (text :login)] ")"])
+    (text :powered-by)
+    [:a {:href "http://github.com/yogthos/yuggoth"} "Yuggoth"]]])
 
-(defn fetch-archives []
-  (GET "/archives" {:handler #(session/put! :archives %)}))
+(defn logout! []
+  (session/remove! :admin)
+  (set-page! home-page))
 
 (defn menu []
   [:div.menu
    (into
-     (if (session/get :admin)
+    (if (session/get :admin)
        [:ul.menu-items
-        [nav-link "#/logout" :logout]
+        [:li {:on-click
+              #(GET "/logout" {:handler logout!})}
+         [:a (text :logout)]]
         [nav-link "#/profile" :profile]
         [nav-link "#/upload" :upload]
-        [nav-link "#/latest-comments" :latest-comments-title "latest"]
-        [nav-link "#/make-post" :new-post "new-post"]]
+        [nav-link "#/latest-comments" :latest-comments-title]
+        [nav-link "#/make-post" :new-post]]
        [:ul.menu-items])
-     [[:li#rss [:a {:href "/rss"} [:div#rss "rss"]]]
-       [nav-link "#/about" :about-title "about"]
-       [nav-link "#/archives" :archives-title "archives" fetch-archives]
-       [nav-link "#/" :home-title "home"]])])
-
-(defn sidebar []
-  (let [title (session/get :entry-title)]
-    (if (or (= (text :new-post) title) (= (text :edit-post) title))
-      [:div.sidebar-preview
-       [:h2 [:span.render-preview (text :preview-title)]]
-       [:div#post-preview]]
-
-      [:div.sidebar
-       [:h2 (text :recent-posts-title)]
-       (conj
-         [:ul
-          (for [{:keys [id time title]} (reverse (sort-by :time (session/get :recent-posts)))]
-            [:li [:a {:on-click (fetch-post id set-current-post)}
-                  title [:div.date (format-time time)]]])]
-          [nav-link "#/archives" (text :more)])
-       (tag-list)])))
+    [[:li#rss [:a {:href "/rss"} [:div#rss "rss"]]]
+    [nav-link "#/about" :about-title]
+    [nav-link "#/archives" :archives-title]
+    [nav-link "#/" :home-title]])])
 
 (defn page []
   [:div.container
    [header]
    [menu]
-   [:div.contents
-     [@current-page]
-     [sidebar]]])
+   (if-let [current-page (session/get :current-page)]
+     [current-page]
+     [:div.contents [:div.post (text :loading)]])
+   (if (session/get :login)
+     [login-form]
+     [footer])])
 
 (defn parse-post-id [url]
   (let [[x y] (clojure.string/split url #":\d+")]
     (re-find #"\d+" (or y x))))
 
-(defn init []
+(defn set-post-and-home-page! [result]
+  (set-current-post! result)
+  (set-page! home-page))
+
+(defn init! []
+  (if js/admin (session/put! :admin true))
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
-  ;(session/init!)
-  (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
-    (set-page! (or (get {"/archives" archives-page
-                         "/about" about-page}
-                        uri)
-                   home-page)))
-  (fetch-archives)
+  ;;fetch initial data
+  (GET "/profile" {:handler #(session/put! :profile %)})
   (GET "/locale" {:handler #(session/put! :locale %)})
-  (GET "/posts/5" {:handler #(session/put! :recent-posts %)})
-  (GET "/tags" {:handler #(session/put! :tags %)})
-  (if-let [blog-id (parse-post-id (.-URL js/document))]
-    ((fetch-post blog-id #(session/put! :post %)))
-    (GET "/latest-post" {:handler #(session/put! :post %)}))
 
-
+  ;; set the appropriate page based on the URL
+  (let [[_ uri] (.split clojure.string (.-URL js/document) #"\#")]
+    (set-page! (get {"/archives" archives-page
+                     "/about" about-page
+                     "/make-post" make-post-page
+                     "/upload" upload-page
+                     "/" home-page
+                     nil home-page}
+                    uri
+                    home-page)))
+  ;;fetch the post based on the URL
+  (if-let [post-id (parse-post-id (.-URL js/document))]
+    ((fetch-post post-id set-post-and-home-page!))
+    (GET "/latest-post" {:handler set-current-post!}))
+  ;;render the page
   (reagent/render-component
     [page]
     (.getElementById js/document "app")))
 
-(init)
+(init!)
 
 
 

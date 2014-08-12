@@ -4,7 +4,7 @@
             [clojure.xml :as xml]
             [clj-rss.core :as rss]
             [noir.response :as resp]
-            [yuggoth.models.db :as db]
+            [yuggoth.db.core :as db]
             [yuggoth.util :as util]))
 
 (def site-url "http://yogthos.net/")

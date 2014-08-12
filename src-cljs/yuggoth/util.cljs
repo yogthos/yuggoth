@@ -3,12 +3,19 @@
   (:require [yuggoth.session :as session]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
+            [clojure.string :refer [join]]
             [secretary.core :as secretary
              :include-macros true]
-            [ajax.core :refer [GET POST]]
-            [cljs-time.core :as time]
-            [cljs-time.coerce :as time-coerce]
-            [cljs-time.format :as time-format]))
+            [ajax.core :as ajax]))
+
+(defn auth-hash [user pass]
+  (->> (str user ":" pass) (js/btoa) (str "Basic ")))
+
+(defn GET [url params]
+  (ajax/GET (str js/context url) params))
+
+(defn POST [url params]
+  (ajax/POST (str js/context url) params))
 
 (defn error-handler [response]
   (session/reset! {:error response}))
@@ -29,39 +36,78 @@
     (.setEnabled true)))
 
 (defn format-title-url [id title]
-  (if title
-    (let [sb (goog.string.StringBuffer.)]
-      (doseq [c (.toLowerCase  title)]
-        (if (or (= (int c) 32) (and (> (int c) 96) (< (int c) 123)))
-          (.append sb c)))
-      (str id "-" (js/encodeURI (.toString sb))))))
+  (when title
+    (->> (re-seq #"[a-zA-Z0-9]+" title)
+         (clojure.string/join "-")
+         (js/encodeURI)
+         (str id "-"))))
 
-(defn format-time [time & [fmt]]
-  (when time
-    (.toTimeString time)
-    #_(-> (or fmt "dd MMM, yyyy")
-        (time-format/formatter)
-        (time-format/unparse time))))
+(defn link [& [x y & xs :as body]]
+  (if (map? x)
+    [:a (merge {:href y} x) xs]
+    [:a {:href x} (rest body)]))
 
-(defn parse-time [time-str & [time-format]]
-  time-str
-  #_(when time-str
-    (-> (or time-format "yyyy-MM-dd HH:mm:ss.SSS")
-        (time-format/formatter)
-        (time-format/parse time-str))))
+(defn set-post-url [{:keys [id]}]
+  (set! (.-href window.location) (str "/#/blog/" id)))
 
-(defn link [path & body]
-  [:a {:href path} body])
+(defn nav-link [path label & [on-click]]
+  [:li {:on-click on-click} (link path (text label))])
 
-(defn nav-link [path label & [id on-click]]
-  [:li {:id id :on-click on-click} (link path (text label))])
 
-(defn set-current-post [post]
+(defn set-location! [url]
+  (set! (.-href js/location) url))
+
+(defn set-page! [page]
+  (session/put! :current-page page))
+
+(defn set-admin-page! [page]
+  (if (session/get :admin)
+    (set-page! page)
+    (set-location! "/")))
+
+(defn set-title! [title]
+  (set! (.-title js/document) title))
+
+(defn set-recent! []
+  (GET "/posts/5" {:handler #(session/put! :recent-posts %)}))
+
+(defn set-current-post! [post]
   (session/put! :post post)
-  (set! (.-href window.location) (str "/#/blog/" (:id post))))
+  (set-recent!)
+  (GET "/tags" {:handler #(session/put! :tags %)}))
 
 (defn fetch-post [id handler]
   (fn []
     (GET "/blog-post"
          {:params {:id id}
           :handler handler})))
+
+(defn html [content]
+  (let [element (.createElement js/document "div")]
+    (set! (.-innerHTML element) content)
+    (let [nodes (.querySelectorAll element "pre code")]
+      (loop [i (.-length nodes)]
+        (when-not (neg? i)
+          (when-let [item (.item nodes i)]
+            (.highlightBlock js/hljs item))
+          (recur (dec i)))))
+    {:dangerouslySetInnerHTML
+      {:__html (.-innerHTML element)}}))
+
+(defn markdown [text]
+  (-> text str js/marked html))
+
+
+(defn input-value [input]
+  (-> input .-target .-value))
+
+(defn set-value! [target]
+  (fn [source] (reset! target (input-value source))))
+
+(defn text-input [target & [opts]]
+  [:input (merge
+           {:type "text"
+            :on-change (set-value! target)
+            :value @target}
+           opts)])
+
