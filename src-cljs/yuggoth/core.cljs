@@ -21,7 +21,6 @@
                      link
                      nav-link
                      text
-                     set-location!
                      hook-browser-navigation!
                      format-title-url
                      fetch-post

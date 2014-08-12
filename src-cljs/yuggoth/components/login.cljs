@@ -9,8 +9,7 @@
                      POST
                      auth-hash
                      text
-                     text-input
-                     set-location!]]))
+                     text-input]]))
 
 ;;TODO: change login to a modal!
 (defn login! [user pass error]

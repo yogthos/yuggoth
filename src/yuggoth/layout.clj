@@ -9,7 +9,8 @@
             [selmer.parser :as parser]
             [ring.util.response :refer [content-type response]]
             [compojure.response :refer [Renderable]]
-            [environ.core :refer [env]])
+            [environ.core :refer [env]]
+            [throttler.core :refer [throttle-chan throttle-fn]])
   (:import java.util.Calendar))
 
 (def template-path "templates/")
@@ -36,6 +37,8 @@
         response)
       "text/html; charset=utf-8")))
 
-(defn render [template & [params]]
+(defn render-fn [template & [params]]
   (RenderableTemplate. template params))
+
+(def render (throttle-fn render-fn 50 :second))
 

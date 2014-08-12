@@ -53,7 +53,7 @@
     (swap! post assoc :saved true)
     (set-current-post! result)
     (set-page! home-page)
-    (set-location! (str "/#/blog/" (:id @post)))))
+    (set-location! "#/blog/" (:id @post))))
 
 (defn save-post! [post]
   [:div.save-post

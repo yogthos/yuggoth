@@ -17,7 +17,7 @@
             [cronj.core :as cronj]))
 
 (defroutes base-routes
-  (route/resources "/")
+  (cache/cache! :resources (route/resources "/"))
   (route/not-found "Not Found"))
 
 (defn init
@@ -30,6 +30,7 @@
   (reset! config/configured?
           (boolean (db/get-admin)))
   (cache/set-size! 5)
+  (cache/set-timeout! 10)
   (if (env :dev) (parser/cache-off!))
   (cronj/start! session-manager/cleanup-job)
   (println "yuggoth started successfully..."))

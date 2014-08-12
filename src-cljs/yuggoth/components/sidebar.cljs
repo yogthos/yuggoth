@@ -33,7 +33,7 @@
               [:li [:a {:on-click (fetch-post id
                                      #(do
                                         (set-current-post! %)
-                                        (set-location! (str "/#/blog/" (:id %)))))}
+                                        (set-location! "#/blog/" (:id %))))}
                     title [:div.date time]]])
             [link "#/archives" (text :more)]]
          [tag-list]]))))

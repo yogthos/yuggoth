@@ -16,7 +16,7 @@
   [:table
      (for [{:keys [blogid time content author]} (session/get :latest-comments)]
        [:tr.padded [:td [:a {:on-click #(do
-                                          (set-location! (str "/#/blog/" blogid))
+                                          (set-location! "#/blog/" blogid)
                                           (set-page! home-page))}
                          [:p (markdown content)] " - " author]]])])
 

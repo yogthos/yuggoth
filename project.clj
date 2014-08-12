@@ -24,6 +24,7 @@
    [secretary "1.2.0"]
    [cljs-ajax "0.2.6"]
    [markdown-clj "0.9.47"]
+   [throttler "1.0.0"]
    [com.github.kyleburton/clj-bloom "1.0.1"]]
 
   :ring

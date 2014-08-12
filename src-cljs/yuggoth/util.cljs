@@ -42,12 +42,18 @@
          (js/encodeURI)
          (str id "-"))))
 
+(defn url [parts]
+  (if-let [context (not-empty js/context)]
+    (apply (partial str context "/") parts)
+    (apply str parts)))
+
+(defn set-location! [& url-parts]
+  (set! (.-href js/location) (url url-parts)))
 
 (defn set-post-url [{:keys [id]}]
-  (set! (.-href window.location) (str js/context "/#/blog/" id)))
+  (set-location! "#/blog/" id))
 
-(defn set-location! [url]
-  (set! (.-href js/location) (str js/context url)))
+
 
 (defn set-page! [page]
   (session/put! :current-page page))
@@ -105,8 +111,8 @@
 
 (defn link [& [x y & xs :as body]]
   (if (map? x)
-    [:a (merge {:href (str js/context y)} x) xs]
-    [:a {:href (str js/context x)} (rest body)]))
+    [:a (merge {:href (url y)} x) xs]
+    [:a {:href (url x)} (rest body)]))
 
 (defn nav-link [path label & [on-click]]
   [:li {:on-click on-click} (link path (text label))])

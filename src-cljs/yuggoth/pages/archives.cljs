@@ -43,7 +43,7 @@
                #(do
                   (set-current-post! %)
                   (set-page! home-page)
-                  (set-location! (str "/#/blog/" (:id %)))))}
+                  (set-location! "#/blog/" (:id %))))}
          (str time " - " title)]
         (if (session/get :admin)
           [post-visibility id public])])]])
