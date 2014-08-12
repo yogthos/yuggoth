@@ -75,11 +75,11 @@
         [nav-link "#/upload" :upload]
         [nav-link "#/latest-comments" :latest-comments-title]
         [nav-link "#/make-post" :new-post]]
-       [:ul.menu-items])
-      [[:li#rss [:a {:href (str js/context "/rss")} [:span#rss "rss"]]]
-       [nav-link "#/about" :about-title]
-       [nav-link "#/archives" :archives-title]
-       [nav-link "#/" :home-title]])])
+      [:ul.menu-items])
+    [[:li#rss [:a {:href (str js/context "/rss")} [:span#rss "rss"]]]
+     [nav-link "#/about" :about-title]
+     [nav-link "#/archives" :archives-title]
+     [nav-link "#/" :home-title]])])
 
 (defn page []
   [:div.container
