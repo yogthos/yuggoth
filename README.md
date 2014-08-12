@@ -23,7 +23,8 @@ Yuggoth is a blog engine which powers my site at http://yogthos.net
 * syntax highlighting using [syntax highlighter](http://alexgorbatchev.com/SyntaxHighlighter/)
 * file uploads and management through web UI
 * latest comments view
-* toggle post visibility
+* throttling
+* content caching
 * localization
 
 ## Usage
