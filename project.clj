@@ -1,4 +1,4 @@
-(defproject yuggoth "0.5.0-SNAPSHOT"
+(defproject yuggoth "1.0"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
@@ -10,17 +10,21 @@
    [ring-server "0.3.1"]
    [clavatar "0.2.1"]
    [clj-rss "0.1.8"]
+   [commons-codec "1.9"]
    [com.taoensso/timbre "3.2.1"]
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.3.4"]
    [postgresql/postgresql "9.1-901-1.jdbc4"]
    [environ "0.5.0"]
    [selmer "0.6.9"]
-   [org.clojure/clojurescript "0.0-2268"]
+   [im.chit/cronj "1.0.1"]
+   [noir-exception "0.2.2"]
+   [org.clojure/clojurescript "0.0-2280"]
    [reagent "0.4.2"]
    [secretary "1.2.0"]
    [cljs-ajax "0.2.6"]
-   [com.andrewmcveigh/cljs-time "0.1.5"]]
+   [markdown-clj "0.9.47"]
+   [com.github.kyleburton/clj-bloom "1.0.1"]]
 
   :ring
   {:handler yuggoth.handler/app,
@@ -43,10 +47,12 @@
      :optimizations :advanced
      :pretty-print false
      :output-wrapper false
+     :externs ["externs/vendor.js"]
      :closure-warnings {:non-standard-jsdoc :off}}}]}
 
   :profiles
-  {:production
+  {:uberjar {:aot :all}
+   :production
    {:ring
     {:open-browser? false, :stacktraces? false, :auto-reload? false}}
    :dev
@@ -63,6 +69,5 @@
             [lein-environ "0.5.0"]
             [lein-cljsbuild "1.0.3"]
             [lein-ancient "0.5.0"]
-            [lein-asset-minifier "0.1.5"]
-            [lein-cooper "0.0.1"]]
+            [lein-asset-minifier "0.1.5"]]
   :min-lein-version "2.0.0")
