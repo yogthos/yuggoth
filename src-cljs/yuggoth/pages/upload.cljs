@@ -17,15 +17,12 @@
 (defn upload-file! [upload-form-id status]
   (reset! status nil)
   (let [io (IframeIo.)]
-    (gev/listen io
-                (aget goog.net.EventType "SUCCESS")
+    (gev/listen io (aget goog.net.EventType "SUCCESS")
                 #(do
                    (session/update-in! [:files] conj (.getResponseText io))
                    (reset! status [:span (text :file-uploaded)])))
-    (gev/listen io
-                (aget goog.net.EventType "ERROR")
-                #(reset! status
-                         [:span.error (text :error-uploading)]))
+    (gev/listen io (aget goog.net.EventType "ERROR")
+                #(reset! status [:span.error (text :error-uploading)]))
     (.setErrorChecker io #(= "error" (.getResponseText io)))
     (.sendFromForm io
                    (.getElementById js/document upload-form-id)
