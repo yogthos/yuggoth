@@ -35,6 +35,7 @@ can be done on the profile page.
 
 ### Building and deploying using Leiningen
 
+to run in development mode
 ```bash
 lein cljsbuild auto dev
 lein ring server
