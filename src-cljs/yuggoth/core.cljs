@@ -115,8 +115,7 @@
                      "/about" about-page
                      "/make-post" make-post-page
                      "/upload" upload-page
-                     "/" home-page
-                     nil home-page}
+                     "/" home-page}
                     uri
                     home-page)))
   ;;fetch the post based on the URL
