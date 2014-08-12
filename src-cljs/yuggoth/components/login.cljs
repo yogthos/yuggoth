@@ -1,12 +1,13 @@
 (ns yuggoth.components.login
- (:require [ajax.core :refer [GET POST]]
-           [secretary.core :as secretary
+ (:require [secretary.core :as secretary
              :include-macros true]
             [reagent.core :as reagent :refer [atom]]
             [yuggoth.pages.home :refer [home-page]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [auth-hash
+             :refer [GET
+                     POST
+                     auth-hash
                      text
                      text-input
                      set-location!]]))

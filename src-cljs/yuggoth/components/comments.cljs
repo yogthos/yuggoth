@@ -1,9 +1,10 @@
 (ns yuggoth.components.comments
-  (:require [ajax.core :refer [GET POST]]
-            [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [text
+             :refer [GET
+                     POST
+                     text
                      markdown
                      text-input]]))
 

@@ -1,9 +1,10 @@
 (ns yuggoth.pages.profile
-  (:require [ajax.core :refer [GET POST]]
-            [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
             [yuggoth.util
-             :refer [auth-hash
+             :refer [GET
+                     POST
+                     auth-hash
                      text
                      markdown
                      input-value
