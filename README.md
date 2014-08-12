@@ -43,6 +43,7 @@ lein ring server
 
 to run as standalone
 ```bash
+lein cljsbuild clean
 lein cljsbuild once release
 lein ring uberjar
 java -jar target/yuggoth-1.0-standalone.jar
