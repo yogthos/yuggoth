@@ -191,7 +191,7 @@ span {
 .post-admin-menu {
   padding-bottom: 30px;
 }
-.post, .edit-post, .edit-admin, .admin-preview, .post-preview, .save-post {
+.post, .post-mobile, .edit-post, .edit-admin, .admin-preview, .post-preview, .save-post {
     float: left;
     width: 650px;
     padding-bottom: 10px;
@@ -205,6 +205,10 @@ span {
     border-radius: 4px;
 
     padding: 20px;
+}
+.post-mobile {
+  width: 980px;
+  padding: 10px;
 }
 .edit-admin, .admin-preview {
   height: auto;

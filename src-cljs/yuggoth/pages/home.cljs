@@ -69,7 +69,7 @@
     (set-title! title)
     [:div.contents
      (if id
-       [:div.post
+       [:div{:class (if (session/get :mobile?) "post-mobile" "post")}
         [:div.entry-title [:h2 title ] [:span time]]
         (when (and (session/get :admin)
                    (pos? (session/get-in [:post :id])))

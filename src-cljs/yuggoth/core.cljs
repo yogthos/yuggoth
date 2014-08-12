@@ -29,7 +29,7 @@
                      set-page!
                      set-admin-page!]]))
 
-;(enable-console-print!)
+(enable-console-print!)
 
 (defn fetch-archives! [& [tag]]
   (GET (if tag (str "/tag/" tag) "/archives")
@@ -102,6 +102,11 @@
   (set-page! home-page))
 
 (defn init! []
+  (session/put!
+   :mobile?
+   (boolean
+    (re-find #"Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
+             (.-userAgent js/navigator))))
   (if js/admin (session/put! :admin true))
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
