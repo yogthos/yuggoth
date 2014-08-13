@@ -28,7 +28,13 @@
 
 (def search
   (throttle-fn
-   (fn [text] (-> text bloom/search archives-by-date)) 10 :second))
+   (fn [text]
+     (let [result (-> text bloom/search)]
+       (archives-by-date
+        (if (session/get :admin)
+          result
+          (filter #(:public %) result)))))
+   10 :second))
 
 (defn index-posts! []
   (reset! bloom/filters {})
