@@ -3,6 +3,7 @@
             [yuggoth.routes.services.core :refer [service-routes]]
             [yuggoth.routes.rss :refer [rss-routes]]
             [yuggoth.routes.setup :refer [setup-routes]]
+            [yuggoth.routes.services.archives :refer [index-posts!]]
             [yuggoth.session-manager :as session-manager]
             [yuggoth.config :as config]
             [yuggoth.db.core :as db]
@@ -31,6 +32,7 @@
           (boolean (db/get-admin)))
   (cache/set-size! 5)
   (cache/set-timeout! 10)
+  (.start (Thread. (index-posts!)))
   (if (env :dev) (parser/cache-off!))
   (cronj/start! session-manager/cleanup-job)
   (println "yuggoth started successfully..."))

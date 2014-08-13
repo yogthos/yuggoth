@@ -53,8 +53,6 @@
 (defn set-post-url [{:keys [id]}]
   (set-location! "#/blog/" id))
 
-
-
 (defn set-page! [page]
   (session/put! :current-page page))
 
@@ -94,7 +92,6 @@
 
 (defn markdown [text]
   (-> text str js/marked html))
-
 
 (defn input-value [input]
   (-> input .-target .-value))

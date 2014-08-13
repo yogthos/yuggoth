@@ -8,6 +8,7 @@
                      text
                      format-title-url
                      fetch-post
+                     input-value
                      set-page!
                      set-title!
                      set-current-post!
@@ -48,6 +49,21 @@
         (if (session/get :admin)
           [post-visibility id public])])]])
 
+(defn submit-search [search-string]
+  (cond
+   (> (count search-string) 3)
+    (POST "/search-posts" {:params {:text search-string}
+                           :handler #(session/put! :archives %)})
+   (empty? search-string)
+   (GET "/archives" {:handler #(session/put! :archives %)})))
+
+(defn search []
+  (let [search-string (atom nil)]
+    (fn []
+      [:div
+       [:label (text :search)]
+       [:input {:type "text" :on-change #(submit-search (input-value %))}]])))
+
 (defn archives-page []
   (set-title! (text :archives-title))
   [:div.conents
@@ -57,6 +73,8 @@
                (when-let [tag (session/get :archives-tag)]
                   (str " - " tag)))]]
     [:div.entry-content
+     [search]
+     [:hr]
      (reduce
       (fn [groups [date items]]
         (conj groups (make-list date items)))

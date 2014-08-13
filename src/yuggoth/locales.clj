@@ -27,6 +27,7 @@
     :ssl? "enable SSL"
     :initialize "initialize"
 
+    :search "search archives"
     :unkown-user "unkown user"
     :loading "loaging..."
     :save "save"
@@ -128,6 +129,7 @@
     :ssl? "activa SSL"
     :initialize "inicia"
 
+    :search "archivos de búsqueda"
     :unkown-user "usuario desconocido"
     :confirm "estás seguro"
     :yes "sí"

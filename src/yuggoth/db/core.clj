@@ -77,7 +77,7 @@
     (sql/query @db
       [(str "select id, time, title, public" (if full? ", content")
             " from blog " (if (not private?) "where public='true'") " order by id desc "
-            (if limit (str "limit " limit)))])
+            (if (and limit (pos? limit)) (str "limit " limit)))])
     (catch Exception ex nil)))
 
 (defn get-public-post-id [id next?]

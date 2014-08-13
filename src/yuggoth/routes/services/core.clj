@@ -28,6 +28,7 @@
       ~@(butlast body)
       (edn ~(last body))
       (catch Throwable t#
+        (.printStackTrace t#)
         (status 400 (edn {:error (.getMessage t#)})))))
 
 (defmacro POST [uri params & body]
@@ -83,4 +84,5 @@
 
   (GET "/locale" [] (locale))
   (GET "/tags" [] (db/tags))
-  (GET "/archives" [] (get-archives)))
+  (GET "/archives" [] (get-archives))
+  (POST "/search-posts" [text] (search text)))
