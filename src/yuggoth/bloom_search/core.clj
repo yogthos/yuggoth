@@ -24,7 +24,10 @@
    (swap! filters assoc id f)))
 
 (defn contains-words? [words f]
- (not-empty (filter (partial include? f) words)))
+  ;search for any term
+  ;(not-empty (filter (partial include? f) words))
+  ;search for every term
+  (every? #{true} (map (partial include? f) words)))
 
 (defn search [search-string]
   (let [search-terms (get-words search-string)]
