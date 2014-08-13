@@ -8,7 +8,7 @@
                     include?]])
   (:import [java.util BitSet]))
 
-(def threshold 0.1)
+(def threshold 0.2)
 
 (def filters (atom {}))
 
