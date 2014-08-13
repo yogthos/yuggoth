@@ -1,5 +1,6 @@
 (ns yuggoth.bloom-search.core
- (:require [com.github.kyleburton.clj-bloom
+ (:require [clojure.string :as s]
+           [com.github.kyleburton.clj-bloom
             :refer [make-optimal-filter
                     optimal-n-and-k
                     make-permuted-hash-fn
@@ -14,8 +15,8 @@
 
 (defn get-words [string]
  (-> string
-     clojure.string/lower-case
-     (clojure.string/split #"\W")))
+     s/lower-case
+     (s/split #"\W")))
 
 (defn add-filter! [id string]
  (let [words (get-words string)
@@ -24,10 +25,7 @@
    (swap! filters assoc id f)))
 
 (defn contains-words? [words f]
-  ;search for any term
-  ;(not-empty (filter (partial include? f) words))
-  ;search for every term
-  (every? #{true} (map (partial include? f) words)))
+  (every? #{true} (map #(include? f (s/lower-case %)) words)))
 
 (defn search [search-string]
   (let [search-terms (get-words search-string)]
