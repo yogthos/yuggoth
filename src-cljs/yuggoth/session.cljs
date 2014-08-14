@@ -1,7 +1,6 @@
 (ns yuggoth.session
   (:refer-clojure :exclude [get get-in reset! swap!])
-  (:require [reagent.core :as reagent :refer [atom]]
-            [yuggoth.cookies :as cookies]))
+  (:require [reagent.core :as reagent :refer [atom]]))
 
 (def state (atom {}))
 
