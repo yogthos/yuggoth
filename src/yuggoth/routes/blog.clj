@@ -9,5 +9,6 @@
 (defroutes blog-routes
   (GET "/" [] (home-page))
   ;;legacy support
+  (GET "/about" [] (redirect "/#/about"))
   (GET "/blog/:postid" [postid]
    (redirect (str "/#/blog/" postid))))

@@ -1,8 +1,12 @@
 <html>
   <head>
-    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, user-scalable=no">
       <link href="/rss" rel="alternate" title="{{site-title}}" type="application/rss+xml">
       <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/default.min.css">
+      <link rel="shortcut icon" href="{{servlet-context}}//img/favicon.ico" type="image/x-icon">
+	  <link rel="icon" href="{{servlet-context}}//img/favicon.ico" type="image/x-icon">
       {% style "/css/site.min.css" %}
   </head>
 
@@ -11,6 +15,13 @@
           <div id="app">
           </div>
 
+          <!--[if IE]> -->
+          {% script "/vendor/js/es5-shim.min.js" %}
+          {% script "/vendor/js/es5-sham.min.js" %}
+          <!-- <![endif]-->
+          <!--[if lt IE 9]>
+          {% script "/vendor/js/html5shiv.min.js" %}
+          <![endif]-->
           {% script "/vendor/js/marked.min.js" %}
           <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script>
           <script type="text/javascript">
@@ -28,9 +39,10 @@
              <script src="//fb.me/react-0.11.0.min.js"></script>
              {% script "/js/app.js" %}
           {% endif %}
-      {% else %}
-          {% include "templates/setup.html" %}
-      {% endif %}
+          {% else %}
+              {% include "templates/setup.html" %}
+          {% endif %}
+
 
   </body>
 </html>
