@@ -106,7 +106,7 @@
    (boolean
     (re-find #"Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
              (.-userAgent js/navigator))))
-  (if js/admin (session/put! :admin true))
+  (when js/admin (session/put! :admin true))
   (secretary/set-config! :prefix "#")
   (hook-browser-navigation!)
   ;;fetch initial data

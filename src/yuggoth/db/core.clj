@@ -89,12 +89,25 @@
            "select id from blog where id < ? and public='true' order by id desc limit 1")
          id]))))
 
+(defn last-next [post]
+  (-> post
+      (assoc :last (get-public-post-id (:id post) false))
+      (assoc :next (get-public-post-id (:id post) true))))
+
 (defn get-post [id]
   (when-let [post (first (sql/query @db ["select * from blog where id=?" id]))]
-    (-> post
-        (assoc :last (get-public-post-id id false))
-        (assoc :next (get-public-post-id id true))
-        (assoc :tags (tags-by-post id)))))
+    (-> post last-next (assoc :tags (tags-by-post id)))))
+
+(defn get-last-post []
+  (when-let [post (first (sql/query @db ["select * from blog where id = (select max(id) from blog)"]))]
+    (last-next post)))
+
+(defn get-last-public-post []
+  (when-let [post (first (sql/query @db ["select * from blog where public='true' order by id desc limit 1"]))]
+    (last-next post)))
+
+(defn last-post-id []
+  (or (:id (first (sql/query @db ["select id from blog order by id desc limit 1"]))) 0))
 
 (defn update-post! [id title content public]
   (sql/update! @db
@@ -117,18 +130,6 @@
     :blog
     {:public public}
     ["id=?" id]))
-
-(defn get-last-post []
-  (first (sql/query @db ["select * from blog where id = (select max(id) from blog)"])))
-
-(defn get-last-public-post []
-  (when-let [post (first (sql/query @db ["select * from blog where public='true' order by id desc limit 1"]))]
-    (-> post
-        (assoc :last (get-public-post-id (:id post) false))
-        (assoc :next (get-public-post-id (:id post) true)))))
-
-(defn last-post-id []
-  (or (:id (first (sql/query @db ["select id from blog order by id desc limit 1"]))) 0))
 
 ;;comments
 (defn add-comment! [blog-id content author]

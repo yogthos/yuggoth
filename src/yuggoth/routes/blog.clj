@@ -1,7 +1,7 @@
 (ns yuggoth.routes.blog
   (:require [compojure.core :refer [defroutes GET]]
-            [yuggoth.layout :as layout]
-            [noir.response :refer [redirect]]))
+            [noir.response :refer [redirect]]
+            [yuggoth.layout :as layout]))
 
 (defn home-page []
   (layout/render "app.html"))
