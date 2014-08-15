@@ -46,7 +46,7 @@
 (defn tags []
   (map :name (sql/query @db ["select * from tag"])))
 
-(defn add-tag [tag-name & [db]]
+(defn add-tag! [tag-name & [db]]
   (sql/insert! (or db @db)
     :tag {:name (.toLowerCase tag-name)}))
 
@@ -68,7 +68,7 @@
     (sql/with-db-transaction [t-con @db]
       (sql/delete! t-con :tag_map ["blogid=?" id])
         (doseq [tag blog-tags]
-          (if-not (some #{tag} current-tags) (add-tag tag t-con))
+          (if-not (some #{tag} current-tags) (add-tag! tag t-con))
           (tag-post! id tag t-con)))))
 
 ;;blog posts
