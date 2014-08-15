@@ -35,19 +35,20 @@
    date
    [:hr]
    [:ul
-    (for [{:keys [id time title public]} (reverse (sort-by :time items))]
-       ^{:key id}
-       [:li.archive
-        [:a {:class "archive"
-             :on-click
-             (fetch-post id
-               #(do
-                  (set-current-post! %)
-                  (set-page! home-page)
-                  (set-location! "#/blog/" (:id %))))}
-         (str time " - " title)]
-        (if (session/get :admin)
-          [post-visibility id public])])]])
+    (doall
+      (for [{:keys [id time title public]} (reverse (sort-by :time items))]
+        ^{:key id}
+        [:li.archive
+         [:a {:class "archive"
+              :on-click
+              (fetch-post id
+                #(do
+                   (set-current-post! %)
+                   (set-page! home-page)
+                   (set-location! "#/blog/" (:id %))))}
+          (str time " - " title)]
+         (if (session/get :admin)
+           [post-visibility id public])]))]])
 
 (defn submit-search [search-string]
   (cond
