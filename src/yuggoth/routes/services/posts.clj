@@ -46,20 +46,21 @@
 (defn toggle-post! [{:keys [id public]}]
   (db/toggle-post! id (not public)))
 
-(defn post-key [id title public]
-  (format-time {:id id :title title :public public :time (java.util.Date.)}))
+(defn make-filter! [post]
+  (bloom/add-filter!
+   (dissoc post :content) (:content post)))
 
 (defn save-post! [{:keys [id title content tags public] :as post}]
   (when (and title content)
     (if id
-      (do
-        (db/update-post! id title content public)
-        (db/update-tags! id tags)
-        (bloom/add-filter! (post-key id title public) content)
-        (db/get-post id))
+      (let [post (do (db/update-post! id title content public)
+                     (db/update-tags! id tags)
+                     (db/get-post id))]
+        (make-filter! post)
+        post)
       (let [post (db/store-post! title content (:handle (session/get :admin)) public)]
         (db/update-tags! (:id post) tags)
-        (bloom/add-filter! (post-key id title public) content)
+        (make-filter! post)
         post))))
 
 (defn update-tags [tags]

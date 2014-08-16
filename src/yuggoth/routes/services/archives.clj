@@ -29,7 +29,7 @@
 (def search
   (throttle-fn
    (fn [text]
-     (let [result (-> text bloom/search)]
+     (let [result (bloom/search text)]
        (archives-by-date
         (if (session/get :admin)
           result
@@ -37,7 +37,10 @@
    10 :second))
 
 (defn index-posts! []
+  (println "generating bloom filters...")
   (reset! bloom/filters {})
   (doseq [post (db/get-posts -1 true true)]
     (bloom/add-filter! (dissoc post :content)
-                       (:content post))))
+                       (:content post)))
+  (println "finished bloom filter generation"))
+
