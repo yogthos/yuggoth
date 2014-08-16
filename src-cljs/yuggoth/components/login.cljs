@@ -11,6 +11,9 @@
                      text
                      text-input]]))
 
+(defn https? []
+  (= "https:" (.-protocol js/location)))
+
 ;;TODO: change login to a modal!
 (defn login! [user pass error]
   (cond
@@ -31,10 +34,12 @@
         pass (atom nil)
         error (atom nil)]
     (fn []
-      [:div.login-form
+      (if (and js/ssl (not (https?)))
+        [:div.login-form [:div.error "load the page over HTTPS to send the credentials securely!"]]
+        [:div.login-form
         [text-input user {:placeholder (text :user)}]
         [text-input pass {:type "password" :placeholder (text :password)}]
        [:span.button.login-button {:on-click #(session/remove! :login)} (text :cancel)]
         [:span.button.login-button {:on-click #(login! @user @pass error)} (text :login)]
         (if-let [error @error]
-          [:div.error error])])))
+          [:div.error error])]))))

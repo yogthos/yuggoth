@@ -28,6 +28,7 @@
     (content-type
       (->> (assoc params
                   :dev (env :dev)
+                  :ssl (:ssl @blog-config)
                   :configured @configured?
                   :locales (locales)
                   :admin (boolean (session/get :admin))
