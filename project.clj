@@ -65,7 +65,8 @@
 
   :minify-assets
 {:assets
-  {"resources/public/css/site.min.css" "resources/public/css"}}
+  {"resources/public/css/site.min.css"
+   "resources/public/css/screen.css"}}
 
   :plugins [[lein-ring "0.8.3"]
             [lein-environ "0.5.0"]
