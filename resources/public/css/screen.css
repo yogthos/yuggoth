@@ -597,7 +597,12 @@ input {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-
+code, kbd, pre, samp{
+  font-family:monospace, monospace;
+  font-size:85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
 .footer a {
     color: #36bcab;
     text-decoration: none;
