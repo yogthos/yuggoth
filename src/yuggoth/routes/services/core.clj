@@ -1,7 +1,7 @@
 (ns yuggoth.routes.services.core
   (:require [compojure.core :as compojure]
             [noir.util.route :refer [restricted]]
-            [noir.response :refer [edn status content-type]]
+            [noir.response :refer [edn status content-type set-headers]]
             [yuggoth.db.core :as db]
             [yuggoth.config :refer [locale]]
             [yuggoth.routes.services.posts :refer :all]
@@ -11,22 +11,30 @@
             [yuggoth.routes.services.profile :refer :all]
             [yuggoth.routes.services.upload :refer :all]))
 
+(def no-cache {"Cache-Control" "private, no-cache, no-store, must-revalidate"})
+
 ;;helpers
 (defmacro GET [uri params & body]
   `(compojure/GET ~uri ~params
      (do ~@(butlast body)
-       (edn ~(last body)))))
+       (set-headers
+         no-cache
+         (edn ~(last body))))))
 
 (defmacro GET-restricted [uri params & body]
   `(compojure/GET ~uri ~params
      (restricted
        (do ~@(butlast body)
-         (edn ~(last body))))))
+         (set-headers
+         no-cache
+         (edn ~(last body)))))))
 
 (defmacro try-body [body]
   `(try
       ~@(butlast body)
-      (edn ~(last body))
+      (set-headers
+         no-cache
+         (edn ~(last body)))
       (catch Throwable t#
         (.printStackTrace t#)
         (status 400 (edn {:error (.getMessage t#)})))))
