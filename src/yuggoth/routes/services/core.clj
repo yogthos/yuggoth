@@ -14,27 +14,24 @@
 (def no-cache {"Cache-Control" "private, no-cache, no-store, must-revalidate"})
 
 ;;helpers
+(defn edn-response [result]
+  (->> result edn (set-headers no-cache)))
+
 (defmacro GET [uri params & body]
   `(compojure/GET ~uri ~params
      (do ~@(butlast body)
-       (set-headers
-         no-cache
-         (edn ~(last body))))))
+       (edn-response ~(last body)))))
 
 (defmacro GET-restricted [uri params & body]
   `(compojure/GET ~uri ~params
      (restricted
        (do ~@(butlast body)
-         (set-headers
-         no-cache
-         (edn ~(last body)))))))
+         (edn-response ~(last body))))))
 
 (defmacro try-body [body]
   `(try
       ~@(butlast body)
-      (set-headers
-         no-cache
-         (edn ~(last body)))
+      (edn-response ~(last body))
       (catch Throwable t#
         (.printStackTrace t#)
         (status 400 (edn {:error (.getMessage t#)})))))
