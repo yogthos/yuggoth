@@ -15,7 +15,7 @@
    [net.sf.jlue/jlue-core "1.3"]
    [org.clojure/java.jdbc "0.3.4"]
    [postgresql/postgresql "9.1-901-1.jdbc4"]
-   [environ "0.5.0"]
+   [environ "1.0.0"]
    [selmer "0.6.9"]
    [im.chit/cronj "1.0.1"]
    [noir-exception "0.2.2"]
@@ -68,8 +68,8 @@
   {"resources/public/css/site.min.css"
    "resources/public/css/screen.css"}}
 
-  :plugins [[lein-ring "0.8.3"]
-            [lein-environ "0.5.0"]
+  :plugins [[lein-ring "0.8.10"]
+            [lein-environ "1.0.0"]
             [lein-cljsbuild "1.0.3"]
             [lein-ancient "0.5.0"]
             [lein-asset-minifier "0.1.5"]]
