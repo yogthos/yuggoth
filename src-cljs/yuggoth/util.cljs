@@ -11,11 +11,14 @@
 (defn auth-hash [user pass]
   (->> (str user ":" pass) (js/btoa) (str "Basic ")))
 
+(defn millis []
+  (.getTime (js/Date.)))
+
 (defn GET [url params]
-  (ajax/GET (str js/context url) params))
+  (ajax/GET (str js/context url) (assoc params :time (millis))))
 
 (defn POST [url params]
-  (ajax/POST (str js/context url) params))
+  (ajax/POST (str js/context url "?time=" (millis)) params))
 
 (defn error-handler [response]
   (session/reset! {:error response}))
