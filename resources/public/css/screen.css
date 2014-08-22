@@ -530,11 +530,10 @@ input {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-code, kbd, pre, samp{
+code {
+  font-family: 'Vollkorn', sans-serif;
   font-size:10pt;
   background-color: #eee;
-  border-radius: 3px;
-  padding: 2px;
 }
 .footer a {
     color: #36bcab;
