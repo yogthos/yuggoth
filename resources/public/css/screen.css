@@ -1,8 +1,8 @@
 body {
-    background-color: #EEEEEE;
-    color: #555;
-    font-family:"PT Sans","Helvetica Neue",Arial,sans-serif;
-    font-size: 13px;
+    background-color: #FFF;
+    font-family: 'Vollkorn', sans-serif;
+    font-size: 13pt;
+    text-rendering: optimizeLegibility;
     margin: 0;
     text-align: center;
     background-origin: padding-box;
@@ -30,16 +30,14 @@ a {
     height: 66px;
     float: left;
     color: #333;
-    font-family: 'Oswald', Helvetica, Arial, sans-serif;
+    font-family: 'Stalemate', cursive;
     font-weight: bold;
-    font-size: 30px;
-    text-rendering: optimizeLegibility;
     margin-bottom: -1px;
 }
 
 .header h1 {
     margin-top: 2px;
-    font-size: 45px;
+    font-size: 50pt;
     text-align: center;
     color: #FFF;
 }
@@ -48,7 +46,7 @@ a {
     clear: both;
     padding-top: 11px;
     padding-bottom: 10px;
-    background-color: #f9f9f9;
+    background-color: #000;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -63,14 +61,14 @@ a {
 }
 
 .menu a {
-    color: #222;
-    font-family: 'Oswald', Helvetica, Arial, sans-serif;
-    font-size: 18px;
+    color: #fff;
+    font-size: 15pt;
     margin: 0 10px;
     padding: 10px 0;
     text-decoration: none;
     text-transform: uppercase;
     cursor: pointer;
+  border: none;
 }
 .menu a:hover {
     color: #999;
@@ -99,11 +97,6 @@ a {
     padding-left: 5px;
     padding-right: 5px;
     color: #eaeaea;
-    background-color: black;
-    -webkit-box-shadow: 0px 2px 3px #555;
-    -moz-box-shadow: 0px 2px 3px #555;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
 }
 
 .menu ul:after {
@@ -125,15 +118,13 @@ a {
 .sidebar {
     margin-top: 10px;
     margin-left: 15px;
-    font-family: 'Oswald', Helvetica, Arial, sans-serif;
     float: left;
-    text-transform: uppercase;
     line-height: 10px;
     text-align: left;
     max-width: 260px;
 
-    background-color: #f9f9f9;
-    padding: 5px;
+    background-color: #FFF;
+    padding: 10px;
 
     border:1px solid;
     border-color:#ddd;
@@ -147,27 +138,24 @@ a {
 
 .sidebar a {
     text-decoration: none;
-    font-weight:bold;
-    font: 13px Helvetica, Arial, Sans-Serif;
-    color: #555;
+    font-size: 12pt;
+    line-height: 135%;
+    color: #000;
 }
-
 .sidebar .date {
     text-transform: none;
-    color: #555;
-    margin-top: 5px;
     margin-bottom: 20px;
 }
 
 .entry-content pre {
     font-family: "Courier New", Courier, monospace, sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     text-align: left;
     width: 600px;
     white-space: pre-wrap;
     white-space: -moz-pre-wrap !important;
     word-wrap: break-word;
-    background-color: #FFF;
+    background-color: #fefefe;
     padding: 5px;
 
     border:1px solid;
@@ -180,12 +168,9 @@ a {
     border-radius: 10px;
 }
 
-span {
+.contents span {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-    -moz-box-shadow:    inset 0 0 5px #fff;
-    -webkit-box-shadow: inset 0 0 5px #fff;
-    box-shadow:         inset 0 0 5px #fff;
     border-radius: 5px;
 }
 .post-admin-menu {
@@ -200,7 +185,7 @@ span {
     margin: 10px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
-    background-color: #f9f9f9;
+    background-color: #fff;
     border: 1px solid #e5e5e5;
     border-radius: 4px;
 
@@ -265,25 +250,15 @@ span {
 }
 
 .entry-title {
-    font-family: 'Oswald', Helvetica, Arial, sans-serif;
-    line-height: 10px;
+    font-size: 14pt;
     text-align: left;
     text-decoration: none;
-    text-transform: uppercase;
     padding-bottom: 5px;
 }
-.entry-title div {
-    float: right;
-    margin-top: -5px;
-}
+
 .entry-title span {
-    color: #555;
-    cursor:pointer;
-    margin-top: 5px;
-    margin-right: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 11px;
+    color: #444;
+    font-size: 12pt;
 }
 
 .entry-public {
@@ -299,16 +274,12 @@ input[name=public] {
     background-color:#ddd;
 }
 
-p#post-time {
-    margin-top: -15px;
-    font-size: 10px;
-}
-
 .entry-content {
+    font-family: 'Vollkorn', sans-serif;
+    font-size: 16pt;
     text-align:left;
     height: auto;
     clear: both;
-    font-size: 16px;
     float: left;
 }
 
@@ -316,53 +287,31 @@ p#post-time {
   padding-top: 20px;
 }
 
+.comments h1 {
+    font-size: 13pt;
+    font-weight: normal;
+}
 .comments h2 {
-    font-size: 12px;
+    font-size: 12pt;
+    font-weight: normal;
+}
+.comments h3 {
+    font-size: 12pt;
+    font-weight: normal;
+}
+.comments h4 {
+    font-size: 11pt;
+    font-weight: normal;
 }
 
-.comment h4 {
-    font-size: 12px;
+.comment-content {
+    font-size: 12pt;
 }
 
 tr.padded td {
     padding-bottom: 10px;
 }
 
-textarea#comment {
-    background-color: #EEEEEE;
-    width: 600px;
-    height: 100px;
-    margin-bottom: 15px;
-    border:1px solid;
-    border-color:#ccc;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-#comment-content h1 {
-    font-size: 15px;
-}
-
-#comment-content h2 {
-    font-size: 14px;
-}
-
-#comment-content h3 {
-    font-size: 13px;
-}
-
-#comment-content h4 {
-    font-size: 12px;
-}
-
-div#comment-content {
-    min-width: 500px;
-
-    color: #555;
-    font-size: 12px;
-    font-family: Tahoma, sans-serif;
-}
 
 #captcha-image {
     margin: 15px;
@@ -380,23 +329,27 @@ div#comment-content {
 }
 
 .entry-content p {
-    line-height: 135%;
+    line-height: 140%;
 }
 
-.entry-content h1 {
-    font-size: 25px;
+.post-content h1 {
+    font-size: 17pt;
+    font-weight: bold;
 }
 
-.entry-content h2 {
-    font-size: 22px;
+.post-content h2 {
+    font-size: 16pt;
+    font-weight: bold;
 }
 
-.entry-content h3 {
-    font-size: 19px;
+.post-content h3 {
+    font-size: 15pt;
+    font-weight: bold;
 }
 
-.entry-content h4 {
-    font-size: 15px;
+.post-content h4 {
+    font-size: 14pt;
+    font-weight: bold;
 }
 
 .entry-content a img {
@@ -414,26 +367,6 @@ form span {
     border: 1px solid #AAA;
     padding: 1px;
     cursor:pointer;
-}
-
-input#title {
-    width: 520px;
-    min-height: 30px;
-    color: #555;
-    font-size: 25px;
-    border: none;
-    margin-bottom: 25px;
-}
-input#file {
-  width: 260px;
-}
-textarea#content {
-    width: 620px;
-    height: 800px;
-    color: #555;
-    font-size: 16px;
-    border: 2px solid #cccccc;
-    font-family: Tahoma, sans-serif;
 }
 
 .submit {
@@ -455,6 +388,7 @@ textarea#content {
     margin-bottom: 15px;
 }
 .button {
+    font-size: 11pt;
     background-color: #999;
     padding: 3px;
     margin-right: 2px;
@@ -575,8 +509,7 @@ img {
 .footer {
     clear: both;
     color: black;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 11pt;
     height: auto;
     text-align: center;
     min-width: 1000px;
@@ -660,7 +593,7 @@ code, kbd, pre, samp{
 }
 .tag {
     padding: 2px;
-    font-size:90%;
+    font-size: 11pt;
     text-decoration: none;
     margin-bottom: 6px;
     cursor:pointer;
@@ -706,6 +639,7 @@ table.mdhelp td {
 }
 
 .comment-preview {
+  font-size: 12px;
   margin-bottom: 10px;
   background-color: #eee;
   border: 1px solid #ccc;
@@ -713,10 +647,6 @@ table.mdhelp td {
 }
 .toolbar {
     display: none;
-}
-
-b {
-    color: #555;
 }
 
 hr {

@@ -82,7 +82,7 @@
                    (pos? (session/get-in [:post :id])))
           [admin-forms])
         [:div.entry-content
-         [:div (markdown content)]
+         [:div.post-content (markdown content)]
          [tags]
          [post-nav]
          [:br]

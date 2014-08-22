@@ -14,11 +14,11 @@
 (defn millis []
   (.getTime (js/Date.)))
 
-(defn GET [url params]
-  (ajax/GET (str js/context url) (assoc params :time (millis))))
+(defn GET [url & [params]]
+  (ajax/GET (str js/context url) (assoc params :timestamp (millis))))
 
 (defn POST [url params]
-  (ajax/POST (str js/context url "?time=" (millis)) params))
+  (ajax/POST (str js/context url) (assoc params :timestamp (millis))))
 
 (defn error-handler [response]
   (session/reset! {:error response}))
