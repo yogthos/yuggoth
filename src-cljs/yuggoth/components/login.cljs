@@ -35,7 +35,7 @@
         error (atom nil)]
     (fn []
       (if (and js/ssl (not (https?)))
-        [:div.login-form [:div.error "load the page over HTTPS to send the credentials securely!"]]
+        [:div.login-form [:div.error (text :ssl-required)]]
         [:div.login-form
         [text-input user {:placeholder (text :user)}]
         [text-input pass {:type "password" :placeholder (text :password)}]

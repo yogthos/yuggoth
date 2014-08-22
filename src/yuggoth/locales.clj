@@ -25,6 +25,7 @@
     :schema "schema"
     :ssl-port "ssl port"
     :ssl? "enable SSL"
+    :ssl-required "load the page over HTTPS to send the credentials securely!"
     :initialize "initialize"
 
     :search "search archives"
@@ -127,6 +128,7 @@
     :schema "schema"
     :ssl-port "puerto SSL"
     :ssl? "activa SSL"
+    :ssl-required "load the page over HTTPS to send the credentials securely!"
     :initialize "inicia"
 
     :search "archivos de búsqueda"
