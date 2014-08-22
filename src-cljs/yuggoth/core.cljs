@@ -37,7 +37,8 @@
                       (set-page! archives-page))}))
 
 ;;routes
-(defroute "/" [] (set-page! home-page))
+(defroute "/" [] (do (set-page! home-page)
+                     (GET "/latest-post" {:handler set-current-post!})))
 (defroute "/about" [] (set-page! about-page))
 (defroute "/archives" [] (fetch-archives!))
 (defroute "/latest-comments" [] (set-page! latest-comments-page))
