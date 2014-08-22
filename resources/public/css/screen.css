@@ -149,7 +149,7 @@ a {
 
 .entry-content pre {
     font-family: "Courier New", Courier, monospace, sans-serif;
-    font-size: 16px;
+    font-size: 12pt;
     text-align: left;
     width: 600px;
     white-space: pre-wrap;
@@ -531,10 +531,10 @@ input {
     border-radius: 3px;
 }
 code, kbd, pre, samp{
-  font-family:monospace, monospace;
-  font-size:85%;
-  background-color: rgba(0,0,0,0.04);
+  font-size:10pt;
+  background-color: #eee;
   border-radius: 3px;
+  padding: 2px;
 }
 .footer a {
     color: #36bcab;
