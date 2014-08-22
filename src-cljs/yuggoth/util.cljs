@@ -81,17 +81,24 @@
          {:params {:id id}
           :handler handler})))
 
+(defn mounted-component [component handler]
+     (with-meta
+       (fn [] component)
+       {:component-did-mount
+        (fn [this]
+          (let [node (reagent.core/dom-node this)]
+            (handler node)))}))
+
 (defn html [content]
-  (let [element (.createElement js/document "div")]
-    (set! (.-innerHTML element) content)
-    (let [nodes (.querySelectorAll element "pre code")]
-      (loop [i (.-length nodes)]
-        (when-not (neg? i)
-          (when-let [item (.item nodes i)]
-            (.highlightBlock js/hljs item))
-          (recur (dec i)))))
-    {:dangerouslySetInnerHTML
-      {:__html (.-innerHTML element)}}))
+  [(mounted-component
+   [:div {:dangerouslySetInnerHTML
+          {:__html content}}]
+    #(let [nodes (.querySelectorAll % "pre code")]
+       (loop [i (.-length nodes)]
+         (when-not (neg? i)
+           (when-let [item (.item nodes i)]
+             (.highlightBlock js/hljs item))
+           (recur (dec i))))))])
 
 (defn markdown [text]
   (-> text str js/marked html))
