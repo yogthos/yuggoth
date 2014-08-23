@@ -32,24 +32,26 @@
    :init yuggoth.handler/init}
 
   :cljsbuild
- {:builds
-  [{:id "dev"
-    :source-paths ["src-cljs"]
-    :compiler
-    {:optimizations :none
-     :output-to "resources/public/js/app.js"
-     :output-dir "resources/public/js/"
-     :pretty-print true
-     :source-map true}}
-   {:id "release"
-    :source-paths ["src-cljs"]
-    :compiler
-    {:output-to "resources/public/js/app.js"
-     :optimizations :advanced
-     :pretty-print false
-     :output-wrapper false
-     :externs ["externs/vendor.js"]
-     :closure-warnings {:non-standard-jsdoc :off}}}]}
+  {:builds
+   [{:id "dev"
+     :source-paths ["src-cljs"]
+     :compiler
+     {:optimizations :none
+      :output-to "resources/public/js/app.js"
+      :output-dir "resources/public/js/"
+      :pretty-print true
+      :source-map true}}
+    {:id "release"
+     :source-paths ["src-cljs"]
+     :compiler
+     {:output-to "resources/public/js/app.js"
+      :optimizations :advanced
+      :pretty-print false
+      :output-wrapper false
+      :externs ["externs/vendor.js"]
+      :closure-warnings {:non-standard-jsdoc :off}}}]}
+
+  :hooks [minify-assets.plugin/hooks]
 
   :profiles
   {:uberjar {:aot :all}
@@ -64,13 +66,13 @@
     :env {:dev true}}}
 
   :minify-assets
-{:assets
-  {"resources/public/css/site.min.css"
-   "resources/public/css/screen.css"}}
+  {:assets
+    {"resources/public/css/site.min.css"
+     "resources/public/css/screen.css"}}
 
-  :plugins [[lein-ring "0.8.10"]
-            [lein-environ "1.0.0"]
-            [lein-cljsbuild "1.0.3"]
-            [lein-ancient "0.5.0"]
-            [lein-asset-minifier "0.1.5"]]
+    :plugins [[lein-ring "0.8.10"]
+              [lein-environ "1.0.0"]
+              [lein-cljsbuild "1.0.3"]
+              [lein-ancient "0.5.0"]
+              [lein-asset-minifier "0.1.6"]]
   :min-lein-version "2.0.0")
