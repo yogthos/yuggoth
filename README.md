@@ -37,33 +37,29 @@ can be done on the profile page.
 
 ### Building and deploying using Leiningen
 
-to compile CSS assets
-
-```bash
-lein minify-assets
-```
-
 to run in development mode
 ```bash
 lein cljsbuild auto dev
 lein ring server
 ```
 
-to run as standalone
+to package for release
 ```bash
 lein cljsbuild clean
 lein cljsbuild once release
 lein ring uberjar
+```
+
+to make a deployable WAR replace `uberjar` with `uberwar` above
+
+The standalone jar can be run using `java -jar`:
+
+```bash
 java -jar target/yuggoth-1.0-standalone.jar
 ```
 
-setting the `$PORT` environment variable allows changing the port which the standalone instance runs on
+To specify a specific port you can either specify it as an argument or put it in the `$PORT` environment variable
 
-
-to make a deployable WAR
-```bash
-lein ring uberwar
-```
 
 ## License
 
