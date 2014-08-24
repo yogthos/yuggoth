@@ -22,8 +22,7 @@
 
 (defn upload-file! [file]
   (in-try-catch
-   (db/store-file! file)
-   (:filename file)))
+   (db/store-file! file)))
 
 (defn delete-file! [name]
   (in-try-catch (db/delete-file! name)))

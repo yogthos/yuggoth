@@ -23,10 +23,12 @@
   (.replaceAll filename "[^a-zA-Z0-9-\\.]" ""))
 
 (defn store-file! [{:keys [tempfile filename content-type] :as file}]
-  (db-update-or-insert! @db
-    :file
-    {:type content-type :name (fix-file-name filename) :data (to-byte-array tempfile)}
-    ["name=?" filename]))
+  (let [db-file-name (fix-file-name filename)]
+    (db-update-or-insert! @db
+      :file
+      {:type content-type :name db-file-name :data (to-byte-array tempfile)}
+      ["name=?" filename])
+    db-file-name))
 
 (defn list-files []
   (map :name (sql/query @db ["select name from file"])))

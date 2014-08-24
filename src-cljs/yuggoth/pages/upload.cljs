@@ -1,5 +1,7 @@
 (ns yuggoth.pages.upload
-  (:import goog.net.IframeIo)
+  (:import goog.net.IframeIo
+           goog.net.EventType
+           [goog.events EventType])
   (:require [goog.events :as gev]
             [reagent.core :as reagent :refer [atom]]
             [yuggoth.session :as session]
@@ -17,11 +19,11 @@
 (defn upload-file! [upload-form-id status]
   (reset! status nil)
   (let [io (IframeIo.)]
-    (gev/listen io (aget goog.net.EventType "SUCCESS")
+    (gev/listen io goog.net.EventType.SUCCESS
                 #(do
                    (session/update-in! [:files] conj (.getResponseText io))
                    (reset! status [:span (text :file-uploaded)])))
-    (gev/listen io (aget goog.net.EventType "ERROR")
+    (gev/listen io goog.net.EventType.ERROR
                 #(reset! status [:span.error (text :error-uploading)]))
     (.setErrorChecker io #(= "error" (.getResponseText io)))
     (.sendFromForm io
