@@ -147,7 +147,7 @@ a {
     margin-bottom: 20px;
 }
 
-.entry-content pre {
+.entry-content pre>code {
     font-family: "Courier New", Courier, monospace, sans-serif;
     font-size: 12pt;
     text-align: left;
