@@ -148,8 +148,8 @@ a {
 }
 
 .entry-content pre>code {
-    font-family: "Courier New", Courier, monospace, sans-serif;
-    font-size: 12pt;
+    font-family: 'Inconsolata', monospace;
+    font-size: 11pt;
     text-align: left;
     width: 600px;
     white-space: pre-wrap;
