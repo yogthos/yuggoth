@@ -6,6 +6,7 @@
             [reagent.core :as reagent :refer [atom]]
             [secretary.core :as secretary
              :include-macros true :refer [defroute]]
+            [yuggoth.noise :refer [make-noise set-body-background]]
             [yuggoth.pages.home :refer [home-page]]
             [yuggoth.pages.upload :refer [upload-page]]
             [yuggoth.pages.latest-comments :refer [latest-comments-page]]
@@ -101,6 +102,16 @@
   (set-current-post! result)
   (set-page! home-page))
 
+(defn generate-background []
+  (when-not (session/get :mobile?)
+    (set-body-background
+     (make-noise
+      :opacity 1
+      :width 80
+      :height 80
+      :from-color 0xdfdfdf
+      :to-color 0xefefef))))
+
 (defn init! []
   (session/put!
    :mobile?
@@ -126,10 +137,13 @@
   (if-let [post-id (parse-post-id (.-URL js/document))]
     ((fetch-post post-id set-post-and-home-page!))
     (GET "/latest-post" {:handler set-current-post!}))
+
   ;;render the page
   (reagent/render-component
     [page]
-    (.getElementById js/document "app")))
+    (.getElementById js/document "app"))
+  ;;create background noise
+  (generate-background))
 
 (init!)
 
