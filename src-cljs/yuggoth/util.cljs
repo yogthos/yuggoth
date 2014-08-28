@@ -73,6 +73,7 @@
 (defn set-current-post! [post]
   (session/put! :post post)
   (set-recent!)
+  (js/scroll 0 0)
   (GET "/tags" {:handler #(session/put! :tags %)}))
 
 (defn fetch-post [id handler]
