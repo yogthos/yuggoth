@@ -29,7 +29,7 @@
           {% script "/vendor/js/html5shiv.min.js" %}
           <![endif]-->
           {% script "/vendor/js/marked.min.js" %}
-          {% script "/vendor/js/highlight.pack.js" %}
+          <!--[if !IE]> -->{% script "/vendor/js/highlight.pack.js" %}<!-- <![endif]-->
           <script type="text/javascript">
               var admin = {{admin}};
               var ssl = {{ssl}};
