@@ -38,12 +38,12 @@
           </script>
 
           {% if dev %}
-             {% script "/vendor/js/react-0.11.0.js" %}
+             {% script "/vendor/js/react.js" %}
              {% script "/js/goog/base.js" %}
              {% script "/js/app.js" %}
              <script type="text/javascript">goog.require("yuggoth.core");</script>
           {% else %}
-             <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.11.0/react.min.js"></script>
+             <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.11.1/react.min.js"></script>
              {% script "/js/app.js" %}
           {% endif %}
       {% else %}
