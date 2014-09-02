@@ -14,7 +14,6 @@
 (defn https? []
   (= "https:" (.-protocol js/location)))
 
-;;TODO: change login to a modal!
 (defn login! [user pass error]
   (cond
     (empty? user)

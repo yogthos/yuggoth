@@ -20,9 +20,6 @@
 (defn POST [url opts]
   (ajax/POST (str js/context url) opts))
 
-(defn error-handler [response]
-  (session/reset! {:error response}))
-
 (defn text [id]
   (session/get-in [:locale id]))
 
