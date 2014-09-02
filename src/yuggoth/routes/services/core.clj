@@ -17,17 +17,6 @@
 (defn edn-response [result]
   (->> result edn (set-headers no-cache)))
 
-(defmacro GET [uri params & body]
-  `(compojure/GET ~uri ~params
-     (do ~@(butlast body)
-       (edn-response ~(last body)))))
-
-(defmacro GET-restricted [uri params & body]
-  `(compojure/GET ~uri ~params
-     (restricted
-       (do ~@(butlast body)
-         (edn-response ~(last body))))))
-
 (defmacro try-body [body]
   `(try
       ~@(butlast body)
@@ -36,14 +25,20 @@
         (.printStackTrace t#)
         (status 400 (edn {:error (.getMessage t#)})))))
 
+(defmacro GET [uri params & body]
+  `(compojure/GET ~uri ~params (~'try-body ~body)))
+
+(defmacro GET-restricted [uri params & body]
+  `(compojure/GET ~uri ~params
+     (restricted (~'try-body ~body))))
+
 (defmacro POST [uri params & body]
   `(compojure/POST ~uri ~params
      (~'try-body ~body)))
 
 (defmacro POST-restricted [uri params & body]
   `(compojure/POST ~uri ~params
-     (restricted
-       (~'try-body ~body))))
+     (restricted (~'try-body ~body))))
 
 (defmacro POST-restricted-raw [uri params & body]
   `(compojure/POST ~uri ~params
@@ -54,11 +49,8 @@
          (catch Throwable t#
            (.getMessage t#))))))
 
-(defn auth [req]
-  (get-in req [:headers "authorization"]))
-
 (compojure/defroutes service-routes
-  (POST "/login" req (login! (auth req)))
+  (POST "/login" req (login! req))
   (GET "/logout" [] (logout!))
 
   (GET "/tag/:tagname" [tagname] (archives-by-date (db/posts-by-tag tagname)))
