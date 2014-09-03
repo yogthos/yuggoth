@@ -12,6 +12,7 @@
             [compojure.route :as route]
             [noir.util.middleware :refer [app-handler]]
             [noir.session :as session]
+            [noir.response :refer [redirect]]
             [noir.util.cache :as cache]
             [selmer.parser :as parser]
             [environ.core :refer [env]]
