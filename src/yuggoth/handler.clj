@@ -56,5 +56,7 @@
            base-routes]
            :middleware (load-middleware)
            :access-rules [admin-page]
-           :formats [:edn]))
+           :formats [:edn]
+           :session-options {:timeout (* 60 30)
+                             :timeout-response (redirect "/")}))
 
