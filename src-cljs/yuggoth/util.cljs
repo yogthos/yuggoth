@@ -1,6 +1,7 @@
 (ns yuggoth.util
   (:import goog.History)
   (:require [yuggoth.session :as session]
+            [goog.crypt.base64 :as b64]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [clojure.string :refer [join]]
@@ -9,7 +10,7 @@
             [ajax.core :as ajax]))
 
 (defn auth-hash [user pass]
-  (->> (str user ":" pass) (js/btoa) (str "Basic ")))
+  (->> (str user ":" pass) (b64/encodeString) (str "Basic ")))
 
 (defn millis []
   (.getTime (js/Date.)))

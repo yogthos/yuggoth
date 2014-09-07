@@ -1,15 +1,9 @@
 (ns yuggoth.components.login
- (:require [secretary.core :as secretary
-             :include-macros true]
-            [reagent.core :as reagent :refer [atom]]
-            [yuggoth.pages.home :refer [home-page]]
-            [yuggoth.session :as session]
-            [yuggoth.util
-             :refer [GET
-                     POST
-                     auth-hash
-                     text
-                     text-input]]))
+ (:require [secretary.core :as secretary :include-macros true]
+           [reagent.core :as reagent :refer [atom]]
+           [yuggoth.pages.home :refer [home-page]]
+           [yuggoth.session :as session]
+           [yuggoth.util :refer [POST auth-hash text text-input]]))
 
 (defn https? []
   (= "https:" (.-protocol js/location)))
