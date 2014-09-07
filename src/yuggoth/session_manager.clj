@@ -1,20 +1,11 @@
 (ns yuggoth.session-manager
-  (:require [noir.session :refer [mem]]
+  (:require [noir.session :refer [clear-expired-sessions]]
             [cronj.core :refer [cronj]]))
-
-(defn- current-time []
-  (quot (System/currentTimeMillis) 1000))
-
-(defn- expired? [[id session]]
-  (pos? (- (:ring.middleware.session-timeout/idle-timeout session) (current-time))))
-
-(defn- clear-expired [_ _]
-  (swap! mem #(->> % (filter expired?) (into {}))))
 
 (def cleanup-job
   (cronj
    :entries
    [{:id "session-cleanup"
-     :handler clear-expired
+     :handler (fn [_ _] (clear-expired-sessions))
      :schedule "* /30 * * * * *"
      :opts {}}]))
