@@ -4,12 +4,13 @@
             [noir.response :refer [edn status content-type set-headers]]
             [yuggoth.db.core :as db]
             [yuggoth.config :refer [locale]]
-            [yuggoth.routes.services.posts :refer :all]
-            [yuggoth.routes.services.comments :refer :all]
-            [yuggoth.routes.services.archives :refer :all]
-            [yuggoth.routes.services.auth :refer :all]
-            [yuggoth.routes.services.profile :refer :all]
-            [yuggoth.routes.services.upload :refer :all]))
+            [yuggoth.routes.services
+              [posts :refer :all]
+              [comments :refer :all]
+              [archives :refer :all]
+              [auth :refer :all]
+              [profile :refer :all]
+              [upload :refer :all]]))
 
 (def no-cache {"Cache-Control" "private, no-cache, no-store, must-revalidate"})
 
