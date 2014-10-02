@@ -58,7 +58,7 @@ The standalone jar can be run using `java -jar`:
 java -jar target/yuggoth-1.0-standalone.jar
 ```
 
-To specify a different port you can either specify it as an argument or put it in the `$PORT` environment variable
+To specify a different port you can either pass it as an argument or put it in the `$PORT` environment variable
 
 
 ## License
