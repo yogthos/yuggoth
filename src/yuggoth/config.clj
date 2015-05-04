@@ -54,7 +54,7 @@
 
 (defn save! [config]
   (with-open [con (DriverManager/getConnection
-                    (str "jdbc:postgresql://" (:host config) "/" (:schema config)) (:user config) (:pass config))])
+                    (str "jdbc:postgresql://" (:host config) ":" (:port config) "/" (:schema config)) (:user config) (:pass config))])
   (with-open [w (clojure.java.io/writer (load-config-file))]
     (.write w (str config))
     (reset-config! config)))
