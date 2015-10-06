@@ -13,7 +13,7 @@
 > - H. P. Lovecraft, &quot;The Whisperer in Darkness&quot;
 
 
-Yuggoth is a blog engine which used to power my site at http://yogthos.net I recently moved my blog over to use the excellent [Cryogen](https://github.com/lacarmen/cryogen) static site generator.
+Yuggoth is a blog engine which used to power my site at http://yogthos.net I've since moved my blog over to use the excellent [Cryogen](https://github.com/lacarmen/cryogen) static site generator.
 
 ## Features
 
