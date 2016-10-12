@@ -1,3 +1,7 @@
+# DEPRECATED
+
+A lot has changed in Clojure ecosystem since this project was written, and it's no longer representitive of best practices. If you're looking for an example project then please take a look at [memory hole](https://github.com/yogthos/Memory Hole).
+
 # Yuggoth
 
 <img src="https://raw.github.com/yogthos/yuggoth/master/logo.png"
